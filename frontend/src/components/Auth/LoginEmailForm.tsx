@@ -23,7 +23,7 @@ export const LoginEmailForm = () => {
     const handleEmailSubmit = () => {
         const emailExists = checkEmailInDatabase(email);
         if (emailExists) {
-            navigate('/login/password'); // navigate to the password login page
+            navigate('/loginPassword', { state: { email: email } }); // navigate to the password login page
         } else {
             navigate('/signup'); // navigate to the signup page
         }
@@ -32,7 +32,7 @@ export const LoginEmailForm = () => {
     // Placeholder for the actual implementation of email check
     const checkEmailInDatabase = (e: string) => {
         // Implement actual check here...
-        return false;
+        return true;
     };
 
     return (
