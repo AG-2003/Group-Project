@@ -61,7 +61,7 @@ export const LoginPasswordForm = () => {
                 <VStack
                     height="100%"
                 >
-                    <FormControl display="flex-start" flexDirection="column" h="100%" ml={20}>
+                    <FormControl display="flex-start" flexDirection="column" h="100%" ml={20} as="form" onSubmit={handlePwdSubmit}>
                         <Flex alignItems="center" alignSelf="center" mb={3} mt={75}>
                             <IconButton
                                 fontSize="xx-large"
@@ -113,6 +113,7 @@ export const LoginPasswordForm = () => {
                             _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
                             onClick={handlePwdSubmit}
                             alignSelf="center"
+                            type='submit'
                         >
                             Continue
                         </Button>
