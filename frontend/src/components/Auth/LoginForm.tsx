@@ -8,8 +8,18 @@ import {
     Text
 } from '@chakra-ui/react';
 import { FaGoogle, FaMicrosoft, FaMailBulk } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export function LoginForm() {
+
+    let navigate = useNavigate(); // Initialize the navigate function
+
+    // Define a function to handle the email login navigation
+    const handleEmailLoginClick = () => {
+        navigate('/loginEmail'); // Replace '/login/email' with the path to your EmailLogin page
+    };
+
+
     return (
         <Flex
             justifyContent="center"
@@ -35,7 +45,7 @@ export function LoginForm() {
                             h="10%"
                             variant="outline"
                             border="solid 2px black"
-                            _hover={{ bg: "purple.200", color: "black", transform: "scale(1.08)" }}
+                            _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
                         >
                             Continue with Google
                         </Button>
@@ -45,7 +55,7 @@ export function LoginForm() {
                             h="10%"
                             variant="outline"
                             border="solid 2px black"
-                            _hover={{ bg: "purple.200", color: "black", transform: "scale(1.08)" }}
+                            _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
                         >
                             Continue with Microsoft
                         </Button>
@@ -55,7 +65,8 @@ export function LoginForm() {
                             h="10%"
                             variant="outline"
                             border="solid 2px black"
-                            _hover={{ bg: "purple.200", color: "black", transform: "scale(1.08)" }}
+                            _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
+                            onClick={handleEmailLoginClick} // Use the handleEmailLoginClick function here
                         >
                             Continue with Email
                         </Button>
