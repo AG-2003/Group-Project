@@ -21,7 +21,7 @@ export function ForgotPwdForm() {
     const navigate = useNavigate();
 
     const handleRecEmailSubmit = () => {
-        navigate('/enterCode', { state: { recEmail: recEmail } });
+        navigate('/enterCode',);
     }
 
 
@@ -36,7 +36,13 @@ export function ForgotPwdForm() {
                 <VStack
                     height="100%"
                 >
-                    <FormControl as="form" onSubmit={handleRecEmailSubmit} display="flex-start" flexDirection="column" h="100%" ml={20}>
+                    <FormControl
+                        as="form"
+                        onSubmit={() => navigate('/newPwd', { state: { recEmail: recEmail } })}
+                        display="flex-start"
+                        flexDirection="column"
+                        h="100%"
+                        ml={20}>
                         <Flex alignItems="center" alignSelf="center" mb={3} mt={75}>
                             <IconButton
                                 fontSize="xx-large"
@@ -52,7 +58,7 @@ export function ForgotPwdForm() {
                         </Flex>
 
                         <FormHelperText mb={20} alignSelf="center">
-                            We'll send a verification code to your email, then you <br /> can set your new password
+                            Please enter your email so we can send a verification mail.
                         </FormHelperText>
 
                         <Input
@@ -84,7 +90,7 @@ export function ForgotPwdForm() {
                             alignSelf="center"
                             type='submit'
                         >
-                            Send code
+                            Continue
                         </Button>
                     </FormControl>
                 </VStack>

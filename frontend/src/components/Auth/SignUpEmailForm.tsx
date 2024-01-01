@@ -1,41 +1,18 @@
-// pages/EmailLoginPage.tsx
-import React, { useState } from 'react';
-import {
-    VStack,
-    Button,
-    Flex,
-    Box,
-    Text,
-    Input,
-    IconButton,
-    FormControl,
-    FormLabel,
-    FormHelperText,
-} from '@chakra-ui/react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom';
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import { Flex, VStack, FormControl, IconButton, FormLabel, FormHelperText, Input, Button, Box } from "@chakra-ui/react";
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from "react";
 
-export function LoginEmailForm() {
-    const [email, setEmail] = useState('');
+
+export function SignUpEmailForm() {
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const email = location.state?.email; // the email user enters on the first process to see if the email already exists in the databse.
 
-    const handleEmailSubmit = () => {
-        const emailExists = checkEmailInDatabase(email);
-        if (emailExists) {
-            navigate('/loginPassword', { state: { email: email } }); // navigate to the password login page
-        } else {
-            navigate('/signUpEmail', { state: { email: email } }); // navigate to the signup page
-        }
+    const [emailS, setEmailS] = useState<string>(email); // the email the user decides to go with when creating an account, default value is kept as the above email.
 
-    };
-
-    // Placeholder for the actual implementation of email check
-    const checkEmailInDatabase = (e: string) => {
-        // Implement actual check here...
-        return false;
-    };
-
+    // console.log(emailS);
     return (
         <Flex
             justifyContent="center"
@@ -47,7 +24,13 @@ export function LoginEmailForm() {
                 <VStack
                     height="100%"
                 >
-                    <FormControl as="form" onSubmit={handleEmailSubmit} display="flex-start" flexDirection="column" h="100%" ml={20}>
+                    <FormControl
+                        as="form"
+                        onSubmit={() => navigate('/signUpPwd', { state: { emailS: emailS } })}
+                        display="flex-start"
+                        flexDirection="column"
+                        h="100%"
+                        ml={20}>
                         <Flex alignItems="center" alignSelf="center" mb={3} mt={75}>
                             <IconButton
                                 fontSize="xx-large"
@@ -58,12 +41,13 @@ export function LoginEmailForm() {
                                 onClick={() => navigate(-1)}
                             />
                             <FormLabel fontSize="xx-large" fontWeight="bold" color="blackAlpha.800" ml={2}>
-                                Continue with Email
+                                Create an account
                             </FormLabel>
                         </Flex>
 
                         <FormHelperText mb={20} alignSelf="center">
-                            We'll check if you have an account, and help create one <br /> if you don't.
+                            As you don't have an account we will help you create one ! <br />
+                            please enter the email address you'd like to use.
                         </FormHelperText>
 
                         <Input
@@ -71,19 +55,20 @@ export function LoginEmailForm() {
                             h="8%"
                             w="75%"
                             type="email"
-                            value={email}
+                            value={emailS}
                             fontSize="large"
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => setEmailS(e.target.value)}
                             focusBorderColor="purple.600"
                             borderColor="black"
                             borderWidth="2px"
                             alignSelf="center"
                             _hover={{}}
+                            defaultValue={email}
                         />
 
 
                         <Button
-                            isDisabled={!email}
+                            isDisabled={!emailS}
                             h="8%"
                             w="75%"
                             mt={6}
@@ -104,5 +89,5 @@ export function LoginEmailForm() {
                 {/* Other content */}
             </Box>
         </Flex >
-    );
-};
+    )
+}

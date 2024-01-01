@@ -7,6 +7,9 @@ import { EmailLogin } from './pages/Auth/EmailLogin';
 import { LoginPassword } from './pages/Auth/LoginPassword';
 import { Home } from './pages/Home';
 import { ForgotPassword } from './pages/Auth/ForgotPassword';
+import { SignUpEmail } from './pages/Auth/SignUpEmail';
+import { SignUpPassword } from './pages/Auth/SignUpPassword';
+import { NewPassword } from './pages/Auth/NewPassword';
 
 
 function App() {
@@ -17,6 +20,9 @@ function App() {
       <Route path='/loginPassword' element={<LoginPassword />} />
       <Route path='/home' element={<Home />} />
       <Route path='/forgotPwd' element={<ForgotPassword />} />
+      <Route path='/signUpEmail' element={<SignUpEmail />} />
+      <Route path='/signUpPwd' element={<SignUpPassword />} />
+      <Route path='/newPwd' element={<NewPassword />} />
     </Routes>
 
   );

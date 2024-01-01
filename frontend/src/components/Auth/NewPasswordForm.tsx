@@ -1,56 +1,26 @@
-// pages/EmailLoginPage.tsx
-import React, { useState } from 'react';
-import {
-    VStack,
-    Button,
-    Flex,
-    Box,
-    Text,
-    Input,
-    IconButton,
-    FormControl,
-    FormLabel,
-    FormHelperText,
-    Divider,
-    InputGroup,
-    InputRightElement,
-} from '@chakra-ui/react';
-import { ArrowBackIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { ArrowBackIcon, ViewOffIcon, ViewIcon } from "@chakra-ui/icons"
+import { Flex, VStack, FormControl, IconButton, FormLabel, FormHelperText, InputGroup, Input, InputRightElement, Button, Text, Box } from "@chakra-ui/react"
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 
-export function LoginPasswordForm() {
+export function NewPasswordForm() {
 
-    const [pwd, setPwd] = useState('');
     const navigate = useNavigate();
-
     const location = useLocation();
-    const email = location.state?.email;
 
+    const email = location.state?.recEmail
 
-
-    const handlePwdSubmit = () => {
-
-        if (verifyPwd) {
-            navigate('/home');
-        } else {
-            navigate('/forgotPwd');
-        }
-    };
-
-    // Placeholder for the actual implementation of password check
-    const checkPwdInDatabase = (p: string) => {
-        // Implement actual check here...
-        return true;
-    };
-
-    const verifyPwd = checkPwdInDatabase(pwd);
+    const [pwd, setPwd] = useState<string>('');
+    const [rePwd, setRePwd] = useState<string>('');
 
     const [showPwd, setShowPwd] = useState(false);
     const toggleShowPwd = () => setShowPwd(!showPwd);
 
+    const checkPwd = !(pwd == rePwd) || !pwd || !rePwd;
 
     return (
+
         <Flex
             justifyContent="center"
             alignItems="center"
@@ -61,7 +31,14 @@ export function LoginPasswordForm() {
                 <VStack
                     height="100%"
                 >
-                    <FormControl display="flex-start" flexDirection="column" h="100%" ml={20} as="form" onSubmit={handlePwdSubmit}>
+                    <FormControl
+                        display="flex-start"
+                        flexDirection="column"
+                        h="100%"
+                        ml={20}
+                        as="form"
+                        onSubmit={() => { navigate('/home') }}
+                    >
                         <Flex alignItems="center" alignSelf="center" mb={3} mt={75}>
                             <IconButton
                                 fontSize="xx-large"
@@ -72,12 +49,13 @@ export function LoginPasswordForm() {
                                 onClick={() => navigate(-1)}
                             />
                             <FormLabel fontSize="xx-large" fontWeight="bold" color="blackAlpha.800" ml={2}>
-                                Login to your account
+                                Set new Password
                             </FormLabel>
                         </Flex>
 
                         <FormHelperText cursor="default" mb={20} alignSelf="center">
-                            using <span style={{ fontWeight: 'bold' }}>{email}</span>
+                            we have sent a verification mail to <span style={{ fontWeight: 'bold' }}>{email}</span>, <br />please
+                            <span style={{ fontWeight: 'bold' }}> verify</span> your email ID and proceed to setting a password.
                         </FormHelperText>
 
                         <InputGroup h="8%" w="75%">
@@ -101,8 +79,29 @@ export function LoginPasswordForm() {
                             </InputRightElement>
                         </InputGroup>
 
+                        <InputGroup h="8%" w="75%" mt={5}>
+                            <Input
+                                placeholder="Re-enter password"
+                                type={showPwd ? "text" : "password"}
+                                value={rePwd}
+                                onChange={(e) => setRePwd(e.target.value)}
+                                focusBorderColor="purple.600"
+                                borderColor="black"
+                                borderWidth="2px"
+                                _hover={{}}
+                            />
+                            <InputRightElement>
+                                <IconButton
+                                    icon={showPwd ? <ViewOffIcon /> : <ViewIcon />}
+                                    onClick={toggleShowPwd}
+                                    aria-label={showPwd ? "Hide password" : "Show password"}
+                                    variant="relative"
+                                />
+                            </InputRightElement>
+                        </InputGroup>
+
                         <Button
-                            isDisabled={!pwd || !verifyPwd}
+                            isDisabled={checkPwd}
                             h="8%"
                             w="75%"
                             mt={6}
@@ -111,7 +110,7 @@ export function LoginPasswordForm() {
                             borderWidth="2px"
                             borderColor="black"
                             _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
-                            onClick={handlePwdSubmit}
+                            // onClick={handlePwdSubmit}
                             alignSelf="center"
                             type='submit'
                         >
@@ -119,8 +118,15 @@ export function LoginPasswordForm() {
                         </Button>
 
                         {/* Forgot Password text */}
-                        <Text color="black" cursor="pointer" onClick={() => navigate('/forgotPwd')} mt={10} _hover={{ textDecoration: 'underline' }}>
-                            Forgot Password?
+                        <Text
+                            w='fit-content'
+                            color="black"
+                            cursor="pointer"
+                            // onClick={() => navigate('/forgotPwd')}
+                            mt={10}
+                            _hover={{ textDecoration: 'underline' }}
+                        >
+                            Haven't recieved email ? Resend.
                         </Text>
                     </FormControl>
 
@@ -131,5 +137,5 @@ export function LoginPasswordForm() {
                 {/* Other content */}
             </Box>
         </Flex >
-    );
-};
+    )
+}
