@@ -30,7 +30,6 @@ export function SignUpEmailForm() {
             .then(() => {
                 window.localStorage.setItem('emailForSignUp', emailS);
                 alert("the link has successfully been sent, press ok after verifying using the link");
-                navigate('/signUpPwd', { state: { emailS: emailS } });
             })
             .catch((err) => {
                 console.log(`this is the error: ${err.message}`)
