@@ -17,7 +17,7 @@ export function NewPasswordForm() {
     const [showPwd, setShowPwd] = useState(false);
     const toggleShowPwd = () => setShowPwd(!showPwd);
 
-    const checkPwd = !(pwd == rePwd) || !pwd || !rePwd;
+    const checkPwd = !(pwd === rePwd) || !pwd || !rePwd;
 
     return (
 
