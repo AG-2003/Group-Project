@@ -5,7 +5,6 @@ import {
     Button,
     Flex,
     Box,
-    Text,
     Input,
     IconButton,
     FormControl,

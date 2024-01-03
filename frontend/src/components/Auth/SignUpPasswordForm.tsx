@@ -2,6 +2,9 @@ import { ArrowBackIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { Flex, VStack, FormControl, IconButton, FormLabel, FormHelperText, Input, Button, Box, Text, InputGroup, InputRightElement } from "@chakra-ui/react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { auth } from "../../firebase-config";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+
 
 
 export function SignUpPasswordForm() {
@@ -9,7 +12,11 @@ export function SignUpPasswordForm() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const email = location.state?.emailS
+    // const email: string = location.state?.emailS // getting the email the user entered earlier
+
+    const email: string | null = window.localStorage.getItem('emailForSignUp');
+
+
 
     const [pwd, setPwd] = useState<string>('');
     const [rePwd, setRePwd] = useState<string>('');
@@ -17,7 +24,39 @@ export function SignUpPasswordForm() {
     const [showPwd, setShowPwd] = useState(false);
     const toggleShowPwd = () => setShowPwd(!showPwd);
 
-    const checkPwd = !(pwd == rePwd) || !pwd || !rePwd;
+    const checkPwd = !(pwd === rePwd) || !pwd || !rePwd;
+
+
+    // const actionCodeSettings = {
+    //     // URL you want to redirect back to. The domain (www.example.com) for this
+    //     // URL must be in the authorized domains list in the Firebase Console.
+    //     url: 'https://localhost:3000/signUpPwd',
+    //     // This must be true.
+    //     handleCodeInApp: true,
+    //     dynamicLinkDomain: 'localhost'
+    // };
+
+
+
+    async function handleSignUpButtonClick(e: any) {
+        e.preventDefault();
+        if (email === null) {
+            throw new Error("Email is null - can't proceed with user creation.");
+        }
+        await createUserWithEmailAndPassword(auth, email, pwd)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                alert(user.email);
+                console.log(user.emailVerified);
+
+            })
+            .catch((err) => {
+                console.log(`this is the error code: ${err.code} and this is the message: ${err.message}`)
+            })
+    }
+
+
+
 
     return (
         <Flex
@@ -31,12 +70,13 @@ export function SignUpPasswordForm() {
                     height="100%"
                 >
                     <FormControl
+
                         display="flex-start"
                         flexDirection="column"
                         h="100%"
                         ml={20}
                         as="form"
-                        onSubmit={() => { navigate('/home') }}
+                        onSubmit={handleSignUpButtonClick}
                     >
                         <Flex alignItems="center" alignSelf="center" mb={3} mt={75}>
                             <IconButton
@@ -59,6 +99,7 @@ export function SignUpPasswordForm() {
 
                         <InputGroup h="8%" w="75%">
                             <Input
+                                id="pwd"
                                 placeholder="Enter password"
                                 type={showPwd ? "text" : "password"}
                                 value={pwd}
@@ -80,6 +121,7 @@ export function SignUpPasswordForm() {
 
                         <InputGroup h="8%" w="75%" mt={5}>
                             <Input
+                                id="checkPwd"
                                 placeholder="Re-enter password"
                                 type={showPwd ? "text" : "password"}
                                 value={rePwd}
@@ -109,11 +151,10 @@ export function SignUpPasswordForm() {
                             borderWidth="2px"
                             borderColor="black"
                             _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
-                            // onClick={handlePwdSubmit}
                             alignSelf="center"
                             type='submit'
                         >
-                            Continue
+                            Sign Up
                         </Button>
 
                         {/* Forgot Password text */}
