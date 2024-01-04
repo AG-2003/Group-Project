@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./NavItem.scss"; // Make sure to import the SCSS file for styles
+import "./navItem.scss"; // Make sure to import the SCSS file for styles
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 type NavItemProps = {

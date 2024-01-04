@@ -20,7 +20,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../../firebase-config";
-import "./PasswordForm.scss";
+import "./passwordForm.scss";
 
 export function LoginPasswordForm() {
   const [pwd, setPwd] = useState("");
