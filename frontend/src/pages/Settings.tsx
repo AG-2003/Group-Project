@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import SideBar from "../components/Settings_/sideBar";
-import Account from "../components/Settings_/account";
-import Security from "../components/Settings_/security";
-import Preference from "../components/Settings_/preference";
+import SideBar from "../components/Settings_/SideBar";
+import Account from "../components/Settings_/Account";
+import Security from "../components/Settings_/Security";
+import Preference from "../components/Settings_/Preference";
 // import Privacy from './components/privacy';
 
 function Settings() {
@@ -18,13 +18,6 @@ function Settings() {
       preferences: preferenceRef,
       privacy: privacyRef,
     };
-    // const ref = refs[section];
-    // if (ref && ref.current) {
-    //   window.scrollTo({
-    //     top: ref.current.offsetTop - 100, // Adjusted to account for fixed sidebar height
-    //     behavior: "smooth",
-    //   });
-    // }
   };
 
   return (

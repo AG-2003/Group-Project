@@ -1,6 +1,3 @@
-import React from "react";
-
-import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import { Login } from "./pages/Auth/Login";
 import { EmailLogin } from "./pages/Auth/EmailLogin";

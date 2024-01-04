@@ -5,9 +5,9 @@ import collaborate from "../../assets/Collaborate.png";
 import communities from "../../assets/Communities.png";
 import share from "../../assets/Share.png";
 import leaderboard from "../../assets/Leaderboard.png";
-import "./body.scss"; // Make sure to import the SCSS file for styles
+import "./Body.scss"; // Make sure to import the SCSS file for styles
 
-const Landing: React.FC = () => {
+export const Body: React.FC = () => {
   return (
     <div className="landing-container">
       <img
@@ -88,4 +88,4 @@ const Landing: React.FC = () => {
   );
 };
 
-export default Landing;
+export default Body;

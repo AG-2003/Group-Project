@@ -20,8 +20,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../../firebase-config";
-import authBg from "../../assets/auth-bg.png";
-import "./passwordForm.scss";
+import "./PasswordForm.scss";
 
 export function LoginPasswordForm() {
   const [pwd, setPwd] = useState("");

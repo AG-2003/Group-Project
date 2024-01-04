@@ -24,7 +24,7 @@ const SideBar = ({ onNavigate }: Props) => {
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<SearchIcon />}
-        onClick={() => onNavigate("/account")}
+        onClick={() => onNavigate("account")}
       >
         Your account
       </Button>

@@ -1,10 +1,10 @@
-import "./navbar.scss";
+import "./NavBar.scss";
 import logo from "../../assets/logo.png";
 import name from "../../assets/name.png";
-import NavItem from "./navItem";
 import { Link } from "react-router-dom";
+import NavItem from "./NavItem";
 
-const Navbar: React.FC = () => {
+export const Navbar: React.FC = () => {
   return (
     <nav className="nav-bar">
       <div className="logo-and-name">

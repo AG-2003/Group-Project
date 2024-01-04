@@ -13,8 +13,7 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase-config";
 import { sendPasswordResetEmail } from "firebase/auth";
-import "./emailForm.scss";
-import authBg from "../../assets/auth-bg.png";
+import "./EmailForm.scss";
 
 export function ForgotPwdForm() {
   const [recEmail, setRecEmail] = useState<string>("");
