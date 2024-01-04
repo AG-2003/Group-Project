@@ -15,10 +15,6 @@ export function SignUpPasswordForm() {
 
     const email: string = location.state?.emailS // getting the email the user entered earlier
 
-
-
-
-
     const [pwd, setPwd] = useState<string>('');
     const [rePwd, setRePwd] = useState<string>('');
 
@@ -26,18 +22,7 @@ export function SignUpPasswordForm() {
     const toggleShowPwd = () => setShowPwd(!showPwd);
 
     const checkPwd = !(pwd === rePwd) || !pwd || !rePwd;
-
-
-    // const actionCodeSettings = {
-    //     // URL you want to redirect back to. The domain (www.example.com) for this
-    //     // URL must be in the authorized domains list in the Firebase Console.
-    //     url: 'https://localhost:3000/signUpPwd',
-    //     // This must be true.
-    //     handleCodeInApp: true,
-    //     dynamicLinkDomain: 'localhost'
-    // };
-
-
+    
 
     async function handleSignUpButtonClick(e: any) {
         e.preventDefault();

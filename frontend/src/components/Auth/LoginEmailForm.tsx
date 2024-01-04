@@ -23,9 +23,6 @@ export function LoginEmailForm() {
     const navigate = useNavigate();
 
 
-
-
-
     const handleEmailSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
@@ -35,11 +32,8 @@ export function LoginEmailForm() {
             if (emailExists) {
                 navigate('/loginPassword', { state: { email: email } });
             } else {
-                // Add the email to the Firestore database
+
                 navigate('/signUpEmail', { state: { email: email } });
-
-
-                //   navigate('/signUpEmail', { state: { email: email } });
             }
         } catch (err) {
             console.error("Error handling email submission:", err);
@@ -58,9 +52,6 @@ export function LoginEmailForm() {
             return false;
         }
     }
-
-
-
 
     return (
         <Flex

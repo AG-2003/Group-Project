@@ -25,6 +25,7 @@ export function LoginForm() {
         try {
             signInMethod = 'g'
             signInWithRedirect(auth, googleProvider);
+            navigate('/index');
         } catch (err) {
             console.log(err)
         }
@@ -35,6 +36,7 @@ export function LoginForm() {
             // Use signInWithRedirect for Microsoft
             signInMethod = 'm'
             await signInWithRedirect(auth, microsoftProvider);
+            navigate('/index');
         } catch (err) {
             console.error(err);
         }

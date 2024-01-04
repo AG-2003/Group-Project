@@ -45,12 +45,9 @@ export function LoginPasswordForm() {
             })
             .catch((err) => {
                 console.log(err.message)
-                navigate('/forgotpwd')
+                navigate('/forgotpwd') // not implemented yet. 
             });
-
-
     }
-
 
     return (
         <Flex

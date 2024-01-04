@@ -2,9 +2,6 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Flex, VStack, FormControl, IconButton, FormLabel, FormHelperText, Input, Button, Box } from "@chakra-ui/react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from "react";
-import { auth } from "../../firebase-config";
-import { sendSignInLinkToEmail } from "firebase/auth";
-
 
 export function SignUpEmailForm() {
 
@@ -13,32 +10,6 @@ export function SignUpEmailForm() {
     const email: string = location.state?.email; // the email user enters on the first process to see if the email already exists in the databse.
 
     const [emailS, setEmailS] = useState<string>(email); // the email the user decides to go with when creating an account, default value is kept as the above email.
-
-
-    // const actionCodeSettings = {
-    //     // URL you want to redirect back to. The domain (www.example.com) for this
-    //     // URL must be in the authorized domains list in the Firebase Console.
-    //     url: 'http://localhost:3000/signUpPwd',
-    //     // This must be true.
-    //     handleCodeInApp: true,
-
-    // };
-
-    // async function sendVerificationLinkToUser(e: any) {
-    //     e.preventDefault();
-    //     await sendSignInLinkToEmail(auth, emailS, actionCodeSettings)
-    //         .then(() => {
-    //             window.localStorage.setItem('emailForSignUp', emailS);
-    //             alert("the link has successfully been sent, press ok after verifying using the link");
-    //         })
-    //         .catch((err) => {
-    //             console.log(`this is the error: ${err.message}`)
-    //         })
-    //     // .finally(() => {
-
-    //     // })
-    // }
-
 
 
 
