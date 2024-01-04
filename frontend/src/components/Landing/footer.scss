@@ -1,0 +1,49 @@
+.app-footer {
+  background-color: #484c6c; // A light background color to match the app's theme
+  color: white; // Dark text color for readability
+  padding: 1rem 0; // Some padding on top and bottom
+  font-size: 0.95rem; // Slightly smaller font size for footer text
+  margin-top: 2rem;
+
+  .footer-content {
+    display: flex;
+    justify-content: space-around;
+
+    .footer-section {
+      h3 {
+        color: #c4c4ff; // Color for the heading to match the app's theme
+        margin-bottom: 1rem;
+        font-size: 1.2rem; 
+      }
+
+      ul {
+        list-style: none;
+
+        li {
+          margin-bottom: 0.5rem;
+
+          a {
+            text-decoration: none;
+            color: white; // Dark text color for readability
+            transition: color 0.3s ease;
+
+            &:hover {
+              color: #dcdcf6; // Highlight color on hover
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    text-align: center;
+    margin-top: 1rem;
+    border-top: 1px solid #dcdcf6; // A subtle border on top
+    padding-top: 1rem;
+
+    p {
+      margin: 0;
+    }
+  }
+}

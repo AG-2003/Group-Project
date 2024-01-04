@@ -12,7 +12,7 @@ import { HamburgerIcon } from "@chakra-ui/icons";
 import { FiFileText, FiGrid, FiClipboard } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
 import { Link } from "react-router-dom";
-import Modal from "./sub-components/createFile"; // Adjust the import path if needed
+import Modal from "./sub-components/Modal"; // Adjust the import path if needed
 import { useState } from "react";
 
 interface Props {
@@ -57,7 +57,6 @@ const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
         fontSize="20px"
         color="black"
         icon={<HamburgerIcon style={iconStyle} />}
-        // boxSize={8}
         onClick={onToggle}
       />
 
@@ -72,7 +71,6 @@ const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
             Create a design
           </MenuButton>
           <MenuList>
-            {/* <MenuItem icon={<FiFileText />}>Docs</MenuItem> */}
             <MenuItem icon={<FiFileText />} onClick={openModal}>
               Docs
             </MenuItem>

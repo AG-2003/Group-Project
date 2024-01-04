@@ -1,0 +1,60 @@
+.login-form-container {
+    position: relative; // This creates a new stacking context
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('../../assets/auth-bg.png'); // Path to your image file
+    background-size: cover; // Cover the entire area of the container
+    background-position: center; // Center the background image
+    background-repeat: no-repeat; // Do not repeat the image
+    
+    .form-stack {
+      z-index: 1; // Ensure that the form is above the pseudo-element
+      max-width: 400px;
+      height: 400px;
+      padding: 2rem;
+      background-color: #ffffff; // This should be semi-transparent if you want to see the bg through it
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+      border-radius: 8px 0px 0px 8px;
+      align-items: flex-start;
+    }
+
+  .form-title {
+    font-size: 24px; // Convert Chakra UI token to px
+    font-weight: bold;
+    color: #1a202c; // Assuming this is blackAlpha.800 in Chakra UI
+    margin-bottom: 16px;
+  }
+
+  .form-subtitle {
+    font-size: 16px;
+    color: #1a202c; // Assuming this is blackAlpha.800 in Chakra UI
+    margin-bottom: 24px;
+  }
+
+  .button-google,
+  .button-microsoft,
+  .button-email {
+    height: 50px; // Adjust as needed
+    width: 100%;
+    margin-bottom: 16px;
+    border: solid 1px #484c6c;
+    justify-content: flex-start; // Align icon and text to the start
+
+    &:hover {
+      background-color: #c4c4ff; // Assuming this is purple.300 in Chakra UI
+      color: black;
+      transform: scale(1.05);
+    }
+  }
+
+  .empty-stack {
+    z-index: 1; // Also ensure this is above the pseudo-element
+    width: 400px; // Adjust the width as necessary
+    height: 400px;
+    padding: 2rem;
+    background-color: #484c6c; // Assuming this is purple.100 in Chakra UI
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15); // Shadow only on the right edge    
+    border-radius: 0px 8px 8px 0px;
+  }
+}
