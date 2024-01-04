@@ -1,0 +1,17 @@
+.navbar {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  background-color: #202124; // Adjust the color as needed
+  color: white;
+  padding: 0.5rem 1rem;
+
+  .nav-item {
+    margin-right: 1rem;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

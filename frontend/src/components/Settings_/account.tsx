@@ -1,4 +1,4 @@
-import "./settings.css";
+import "./Settings.css";
 import {
   Avatar,
   Box,

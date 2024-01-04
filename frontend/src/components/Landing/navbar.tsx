@@ -1,8 +1,8 @@
-import "./navbar.scss";
+import "./NavBar.scss";
 import logo from "../../assets/logo.png";
 import name from "../../assets/name.png";
 import { Link } from "react-router-dom";
-import NavItem from "./navItem";
+import NavItem from "./NavItem";
 
 export const Navbar: React.FC = () => {
   return (
