@@ -11,7 +11,7 @@ import {
 import { getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
-import "./LoginForm.scss";
+import "./loginForm.scss";
 
 export function LoginForm() {
   const navigate = useNavigate(); // Initialize the navigate function

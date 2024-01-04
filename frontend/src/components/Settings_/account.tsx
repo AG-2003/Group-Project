@@ -1,4 +1,4 @@
-import "./Settings.css";
+import "./settings.css";
 import {
   Avatar,
   Box,
@@ -56,7 +56,7 @@ const Account = () => {
               className="button button-upload"
               colorScheme="purple"
               size="sm"
-              // onClick={() => document.getElementById('file-upload').click()}
+            // onClick={() => document.getElementById('file-upload').click()}
             >
               Upload
             </Button>
