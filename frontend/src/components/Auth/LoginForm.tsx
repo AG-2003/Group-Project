@@ -20,12 +20,12 @@ export function LoginForm() {
     const navigate = useNavigate(); // Initialize the navigate function
 
     let signInMethod = ''
-    const signInWithGoogle = () => {
+    const signInWithGoogle = async () => {
         // Initiates the Google sign-in redirect when this function is called
         try {
             signInMethod = 'g'
-            signInWithRedirect(auth, googleProvider);
-            navigate('/index');
+            await signInWithRedirect(auth, googleProvider);
+
         } catch (err) {
             console.log(err)
         }
@@ -61,25 +61,24 @@ export function LoginForm() {
         }
     }
 
-    useEffect(() => {
-        const handleRedirectSignIn = async () => {
-            try {
-                const result = await getRedirectResult(auth);
-                const user = result?.user;
-                if (user) {
-                    if (signInMethod == 'g') {
-                        saveGoogleUserToFirestore(user);
-                        signInMethod = ''
-                    } else {
-                        saveMicrosoftUserToFirestore(user)
-                        signInMethod = ''
-                    }
+    const handleRedirectSignIn = async () => {
+        try {
+            const result = await getRedirectResult(auth);
+            const user = result?.user;
+            if (user) {
+                if (signInMethod == 'g') {
+                    await saveGoogleUserToFirestore(user);
+                } else {
+                    await saveMicrosoftUserToFirestore(user);
                 }
-            } catch (err) {
-                console.error(err);
+                navigate('/index');  // Navigate to /index here
             }
-        };
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
+    useEffect(() => {
         handleRedirectSignIn();
     }, []);
 

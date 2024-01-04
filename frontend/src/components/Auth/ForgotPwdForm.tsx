@@ -14,16 +14,27 @@ import {
 } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
+import { auth } from "../../firebase-config";
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 export function ForgotPwdForm() {
     const [recEmail, setRecEmail] = useState<string>('');
 
     const navigate = useNavigate();
 
-    const handleRecEmailSubmit = () => {
-        navigate('/enterCode',);
-    }
 
+    const handleRecoveryEmailSubmission = (e: any) => {
+        e.preventDefault();
+        sendPasswordResetEmail(auth, recEmail)
+            .then(() => {
+                console.log(`recovery mail sent to ${recEmail}`);
+                navigate(-1);
+                alert(`please change password through the link sent to your email ID ${recEmail}`)
+            })
+            .catch((err) => {
+                console.log(err.message);
+            })
+    }
 
     return (
         <Flex
@@ -38,7 +49,7 @@ export function ForgotPwdForm() {
                 >
                     <FormControl
                         as="form"
-                        onSubmit={() => navigate('/newPwd', { state: { recEmail: recEmail } })}
+                        onSubmit={handleRecoveryEmailSubmission}
                         display="flex-start"
                         flexDirection="column"
                         h="100%"

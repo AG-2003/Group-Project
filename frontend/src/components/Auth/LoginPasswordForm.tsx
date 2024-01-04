@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { ArrowBackIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../../firebase-config';
 
 
@@ -47,6 +47,18 @@ export function LoginPasswordForm() {
                 console.log(err.message)
                 navigate('/forgotpwd') // not implemented yet. 
             });
+    }
+
+    const handleRecoveryEmailSubmission = (e: any) => {
+        e.preventDefault();
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                console.log(`recovery mail sent to ${email}`);
+                alert(`please change password through the link sent to your email ID ${email} and try again `)
+            })
+            .catch((err) => {
+                console.log(err.message);
+            })
     }
 
     return (
@@ -117,7 +129,7 @@ export function LoginPasswordForm() {
                         </Button>
 
                         {/* Forgot Password text */}
-                        <Text color="black" cursor="pointer" onClick={() => navigate('/forgotPwd')} mt={10} _hover={{ textDecoration: 'underline' }}>
+                        <Text color="black" cursor="pointer" onClick={handleRecoveryEmailSubmission} mt={10} _hover={{ textDecoration: 'underline' }}>
                             Forgot Password?
                         </Text>
                     </FormControl>

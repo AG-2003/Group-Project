@@ -2,6 +2,7 @@ import { ArrowBackIcon, ViewOffIcon, ViewIcon } from "@chakra-ui/icons"
 import { Flex, VStack, FormControl, IconButton, FormLabel, FormHelperText, InputGroup, Input, InputRightElement, Button, Text, Box } from "@chakra-ui/react"
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { auth } from "../../firebase-config";
 
 
 export function NewPasswordForm() {
