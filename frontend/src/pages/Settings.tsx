@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import SideBar from "../components/settings-components/sideBar";
-import Account from "../components/settings-components/Account";
-import Security from "../components/settings-components/security";
-import Preference from "../components/settings-components/preference";
+import SideBar from "../components/Settings_/sideBar";
+import Account from "../components/Settings_/account";
+import Security from "../components/Settings_/security";
+import Preference from "../components/Settings_/preference";
 // import Privacy from './components/privacy';
 
 function Settings() {
