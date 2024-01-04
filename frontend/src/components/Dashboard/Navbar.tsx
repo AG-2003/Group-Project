@@ -49,13 +49,14 @@ const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
       alignItems="center"
       p={1}
       height="30px"
-      bg={"#dcdcf6"}
+      bg={"#484c6c"}
     >
       <IconButton
         bg="inherit"
         aria-label="Menu"
         fontSize="20px"
-        color="black"
+        color="white"
+        colorScheme="purple.100"
         icon={<HamburgerIcon style={iconStyle} />}
         onClick={onToggle}
       />

@@ -17,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm }) => {
   const handleOkClick = () => {
     onConfirm(title);
     setTitle(""); // Clear the title after confirmation
-    navigate("/docs"); // Navigate to the Docs page
+    navigate("/Doc"); // Navigate to the Docs page
   };
 
   return (

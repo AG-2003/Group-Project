@@ -9,6 +9,7 @@ import { NewPassword } from "./pages/Auth/NewPassword";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
+import Doc from "./pages/Doc";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
       <Route path="/Settings" element={<Settings />} />
+      <Route path="/Doc" element={<Doc />} />
     </Routes>
   );
 }

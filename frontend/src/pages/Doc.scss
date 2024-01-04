@@ -1,0 +1,10 @@
+.document-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  .editor-content {
+    display: flex;
+    flex-grow: 1;
+  }
+}
