@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { VStack, Button, Box, HStack, Text } from "@chakra-ui/react";
 import { FaGoogle, FaMicrosoft, FaMailBulk } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -83,39 +83,36 @@ export function LoginForm() {
   }, []);
 
   return (
-    <div>
-      <img src={authBg} alt="Auth Background" className="background-image" />
-      <HStack className="login-form-container" spacing={0}>
-        <VStack className="form-stack">
-          <Text className="form-title">Log in or sign up</Text>
-          <Text className="form-subtitle">
-            Use your email or another service and continue to Joints
-          </Text>
+    <HStack className="login-form-container" spacing={0}>
+      <VStack className="form-stack">
+        <Text className="form-title">Log in or sign up</Text>
+        <Text className="form-subtitle">
+          Use your email or another service and continue to Joints
+        </Text>
 
-          <Button
-            leftIcon={<FaGoogle />}
-            className="button-google"
-            onClick={signInWithGoogle}
-          >
-            Continue with Google
-          </Button>
-          <Button
-            leftIcon={<FaMicrosoft />}
-            className="button-microsoft"
-            onClick={signInWithMicrosoft}
-          >
-            Continue with Microsoft
-          </Button>
-          <Button
-            leftIcon={<FaMailBulk />}
-            className="button-email"
-            onClick={handleEmailLoginClick}
-          >
-            Continue with Email
-          </Button>
-        </VStack>
-        <Box className="empty-stack"></Box>
-      </HStack>
-    </div>
+        <Button
+          leftIcon={<FaGoogle />}
+          className="button-google"
+          onClick={signInWithGoogle}
+        >
+          Continue with Google
+        </Button>
+        <Button
+          leftIcon={<FaMicrosoft />}
+          className="button-microsoft"
+          onClick={signInWithMicrosoft}
+        >
+          Continue with Microsoft
+        </Button>
+        <Button
+          leftIcon={<FaMailBulk />}
+          className="button-email"
+          onClick={handleEmailLoginClick}
+        >
+          Continue with Email
+        </Button>
+      </VStack>
+      <Box className="empty-stack"></Box>
+    </HStack>
   );
 }

@@ -9,7 +9,6 @@ import {
   Input,
   Select,
   VStack,
-  Text,
 } from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
 import { useState } from "react";
@@ -75,12 +74,6 @@ const Account = () => {
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
         {/* Description */}
-        {/* <Box my={4}>
-          <Heading size="sm" mb={3}>Verification Status</Heading>
-          <Text>
-            Haven't recieved email ? Resend.
-          </Text>
-        </Box> */}
         <Box my={4}>
           <Heading size="sm" mb={3}>
             Description

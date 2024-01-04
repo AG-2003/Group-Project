@@ -64,63 +64,60 @@ export function LoginPasswordForm() {
   };
 
   return (
-    <div>
-      <img src={authBg} alt="Auth Background" className="background-image" />
-      <HStack className="login-form-container" spacing={0}>
-        <VStack className="form-stack">
-          <FormControl as="form" onSubmit={handlePwdSubmit}>
-            <Flex>
+    <HStack className="login-form-container" spacing={0}>
+      <VStack className="form-stack">
+        <FormControl as="form" onSubmit={handlePwdSubmit}>
+          <Flex>
+            <IconButton
+              fontSize="x-large"
+              aria-label="Back-button"
+              icon={<ArrowBackIcon />}
+              colorScheme="purple.100"
+              color="black"
+              onClick={() => navigate(-1)}
+              mr={2}
+            />
+            <Text className="form-title">Login to your account</Text>
+          </Flex>
+
+          <Text className="form-subtitle">
+            using <span style={{ fontStyle: "italic" }}>{email}</span>
+          </Text>
+
+          <InputGroup>
+            <Input
+              className="pwd-input"
+              placeholder="Enter password"
+              type={showPwd ? "text" : "password"}
+              value={pwd}
+              onChange={(e) => setPwd(e.target.value)}
+            />
+            <InputRightElement className="pwd-icon">
               <IconButton
-                fontSize="x-large"
-                aria-label="Back-button"
-                icon={<ArrowBackIcon />}
-                colorScheme="purple.100"
-                color="black"
-                onClick={() => navigate(-1)}
-                mr={2}
+                icon={showPwd ? <ViewOffIcon /> : <ViewIcon />}
+                onClick={toggleShowPwd}
+                aria-label={showPwd ? "Hide password" : "Show password"}
+                variant="relative"
               />
-              <Text className="form-title">Login to your account</Text>
-            </Flex>
+            </InputRightElement>
+          </InputGroup>
 
-            <Text className="form-subtitle">
-              using <span style={{ fontStyle: "italic" }}>{email}</span>
-            </Text>
+          <Button
+            // isDisabled={!pwd || !verifyPwd}
+            isDisabled={!pwd}
+            className="auth-button"
+            // onClick={handlePwdSubmit}
+            type="submit"
+          >
+            Continue
+          </Button>
 
-            <InputGroup>
-              <Input
-                className="pwd-input"
-                placeholder="Enter password"
-                type={showPwd ? "text" : "password"}
-                value={pwd}
-                onChange={(e) => setPwd(e.target.value)}
-              />
-              <InputRightElement className="pwd-icon">
-                <IconButton
-                  icon={showPwd ? <ViewOffIcon /> : <ViewIcon />}
-                  onClick={toggleShowPwd}
-                  aria-label={showPwd ? "Hide password" : "Show password"}
-                  variant="relative"
-                />
-              </InputRightElement>
-            </InputGroup>
-
-            <Button
-              // isDisabled={!pwd || !verifyPwd}
-              isDisabled={!pwd}
-              className="auth-button"
-              // onClick={handlePwdSubmit}
-              type="submit"
-            >
-              Continue
-            </Button>
-
-            <Text className="forgot" onClick={handleRecoveryEmailSubmission}>
-              Forgot Password?
-            </Text>
-          </FormControl>
-        </VStack>
-        <Box className="empty-stack"></Box>
-      </HStack>
-    </div>
+          <Text className="forgot" onClick={handleRecoveryEmailSubmission}>
+            Forgot Password?
+          </Text>
+        </FormControl>
+      </VStack>
+      <Box className="empty-stack"></Box>
+    </HStack>
   );
 }

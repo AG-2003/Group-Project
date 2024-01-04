@@ -1,0 +1,97 @@
+// Define the colors from the design
+$color-dark-purple: #484c6c;
+$color-white: #ffffff;
+$color-dropdown-arrow: #ffffff; // Adjust based on design
+
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@600&family=Dosis:wght@600&display=swap');
+
+// Basic reset
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// App overall styling
+.app {
+  font-family: 'Arial', sans-serif;
+}
+
+// Nav bar styling
+.nav-bar {
+  font-family: 'Comfortaa', sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: $color-dark-purple;
+  color: $color-white;
+
+  .logo-and-name {
+    display: flex;
+    align-items: center;
+
+    .logo {
+      height: 50px; // Set the height of your logo
+    }
+
+    .name {
+      height: 50px; // Set the height of your logo
+      margin-left: 1rem;
+    }
+  }
+
+  .nav-items {
+    display: flex;
+
+    .nav-item {
+      margin-right: 5rem;
+      cursor: pointer;
+    }
+  }
+
+  .get-started {
+    background-color: #806cac; // Button background color
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-family: 'Comfortaa', sans-serif;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: rgb(106, 93, 146);
+    }
+  }
+}
+
+// Body content styling
+.body-content img {
+  width: 100%; // Ensure the image takes full width of its container
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .nav-bar {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .logo-and-name {
+      margin-bottom: 1rem;
+    }
+
+    .nav-items {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .nav-item {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .get-started {
+      align-self: center;
+      margin-top: 1rem;
+    }
+  }
+}

@@ -50,41 +50,37 @@ export function LoginEmailForm() {
   };
 
   return (
-    <div>
-      <img src={authBg} alt="Auth Background" className="background-image" />
-      <HStack className="login-form-container" spacing={0}>
-        <VStack className="form-stack">
-          <Flex>
-            <IconButton
-              fontSize="x-large"
-              aria-label="Back-button"
-              icon={<ArrowBackIcon />}
-              colorScheme="purple.100"
-              color="black"
-              onClick={() => navigate(-1)}
-              mr={2}
-            />
-            <Text className="form-title">Continue with Email</Text>
-          </Flex>
-          <Text className="form-subtitle">
-            We'll check if you have an account, and help create one if you
-            don't.
-          </Text>
-          <form onSubmit={handleEmailSubmit}>
-            <Input
-              className="email-input"
-              placeholder="Enter email (work or personal)"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Button className="auth-button" type="submit" isDisabled={!email}>
-              Continue
-            </Button>
-          </form>
-        </VStack>
-        <Box className="empty-stack"></Box>
-      </HStack>
-    </div>
+    <HStack className="login-form-container" spacing={0}>
+      <VStack className="form-stack">
+        <Flex>
+          <IconButton
+            fontSize="x-large"
+            aria-label="Back-button"
+            icon={<ArrowBackIcon />}
+            colorScheme="purple.100"
+            color="black"
+            onClick={() => navigate(-1)}
+            mr={2}
+          />
+          <Text className="form-title">Continue with Email</Text>
+        </Flex>
+        <Text className="form-subtitle">
+          We'll check if you have an account, and help create one if you don't.
+        </Text>
+        <form onSubmit={handleEmailSubmit}>
+          <Input
+            className="email-input"
+            placeholder="Enter email (work or personal)"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Button className="auth-button" type="submit" isDisabled={!email}>
+            Continue
+          </Button>
+        </form>
+      </VStack>
+      <Box className="empty-stack"></Box>
+    </HStack>
   );
 }

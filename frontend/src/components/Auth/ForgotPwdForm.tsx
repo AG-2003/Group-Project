@@ -37,45 +37,38 @@ export function ForgotPwdForm() {
   };
 
   return (
-    <div>
-      <img src={authBg} alt="Auth Background" className="background-image" />
-      <HStack className="login-form-container" spacing={0}>
-        <VStack className="form-stack">
-          <Flex>
-            <IconButton
-              fontSize="x-large"
-              aria-label="Back-button"
-              icon={<ArrowBackIcon />}
-              colorScheme="purple.100"
-              color="black"
-              onClick={() => navigate(-1)}
-              mr={2}
-            />
-            <Text className="form-title">Password retrieval</Text>
-          </Flex>
-          <Text className="form-subtitle">
-            You have entered an incorrect password. Please enter your email so
-            we can send a verification mail.
-          </Text>
-          <form onSubmit={handleRecoveryEmailSubmission}>
-            <Input
-              className="email-input"
-              placeholder="Enter email (work or personal)"
-              type="email"
-              value={recEmail}
-              onChange={(e) => setRecEmail(e.target.value)}
-            />
-            <Button
-              className="auth-button"
-              type="submit"
-              isDisabled={!recEmail}
-            >
-              Continue
-            </Button>
-          </form>
-        </VStack>
-        <Box className="empty-stack"></Box>
-      </HStack>
-    </div>
+    <HStack className="login-form-container" spacing={0}>
+      <VStack className="form-stack">
+        <Flex>
+          <IconButton
+            fontSize="x-large"
+            aria-label="Back-button"
+            icon={<ArrowBackIcon />}
+            colorScheme="purple.100"
+            color="black"
+            onClick={() => navigate(-1)}
+            mr={2}
+          />
+          <Text className="form-title">Password retrieval</Text>
+        </Flex>
+        <Text className="form-subtitle">
+          You have entered an incorrect password. Please enter your email so we
+          can send a verification mail.
+        </Text>
+        <form onSubmit={handleRecoveryEmailSubmission}>
+          <Input
+            className="email-input"
+            placeholder="Enter email (work or personal)"
+            type="email"
+            value={recEmail}
+            onChange={(e) => setRecEmail(e.target.value)}
+          />
+          <Button className="auth-button" type="submit" isDisabled={!recEmail}>
+            Continue
+          </Button>
+        </form>
+      </VStack>
+      <Box className="empty-stack"></Box>
+    </HStack>
   );
 }

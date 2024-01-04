@@ -62,73 +62,70 @@ export function SignUpPasswordForm() {
   }
 
   return (
-    <div>
-      <img src={authBg} alt="Auth Background" className="background-image" />
-      <HStack className="login-form-container" spacing={0}>
-        <VStack className="form-stack">
-          <FormControl as="form" onSubmit={handleSignUpButtonClick}>
-            <Flex>
+    <HStack className="login-form-container" spacing={0}>
+      <VStack className="form-stack">
+        <FormControl as="form" onSubmit={handleSignUpButtonClick}>
+          <Flex>
+            <IconButton
+              fontSize="x-large"
+              aria-label="Back-button"
+              icon={<ArrowBackIcon />}
+              colorScheme="purple.100"
+              color="black"
+              onClick={() => navigate(-1)}
+              mr={2}
+            />
+            <Text className="form-title">Create an account</Text>
+          </Flex>
+
+          <Text className="form-subtitle">
+            Please enter the password you would like to use for your account{" "}
+            <span style={{ fontStyle: "italic" }}>{email}</span>
+          </Text>
+          <InputGroup>
+            <Input
+              className="pwd-input"
+              placeholder="Enter password"
+              type={showPwd ? "text" : "password"}
+              value={pwd}
+              onChange={(e) => setPwd(e.target.value)}
+            />
+            <InputRightElement className="pwd-icon">
               <IconButton
-                fontSize="x-large"
-                aria-label="Back-button"
-                icon={<ArrowBackIcon />}
-                colorScheme="purple.100"
-                color="black"
-                onClick={() => navigate(-1)}
-                mr={2}
+                icon={showPwd ? <ViewOffIcon /> : <ViewIcon />}
+                onClick={toggleShowPwd}
+                aria-label={showPwd ? "Hide password" : "Show password"}
+                variant="relative"
               />
-              <Text className="form-title">Create an account</Text>
-            </Flex>
+            </InputRightElement>
+          </InputGroup>
 
-            <Text className="form-subtitle">
-              Please enter the password you would like to use for your account{" "}
-              <span style={{ fontStyle: "italic" }}>{email}</span>
-            </Text>
-            <InputGroup>
-              <Input
-                className="pwd-input"
-                placeholder="Enter password"
-                type={showPwd ? "text" : "password"}
-                value={pwd}
-                onChange={(e) => setPwd(e.target.value)}
+          <InputGroup>
+            <Input
+              className="pwd-input"
+              placeholder="Re-enter password"
+              type={showPwd ? "text" : "password"}
+              value={rePwd}
+              onChange={(e) => setRePwd(e.target.value)}
+            />
+            <InputRightElement className="pwd-icon">
+              <IconButton
+                icon={showPwd ? <ViewOffIcon /> : <ViewIcon />}
+                onClick={toggleShowPwd}
+                aria-label={showPwd ? "Hide password" : "Show password"}
+                variant="relative"
               />
-              <InputRightElement className="pwd-icon">
-                <IconButton
-                  icon={showPwd ? <ViewOffIcon /> : <ViewIcon />}
-                  onClick={toggleShowPwd}
-                  aria-label={showPwd ? "Hide password" : "Show password"}
-                  variant="relative"
-                />
-              </InputRightElement>
-            </InputGroup>
+            </InputRightElement>
+          </InputGroup>
 
-            <InputGroup>
-              <Input
-                className="pwd-input"
-                placeholder="Re-enter password"
-                type={showPwd ? "text" : "password"}
-                value={rePwd}
-                onChange={(e) => setRePwd(e.target.value)}
-              />
-              <InputRightElement className="pwd-icon">
-                <IconButton
-                  icon={showPwd ? <ViewOffIcon /> : <ViewIcon />}
-                  onClick={toggleShowPwd}
-                  aria-label={showPwd ? "Hide password" : "Show password"}
-                  variant="relative"
-                />
-              </InputRightElement>
-            </InputGroup>
+          <Button isDisabled={checkPwd} className="auth-button" type="submit">
+            Continue
+          </Button>
 
-            <Button isDisabled={checkPwd} className="auth-button" type="submit">
-              Continue
-            </Button>
-
-            <Text className="forgot">Haven't recieved email ? Resend.</Text>
-          </FormControl>
-        </VStack>
-        <Box className="empty-stack"></Box>
-      </HStack>
-    </div>
+          <Text className="forgot">Haven't recieved email ? Resend.</Text>
+        </FormControl>
+      </VStack>
+      <Box className="empty-stack"></Box>
+    </HStack>
   );
 }

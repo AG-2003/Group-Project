@@ -1,0 +1,136 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Foldit&display=swap'); //headings
+@import url('https://fonts.googleapis.com/css2?family=Urbanist&display=swap'); //text
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@600&family=Dosis:wght@600&display=swap'); //button
+
+.background-image {
+  top: 10px;
+  position: fixed;
+  z-index: -1;
+}
+
+.header {
+  width: 90%;
+  margin-top: 1rem;
+  margin-left: 4rem;
+  padding: 20px; 
+  background: linear-gradient(135deg, #5f4b8b 0%, #c4c4ff 100%);
+  border-radius: 15px; 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25); 
+  text-align: center; 
+  transition: transform 0.2s ease-in-out; 
+
+  &:hover {
+    transform: translateY(-5px); 
+  }
+
+  p {
+    font-family: 'Urbanist', sans-serif;
+    font-size: 26px; // Larger font size for more presence
+    color: #fff; // White text for better contrast against the gradient
+    line-height: 1.8; // Increased line height for readability
+    opacity: 0.9; // Slightly transparent for a softer look
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2); // Text shadow for depth
+  }
+
+  .heading {
+    padding: 30px;
+
+    h1 {
+      font-size: 80px; 
+      color: #fff; 
+      font-family: 'Caveat', cursive;
+      margin-bottom: 30px; 
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3); 
+    }
+  }
+}
+.centered-rectangle {
+    width: 90%;
+    margin-top: 1rem;
+    margin-left: 4rem;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    transition: transform 0.2s ease-in-out; // Smooth transition for hover effect
+    
+      &:hover {
+        transform: translateY(-5px); // Slightly larger lift on hover for a dynamic effect
+      }
+
+  p {
+    font-family: 'Urbanist', sans-serif;
+      font-size: 22px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); // Text shadow for depth
+    }
+  
+    .feature {
+      padding: 30px; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+
+      h2 {
+          font-family: 'Caveat', cursive;
+          font-size: 50px;
+          color: #333;
+          font-weight: bold;
+          margin-bottom: 20px;
+          text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+        }
+      
+        button {
+
+          background-color: #806cac; // Button background color
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-family: 'Comfortaa', sans-serif;
+            transition: background-color 0.3s;
+            color: white;
+          
+            &:hover {
+              background-color: rgb(106, 93, 146);
+            }
+        }
+
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+
+        .text-content-left {
+          flex: 1;
+          text-align: left;
+        }
+
+      .image-content-left {
+        flex: 1;
+        img{
+          border-radius: 15px;
+        }
+      }
+
+      .text-content-right {
+        flex: 1;
+        text-align: left;
+        order: 2; 
+        margin-left: 2rem;
+      }
+
+      .image-content-right {
+        flex: 1;
+        order: 1; 
+        img{
+          border-radius: 15px;
+        }
+      }
+    }
+  }

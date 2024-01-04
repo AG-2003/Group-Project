@@ -1,0 +1,58 @@
+.nav-item {
+  position: relative;
+
+  .dropdown-toggle {
+      display: flex; // Use flexbox to align items horizontally
+      align-items: center; // Center items vertically within the button
+      background: none;
+      border: none;
+      cursor: pointer;
+  
+      svg {
+        font-size: 18px;
+        margin-left: 5px;
+      }
+    }
+
+    .arrow {
+      display: inline-block;
+      margin-left: 5px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #ffffff; // Change color as needed
+  
+      &.up {
+        border-top: none;
+        border-bottom: 5px solid #ffffff; // Change color as needed
+      }
+  
+      &.down {
+        border-top: 5px solid #ffffff; // Change color as needed
+        border-bottom: none;
+      }
+    }
+
+  .dropdown-content {
+    display: block;
+    position: absolute;
+    background-color: #f9f9f9; // Your desired background color
+    min-width: 200px; // Your desired width
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); // Your desired shadow
+    z-index: 1;
+    border-radius: 10px;
+    margin-top: 1rem;
+
+    // Additional styles for the dropdown items
+    a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+
+      &:hover {
+        background-color: #f1f1f1; // Your desired hover color
+        border-radius: 10px;      
+      }
+    }
+  }
+}

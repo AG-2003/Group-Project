@@ -54,14 +54,14 @@ const Dashboard: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          {currentComponent === "Profile" && <Profile />}
-          {currentComponent === "Projects" && <Projects />}
+          {currentComponent == "Profile" && <Profile />}
+          {currentComponent == "Projects" && <Projects />}
           {/* {currentComponent == "Templates" && <Templates />} */}
           {/* {currentComponent == "Teams" && <Teams />} */}
           {/* {currentComponent == "Calls" && <Calls />} */}
           {/* {currentComponent == "Calendar" && <Calendar />} */}
           {/* {currentComponent == "Social" && <Social />} */}
-          {currentComponent === "Trash" && <Trash />}
+          {currentComponent == "Trash" && <Trash />}
         </Box>
       </Box>
     </>
