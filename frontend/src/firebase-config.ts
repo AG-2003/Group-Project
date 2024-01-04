@@ -1,8 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getFirestore } from 'firebase/firestore'
 import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
@@ -22,6 +23,19 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
+// initialize firestore database
+export const db = getFirestore(app);
+
+// Microsoft OAuth provider configuration
+export const microsoftProvider = new OAuthProvider('microsoft.com');
+microsoftProvider.setCustomParameters({
+    // Add your Microsoft client_id here
+    clientId: 'ad1d4e30-d1fe-42fb-b88d-5ba541daa3df',
+});
+
+// Google Auth provider configuration
+export const googleProvider = new GoogleAuthProvider();
+
 
 
 export const auth = getAuth(app);

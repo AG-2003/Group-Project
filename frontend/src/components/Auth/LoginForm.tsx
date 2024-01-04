@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     VStack,
     Button,
@@ -9,11 +9,77 @@ import {
 } from '@chakra-ui/react';
 import { FaGoogle, FaMicrosoft, FaMailBulk } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { auth, googleProvider, db, microsoftProvider } from "../../firebase-config"
+import { getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
+import { User } from 'firebase/auth'; // Import the User type from your Firebase authentication library
+
 
 export function LoginForm() {
 
-    let navigate = useNavigate(); // Initialize the navigate function
+    const navigate = useNavigate(); // Initialize the navigate function
 
+    let signInMethod = ''
+    const signInWithGoogle = () => {
+        // Initiates the Google sign-in redirect when this function is called
+        try {
+            signInMethod = 'g'
+            signInWithRedirect(auth, googleProvider);
+        } catch (err) {
+            console.log(err)
+        }
+    };
+
+    const signInWithMicrosoft = async () => {
+        try {
+            // Use signInWithRedirect for Microsoft
+            signInMethod = 'm'
+            await signInWithRedirect(auth, microsoftProvider);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const saveGoogleUserToFirestore = async (user: User) => {
+        if (user != null) {
+            const userRef = doc(db, 'users', user.uid);
+            setDoc(userRef, {
+                email: user?.email,
+
+            });
+        }
+    }
+
+    const saveMicrosoftUserToFirestore = (user: User | null) => {
+        if (user != null) {
+            const userRef = doc(db, 'users', user.uid);
+            setDoc(userRef, {
+                email: user?.email,
+            });
+        }
+    }
+
+    useEffect(() => {
+        const handleRedirectSignIn = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                const user = result?.user;
+                if (user) {
+                    if (signInMethod == 'g') {
+                        saveGoogleUserToFirestore(user);
+                        signInMethod = ''
+                    } else {
+                        saveMicrosoftUserToFirestore(user)
+                        signInMethod = ''
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        handleRedirectSignIn();
+    }, []);
 
 
 
@@ -43,6 +109,7 @@ export function LoginForm() {
                             variant="outline"
                             border="solid 2px black"
                             _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
+                            onClick={signInWithGoogle}
                         >
                             Continue with Google
                         </Button>
@@ -53,6 +120,7 @@ export function LoginForm() {
                             variant="outline"
                             border="solid 2px black"
                             _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
+                            onClick={signInWithMicrosoft}
                         >
                             Continue with Microsoft
                         </Button>
@@ -63,7 +131,7 @@ export function LoginForm() {
                             variant="outline"
                             border="solid 2px black"
                             _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
-                            onClick={() => { navigate('/loginEmail') }} // Use the handleEmailLoginClick function here
+                            onClick={() => { navigate('/loginEmail') }}
                         >
                             Continue with Email
                         </Button>

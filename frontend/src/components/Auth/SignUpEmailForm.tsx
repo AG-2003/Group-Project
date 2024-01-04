@@ -15,29 +15,29 @@ export function SignUpEmailForm() {
     const [emailS, setEmailS] = useState<string>(email); // the email the user decides to go with when creating an account, default value is kept as the above email.
 
 
-    const actionCodeSettings = {
-        // URL you want to redirect back to. The domain (www.example.com) for this
-        // URL must be in the authorized domains list in the Firebase Console.
-        url: 'http://localhost:3000/signUpPwd',
-        // This must be true.
-        handleCodeInApp: true,
+    // const actionCodeSettings = {
+    //     // URL you want to redirect back to. The domain (www.example.com) for this
+    //     // URL must be in the authorized domains list in the Firebase Console.
+    //     url: 'http://localhost:3000/signUpPwd',
+    //     // This must be true.
+    //     handleCodeInApp: true,
 
-    };
+    // };
 
-    async function sendVerificationLinkToUser(e: any) {
-        e.preventDefault();
-        await sendSignInLinkToEmail(auth, emailS, actionCodeSettings)
-            .then(() => {
-                window.localStorage.setItem('emailForSignUp', emailS);
-                alert("the link has successfully been sent, press ok after verifying using the link");
-            })
-            .catch((err) => {
-                console.log(`this is the error: ${err.message}`)
-            })
-        // .finally(() => {
+    // async function sendVerificationLinkToUser(e: any) {
+    //     e.preventDefault();
+    //     await sendSignInLinkToEmail(auth, emailS, actionCodeSettings)
+    //         .then(() => {
+    //             window.localStorage.setItem('emailForSignUp', emailS);
+    //             alert("the link has successfully been sent, press ok after verifying using the link");
+    //         })
+    //         .catch((err) => {
+    //             console.log(`this is the error: ${err.message}`)
+    //         })
+    //     // .finally(() => {
 
-        // })
-    }
+    //     // })
+    // }
 
 
 
@@ -56,7 +56,7 @@ export function SignUpEmailForm() {
                 >
                     <FormControl
                         as="form"
-                        onSubmit={sendVerificationLinkToUser}
+                        onSubmit={() => { navigate('/signUpPwd', { state: { emailS: emailS } }) }}
                         display="flex-start"
                         flexDirection="column"
                         h="100%"

@@ -17,37 +17,39 @@ import {
 } from '@chakra-ui/react';
 import { ArrowBackIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../../firebase-config';
 
 
 export function LoginPasswordForm() {
 
     const [pwd, setPwd] = useState('');
+
     const navigate = useNavigate();
 
     const location = useLocation();
     const email = location.state?.email;
 
-
-
-    const handlePwdSubmit = () => {
-
-        if (verifyPwd) {
-            navigate('/home');
-        } else {
-            navigate('/forgotPwd');
-        }
-    };
-
-    // Placeholder for the actual implementation of password check
-    const checkPwdInDatabase = (p: string) => {
-        // Implement actual check here...
-        return true;
-    };
-
-    const verifyPwd = checkPwdInDatabase(pwd);
-
     const [showPwd, setShowPwd] = useState(false);
     const toggleShowPwd = () => setShowPwd(!showPwd);
+
+
+    async function handlePwdSubmit(e: any) {
+        e.preventDefault();
+        await signInWithEmailAndPassword(auth, email, pwd)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log(user);
+                alert(`you have signed in into ${user.email}`);
+                navigate('/index');
+            })
+            .catch((err) => {
+                console.log(err.message)
+                navigate('/forgotpwd')
+            });
+
+
+    }
 
 
     return (
@@ -102,7 +104,7 @@ export function LoginPasswordForm() {
                         </InputGroup>
 
                         <Button
-                            isDisabled={!pwd || !verifyPwd}
+                            isDisabled={!pwd}
                             h="8%"
                             w="75%"
                             mt={6}
@@ -111,7 +113,6 @@ export function LoginPasswordForm() {
                             borderWidth="2px"
                             borderColor="black"
                             _hover={{ bg: "purple.300", color: "black", transform: "scale(1.08)" }}
-                            onClick={handlePwdSubmit}
                             alignSelf="center"
                             type='submit'
                         >

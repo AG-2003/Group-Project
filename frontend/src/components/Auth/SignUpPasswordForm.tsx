@@ -4,7 +4,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { auth } from "../../firebase-config";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-
+import { setDoc, doc, collection } from "firebase/firestore";
+import { db } from "../../firebase-config";
 
 
 export function SignUpPasswordForm() {
@@ -12,9 +13,9 @@ export function SignUpPasswordForm() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // const email: string = location.state?.emailS // getting the email the user entered earlier
+    const email: string = location.state?.emailS // getting the email the user entered earlier
 
-    const email: string | null = window.localStorage.getItem('emailForSignUp');
+
 
 
 
@@ -40,15 +41,20 @@ export function SignUpPasswordForm() {
 
     async function handleSignUpButtonClick(e: any) {
         e.preventDefault();
-        if (email === null) {
-            throw new Error("Email is null - can't proceed with user creation.");
-        }
         await createUserWithEmailAndPassword(auth, email, pwd)
-            .then((userCredential) => {
+            .then(async (userCredential) => {
                 const user = userCredential.user;
-                alert(user.email);
-                console.log(user.emailVerified);
+                console.log(user);
+                const usersCollectionRef = collection(db, "users");
+                const userRef = doc(usersCollectionRef, email);
 
+                await setDoc(userRef, {
+                    email: user.email,
+                    isVerified: user.emailVerified,
+                    userName: user.displayName
+
+                });
+                navigate('/index')
             })
             .catch((err) => {
                 console.log(`this is the error code: ${err.code} and this is the message: ${err.message}`)
@@ -93,8 +99,8 @@ export function SignUpPasswordForm() {
                         </Flex>
 
                         <FormHelperText cursor="default" mb={20} alignSelf="center">
-                            we have sent a verification mail to <span style={{ fontWeight: 'bold' }}>{email}</span>, <br />please
-                            <span style={{ fontWeight: 'bold' }}> verify</span> your email ID and proceed to setting a password.
+                            Please enter the password you would like to use for your account <span style={{ fontWeight: 'bold' }}>{email}</span>
+
                         </FormHelperText>
 
                         <InputGroup h="8%" w="75%">

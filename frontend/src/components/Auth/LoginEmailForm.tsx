@@ -13,27 +13,54 @@ import {
 } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
+import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { db } from '../../firebase-config'
+
 
 export function LoginEmailForm() {
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState<string>('');
 
     const navigate = useNavigate();
 
-    const handleEmailSubmit = () => {
-        const emailExists = checkEmailInDatabase(email);
-        if (emailExists) {
-            navigate('/loginPassword', { state: { email: email } }); // navigate to the password login page
-        } else {
-            navigate('/signUpEmail', { state: { email: email } }); // navigate to the signup page
+
+
+
+
+    const handleEmailSubmit = async (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
+
+        try {
+            const emailExists = await checkEmailInDatabase(email);
+
+            if (emailExists) {
+                navigate('/loginPassword', { state: { email: email } });
+            } else {
+                // Add the email to the Firestore database
+                navigate('/signUpEmail', { state: { email: email } });
+
+
+                //   navigate('/signUpEmail', { state: { email: email } });
+            }
+        } catch (err) {
+            console.error("Error handling email submission:", err);
         }
-
     };
 
-    // Placeholder for the actual implementation of email check
-    const checkEmailInDatabase = (e: string) => {
-        // Implement actual check here...
-        return false;
-    };
+
+    const checkEmailInDatabase = async (email: string) => {
+        const usersCollectionRef = collection(db, "users");
+        try {
+            const data = await getDocs(usersCollectionRef)
+            const userEmails = data.docs.map((doc) => doc.data().email);
+            return userEmails.some((userEmail) => userEmail === email);
+        } catch (err) {
+            console.log(err)
+            return false;
+        }
+    }
+
+
+
 
     return (
         <Flex
