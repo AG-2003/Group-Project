@@ -14,6 +14,7 @@ import ProtectedRoutes from "./RoutingSecurity/ProtectedRoutes";
 function App() {
   return (
     <Routes>
+      <Route index element={<Landing />} />
       <Route path="/auth" element={<Login />} />
       <Route path="/loginEmail" element={<EmailLogin />} />
       <Route path="/loginPassword" element={<LoginPassword />} />
@@ -22,7 +23,6 @@ function App() {
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
       <Route element={<ProtectedRoutes/>}>
-        <Route index element={<Landing />} />
         <Route path='/index' element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
       </Route>
