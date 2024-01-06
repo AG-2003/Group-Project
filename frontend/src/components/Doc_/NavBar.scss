@@ -1,17 +1,37 @@
 .navbar {
   display: flex;
-  justify-content: start;
+  justify-content: space-between; // This spreads out the items
   align-items: center;
-  background-color: #202124; // Adjust the color as needed
-  color: white;
+  background-color: #202124; // Dark background color
+  color: #e8eaed; // Light text color
   padding: 0.5rem 1rem;
 
-  .nav-item {
+  .sidebar-icon,
+  .action-icon {
     margin-right: 1rem;
     cursor: pointer;
+  }
 
-    &:hover {
-      text-decoration: underline;
+  .nav-items {
+    display: flex; // Aligns nav-items in a row
+
+    .nav-item {
+      margin-right: 1rem;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
+  }
+
+  .title-area {
+    flex-grow: 1; // Allows the title area to take up available space
+    display: flex;
+    justify-content: center; // Centers the title
+  }
+
+  .action-buttons {
+    // Add styles for action buttons if needed
   }
 }

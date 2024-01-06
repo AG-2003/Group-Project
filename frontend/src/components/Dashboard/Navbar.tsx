@@ -20,7 +20,7 @@ interface Props {
   onToggle: () => void;
 }
 
-const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
+const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
   const iconStyle = {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
@@ -88,4 +88,4 @@ const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
   );
 };
 
-export default Navbar;
+export default NavBar;
