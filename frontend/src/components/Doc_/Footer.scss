@@ -1,15 +1,17 @@
 .footer {
+  background-color: #f4f4f4;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 1rem;
-  // Add any additional styling here
+  padding: 0.35rem;
 
   .zoom-slider {
+    margin-right: 4.25rem;
+    position: fixed;
     -webkit-appearance: none; // Removes default webkit styles
     appearance: none;
     width: 150px; // Adjust the width as needed
-    height: 5px; // Adjust the height of the slider track
+    height: 2.5px; // Adjust the height of the slider track
     background: #ddd; // Slider track color
     outline: none;
     opacity: 0.7; // Slider opacity
@@ -23,8 +25,8 @@
     &::-webkit-slider-thumb {
       -webkit-appearance: none; // Required for custom thumb style
       appearance: none;
-      width: 20px; // Thumb width
-      height: 20px; // Thumb height
+      width: 15px; // Thumb width
+      height: 15px; // Thumb height
       background: #444; // Thumb color
       cursor: pointer;
       border-radius: 50%; // Round thumb
@@ -40,6 +42,6 @@
   }
 
   .zoom-percentage {
-    margin-left: 1rem; // Spacing between slider and label
+    margin-right: 1rem;
   }
 }

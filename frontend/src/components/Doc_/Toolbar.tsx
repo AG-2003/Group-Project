@@ -1,4 +1,5 @@
 import React from "react";
+import { Editor, EditorState, RichUtils } from "draft-js";
 import "./ToolBar.scss";
 import {
   ButtonGroup,
@@ -34,7 +35,34 @@ import {
   FaHeading,
 } from "react-icons/fa";
 
-const ToolBar: React.FC = () => {
+interface ToolBarProps {
+  editorState: EditorState;
+  setEditorState: (editorState: EditorState) => void;
+  editorRef: React.RefObject<Editor>; // Define this in your interface
+}
+
+const ToolBar: React.FC<ToolBarProps> = ({
+  editorState,
+  setEditorState,
+  editorRef,
+}) => {
+  const applyStyle = (style: string) => {
+    // Focus the editor
+    editorRef.current && editorRef.current.focus();
+
+    // Apply the style
+    const newState = RichUtils.toggleInlineStyle(editorState, style);
+
+    // Create a new EditorState with the current selection to avoid cursor jumping
+    const selection = editorState.getSelection();
+    const stateWithPreservedSelection = EditorState.forceSelection(
+      newState,
+      selection
+    );
+
+    // Update the EditorState with the new state that has the preserved selection
+    setEditorState(stateWithPreservedSelection);
+  };
   return (
     <div className="container">
       <ButtonGroup className="toolbar">
@@ -106,23 +134,24 @@ const ToolBar: React.FC = () => {
             icon={<FaMinus />}
           />
         </Tooltip>
-        <Tooltip label="Bold" hasArrow>
-          <IconButton className="tool" aria-label="Bold" icon={<FaBold />} />
-        </Tooltip>
-        <Tooltip label="Italic" hasArrow>
-          <IconButton
-            className="tool"
-            aria-label="Italic"
-            icon={<FaItalic />}
-          />
-        </Tooltip>
-        <Tooltip label="Underline" hasArrow>
-          <IconButton
-            className="tool"
-            aria-label="Underline"
-            icon={<FaUnderline />}
-          />
-        </Tooltip>
+        <IconButton
+          className="tool"
+          aria-label="Bold"
+          icon={<FaBold />}
+          onClick={() => applyStyle("BOLD")}
+        />
+        <IconButton
+          className="tool"
+          aria-label="Italic"
+          icon={<FaItalic />}
+          onClick={() => applyStyle("ITALIC")}
+        />
+        <IconButton
+          className="tool"
+          aria-label="Underline"
+          icon={<FaUnderline />}
+          onClick={() => applyStyle("UNDERLINE")}
+        />
         <Tooltip label="Text Color" hasArrow>
           <IconButton
             className="tool"

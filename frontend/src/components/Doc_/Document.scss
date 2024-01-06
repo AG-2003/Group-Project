@@ -3,6 +3,15 @@
   }
 
 .document {
+  .DraftEditor-root {
+      /* Style the editor container */
+    }
+  
+    .DraftEditor-editorContainer {
+      /* Style the editor content area */
+      min-height: 6em;
+      /* For example, set a minimum height */
+    }
   display: flex;
   justify-content: center;
   align-items: flex-start; // Align to the top

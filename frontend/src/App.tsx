@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import Doc from "./pages/Doc";
+import "draft-js/dist/Draft.css";
 
 function App() {
   return (
