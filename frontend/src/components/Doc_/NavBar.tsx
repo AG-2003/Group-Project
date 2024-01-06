@@ -1,10 +1,18 @@
-import { IconButton, Flex, Button, useDisclosure } from "@chakra-ui/react";
+import {
+  IconButton,
+  Flex,
+  Button,
+  useDisclosure,
+  Tooltip,
+} from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { FaCloudUploadAlt, FaShareSquare, FaUser } from "react-icons/fa"; // Import FontAwesome icons
+import {
+  IoVideocamOutline,
+  IoBarChartOutline,
+  IoShareOutline,
+} from "react-icons/io5";
 import "./NavBar.scss";
-
-// import { Link } from "react-router-dom";
-// import { useState } from "react";
+import { useState } from "react";
 
 interface Props {
   isSidebarOpen: boolean;
@@ -12,10 +20,19 @@ interface Props {
 }
 
 const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
+  const [title, setTitle] = useState("Untitled");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const iconStyle = {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
+  };
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  };
+  const handleBlur = () => {
+    if (title.trim() === "") {
+      setTitle("Untitled");
+    }
   };
 
   return (
@@ -38,26 +55,67 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
         <div className="nav-item">Extensions</div>
         <div className="nav-item">Help</div>
       </div>
-      <div className="title-area">Untitled - Doc</div>
+      {/* <div className="title-area">
+        <input
+          className="title-input"
+          value={title}
+          onChange={handleTitleChange}
+          onBlur={handleBlur}
+          placeholder="Untitled"
+          aria-label="Document Title"
+        />
+      </div> */}
+      <div className="title-area">
+        <input
+          className="title-input"
+          value={title}
+          onChange={handleTitleChange}
+          onBlur={handleBlur}
+          placeholder="Untitled"
+          aria-label="Document Title"
+        />
+        <span className="doc-extension">.doc</span>
+      </div>
       <div className="action-buttons">
-        <IconButton
-          className="action-icon upload"
-          aria-label="Upload"
-          icon={<FaCloudUploadAlt />}
-          onClick={onOpen}
-        />
-        <IconButton
-          className="action-icon share"
-          aria-label="Share"
-          icon={<FaShareSquare />}
-          onClick={onOpen}
-        />
-        <IconButton
-          className="action-icon user"
-          aria-label="User"
-          icon={<FaUser />}
-          onClick={onOpen}
-        />
+        <Tooltip
+          label="Video Call"
+          className="tooltip-label"
+          placement="top"
+          hasArrow
+        >
+          <IconButton
+            className="action-icon call"
+            aria-label="Video Call"
+            icon={<IoVideocamOutline />}
+            onClick={onOpen}
+          />
+        </Tooltip>
+        <Tooltip
+          label="Get Analytics"
+          className="tooltip-label"
+          placement="top"
+          hasArrow
+        >
+          <IconButton
+            className="action-icon analytics"
+            aria-label="Analyse"
+            icon={<IoBarChartOutline />}
+            onClick={onOpen}
+          />
+        </Tooltip>
+        <Tooltip
+          label="Share"
+          className="tooltip-label"
+          placement="top"
+          hasArrow
+        >
+          <IconButton
+            className="action-icon share"
+            aria-label="share"
+            icon={<IoShareOutline />}
+            onClick={onOpen}
+          />
+        </Tooltip>
       </div>
     </div>
   );

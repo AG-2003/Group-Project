@@ -1,16 +1,46 @@
+.document .editable-area:focus {
+  outline: none; // Remove the default focus outline
+  }
+
 .document {
-  flex-grow: 1;
-  padding: 1rem;
-  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; // Align to the top
+  padding: 1rem 0; // Padding at the top and bottom only
+  margin-top: -1rem; // Adjust for the top padding of the navbar and toolbar if needed
+  height: calc(100vh - 2rem);
+  background-color: #eeeeff;
+  overflow: auto; // Use main scroll instead of internal scroll
 
   .editable-area {
-    width: 100%;
-    height: 100%;
-    border: none;
-    outline: none;
-    resize: none;
-    padding: 1rem;
-    font-size: 16px;
-    line-height: 1.5;
+    width: 210mm; // Width of A4 paper
+    min-height: 297mm; // Minimum height of A4 paper
+    margin: 1rem 0; // Margin top and bottom for aesthetics
+    padding: 3rem; // Padding inside the editable area
+    border: 1px solid #ddd; // Border to visualize the A4 paper edges
+    background-color: #fff; // White background for the editable area
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow to lift the paper off the page
+    overflow: hidden; // Hide overflow
+    resize: none; // Disable resizing of the textarea
   }
+    // &:focus {
+    //   outline: none;
+    //   border: 1px solid transparent;
+
+    //   // Webkit-specific removal of highlight border
+    //   &:focus {
+    //     outline: none;
+    //     border: 1px solid transparent;
+    //     box-shadow: none; // Remove if you don't want any focus indication
+
+    //     // Webkit and Mozilla browsers
+    //     &::-moz-focus-inner {
+    //       border: 0;
+    //     }
+
+    //     &:-webkit-focus-ring-color {
+    //       outline: none;
+    //     }
+    //   }
+    // }
 }

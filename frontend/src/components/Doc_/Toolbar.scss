@@ -4,18 +4,20 @@
   justify-content: center; // Center children horizontally
   align-items: center; // Center children vertically
   padding: 1rem;
+  background-color: #eeeeff;
 }
 
 .toolbar {
   padding: 0.25rem; // Reduced padding for less space around buttons.
-  background-color: #dcdcf6; // A muted color similar to the second image.
+  background-color: #bcbcdc; // A muted color similar to the second image.
   border-radius: 8px; // Less rounded corners compared to the first image.
   display: flex; // Ensure the buttons are flexibly placed.
+  box-shadow: 0 0 10px rgba(0.1, 0.1, 0.1, 0.1); // Shadow to lift the paper off the page
   // gap: 4px; // Adds a gap between buttons.
 
   .tool {
     background-color: transparent; // No background color for a flat look.
-    color: #666; // Muted icon color.
+    color: #2c2c2c; // Muted icon color.
     border: none; // Remove borders if any.
 
     &:hover {

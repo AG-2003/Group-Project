@@ -2,32 +2,26 @@ import React, { useState } from "react";
 import NavBar from "../components/Doc_/NavBar";
 import ToolBar from "../components/Doc_/ToolBar";
 import Document from "../components/Doc_/Document";
-// import "./Doc.scss";
+import Footer from "../components/Doc_/Footer";
+import "./Doc.scss"; // Make sure you import Doc.scss here
 
 const Doc: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  //  const [currentComponent, setCurrentComponent] = useState("Profile");
-
-  //  const handleButtonClick = (component: string) => {
-  //    setCurrentComponent(component);
-  //  };
-
-  // Variants for Framer Motion animation
-  //  const sidebarVariants = {
-  //    open: { width: "200px" },
-  //    closed: { width: "0px" },
-  //  };
-
-  // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const handleZoomChange = (newZoomLevel: number) => {
+    // Logic to update document size
+    // For example:
+    // documentContainer.style.transform = `scale(${newZoomLevel / 100})`;
+  };
+
   return (
-    <div className="document-editor">
+    <div className="doc-container">
       <NavBar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <ToolBar />
-      <div className="editor-content">
-        <Document />
-      </div>
+      <Document />
+      <Footer onZoomChange={handleZoomChange} />
     </div>
   );
 };
