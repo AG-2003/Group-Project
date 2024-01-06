@@ -1,10 +1,11 @@
 .navbar {
+  width: 100%;
   display: flex;
   justify-content: space-between; // This spreads out the items
   align-items: center;
-  background-color: #202124; // Dark background color
+  background-color: #484c6c; // Dark background color
   color: #e8eaed; // Light text color
-  padding: 0.5rem 1rem;
+  padding: 5px;
 
   .sidebar-icon,
   .action-icon {
@@ -12,8 +13,16 @@
     cursor: pointer;
   }
 
+    .menu-icon-button {
+      background: inherit;
+      font-size: 20px; // This sets the size of the icon inside the button
+      color: white;
+      margin-left: 9px;
+    }
+
   .nav-items {
     display: flex; // Aligns nav-items in a row
+    margin-left: 2rem;
 
     .nav-item {
       margin-right: 1rem;
@@ -31,7 +40,30 @@
     justify-content: center; // Centers the title
   }
 
-  .action-buttons {
-    // Add styles for action buttons if needed
-  }
+    // NavBar.scss
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      background-color: inherit;
+      // Add any additional styles for the container of the action buttons
+  
+      .action-icon {
+        margin-left: 12px; // Spacing between action buttons
+        color: white; // Icon color
+        background-color: inherit;
+  
+        // You can add specific styles for each button if needed, using their additional class names
+        &.upload {
+          // Styles specific to the upload button
+        }
+  
+        &.share {
+          // Styles specific to the share button
+        }
+  
+        &.user {
+          // Styles specific to the user button
+        }
+      }
+    }
 }

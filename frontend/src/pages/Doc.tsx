@@ -23,9 +23,7 @@ const Doc: React.FC = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   return (
     <div className="document-editor">
-      <div style={{ padding: "10px", background: "#484c6c" }}>
-        <NavBar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      </div>
+      <NavBar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <ToolBar />
       <div className="editor-content">
         <Document />
