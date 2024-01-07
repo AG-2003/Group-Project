@@ -72,12 +72,15 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             Create a design
           </MenuButton>
           <MenuList>
-            <MenuItem icon={<FiFileText />} onClick={openModal}>
+            {/* <MenuItem icon={<FiFileText />} onClick={openModal}>
               Docs
-            </MenuItem>
+            </MenuItem> */}
+            <MenuItem icon={<FiFileText />}>Docs</MenuItem>
             <MenuItem icon={<LuPresentation />}>Slides</MenuItem>
             <MenuItem icon={<FiGrid />}>Spreadsheets</MenuItem>
-            <MenuItem icon={<FiClipboard />}>Whiteboard</MenuItem>
+            <MenuItem icon={<FiClipboard />} onClick={openModal}>
+              Whiteboard
+            </MenuItem>
           </MenuList>
         </Menu>
         <Link to="/settings">

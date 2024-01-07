@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import Doc from "./pages/Doc";
+import Whiteboard from "./pages/Whiteboard";
+
 import "draft-js/dist/Draft.css";
 
 function App() {
@@ -26,8 +28,17 @@ function App() {
       <Route path="/newPwd" element={<NewPassword />} />
       <Route path="/Settings" element={<Settings />} />
       <Route path="/Doc" element={<Doc />} />
+      <Route path="/Board" element={<Whiteboard />} />;
     </Routes>
   );
 }
 
 export default App;
+
+// import Whiteboard from "./pages/Whiteboard";
+
+// function App() {
+//   return <Whiteboard />;
+// }
+
+// export default App;
