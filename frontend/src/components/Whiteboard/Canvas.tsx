@@ -1,5 +1,8 @@
 import React, { useState, useRef } from "react";
-import { Stage, Layer, Line, Text, StageProps, Circle } from "react-konva";
+import { Stage, Layer, Line, Text, StageProps } from "react-konva";
+import { FaPen, FaEraser, FaTextHeight, FaTrash } from "react-icons/fa"; // Import necessary icons
+import { FaDroplet, FaBrush } from "react-icons/fa6";
+
 import "./Canvas.scss";
 
 type Tool = "pen" | "eraser" | "text" | "clear";
@@ -114,13 +117,28 @@ const Canvas: React.FC = () => {
   const [strokeSize, setStrokeSize] = useState<number>(5); // Default stroke size
   const [lines, setLines] = useState<LineType[]>([]);
   const [eraserSize, setEraserSize] = useState<number>(20); // Default eraser size
-  const [showEraserCue, setShowEraserCue] = useState<boolean>(false);
-  const [cursorPosition, setCursorPosition] = useState<{
-    x: number;
-    y: number;
-  }>({ x: 0, y: 0 });
+  const stageRef = useRef<any>(null); // Ref for the Konva Stage
   const [texts, setTexts] = useState<TextType[]>([]);
   const isDrawing = useRef(false);
+  const [showPenFeatures, setShowPenFeatures] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showSizeSlider, setShowSizeSlider] = useState(false);
+
+  const handlePenClick = () => {
+    setShowPenFeatures(!showPenFeatures);
+  };
+
+  // Event handler for the FaDroplet button
+  const handleColorClick = () => {
+    setShowColorPicker(!showColorPicker);
+    setShowSizeSlider(false); // Hide the size slider if it's open
+  };
+
+  // Event handler for the FaBrush button
+  const handleSizeClick = () => {
+    setShowSizeSlider(!showSizeSlider);
+    setShowColorPicker(false); // Hide the color picker if it's open
+  };
 
   const validateAndUpdateStrokeSize = (size: number) => {
     const newSize = Math.max(1, Math.min(size, 20)); // Assuming max size is 20
@@ -182,12 +200,6 @@ const Canvas: React.FC = () => {
       lastLine.points = lastLine.points.concat([point.x, point.y]);
       lines.splice(lines.length - 1, 1, lastLine);
       setLines(lines.concat());
-      if (point) {
-        setCursorPosition(point); // Update cursor position
-        if (tool === "eraser") {
-          setShowEraserCue(true); // Show eraser cue if eraser tool is selected
-        }
-      }
     }
   };
 
@@ -198,22 +210,12 @@ const Canvas: React.FC = () => {
   const handleToolChange = (selectedTool: Tool) => {
     if (selectedTool === "clear") {
       clearBoard();
+    }
+    if (selectedTool !== "pen") {
+      setShowPenFeatures(false);
     } else {
       setTool(selectedTool);
-      setShowEraserCue(selectedTool === "eraser");
     }
-  };
-
-  // // Show the eraser cue when the eraser tool is active and the mouse is over the canvas
-  // const handleMouseEnter: StageProps["onMouseEnter"] = () => {
-  //   if (tool === "eraser") {
-  //     setShowEraserCue(true);
-  //   }
-  // };
-
-  // Hide the eraser cue when the mouse leaves the canvas
-  const handleMouseLeave: StageProps["onMouseLeave"] = () => {
-    setShowEraserCue(false);
   };
 
   const clearBoard = () => {
@@ -229,13 +231,12 @@ const Canvas: React.FC = () => {
   return (
     <div className="canvas-container" onDoubleClick={clearBoard}>
       <Stage
+        ref={stageRef}
         width={window.innerWidth}
         height={window.innerHeight}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        // onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
       >
         <Layer>
           {lines.map((line, i) => (
@@ -262,33 +263,49 @@ const Canvas: React.FC = () => {
               draggable
             />
           ))}
-          {showEraserCue && (
-            <Circle
-              x={cursorPosition.x}
-              y={cursorPosition.y}
-              radius={eraserSize / 2}
-              stroke="#000000" // Border color for the eraser cue
-              strokeWidth={1}
-              shadowColor="black"
-              shadowBlur={5}
-              shadowOffsetX={2}
-              shadowOffsetY={2}
-              shadowOpacity={0.5}
-            />
-          )}
         </Layer>
       </Stage>
-      <select
-        value={tool}
-        onChange={(e) => handleToolChange(e.target.value as Tool)}
-        className="tool-selector"
-      >
-        <option value="pen">Pen</option>
-        <option value="eraser">Eraser</option>
-        <option value="text">Text</option>
-        <option value="clear">Clear Board</option>
-      </select>
-      {tool === "pen" && (
+      <div className="toolbar">
+        <div
+          className={`pen-container ${showPenFeatures ? "show-features" : ""}`}
+        >
+          <button
+            className={`tool-button ${tool === "pen" ? "selected" : ""}`}
+            onClick={handlePenClick}
+          >
+            <FaPen />
+          </button>
+          <div className="pen-features">
+            <button onClick={handleColorClick}>
+              <FaDroplet />
+            </button>
+            <button onClick={handleSizeClick}>
+              <FaBrush />
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={() => handleToolChange("eraser")}
+          className={`tool-button ${tool === "eraser" ? "selected" : ""}`}
+        >
+          <FaEraser />
+        </button>
+        <button
+          onClick={() => handleToolChange("text")}
+          className={`tool-button ${tool === "text" ? "selected" : ""}`}
+        >
+          <FaTextHeight />
+        </button>
+        <button
+          onClick={() => handleToolChange("clear")}
+          className="tool-button"
+        >
+          <FaTrash />
+        </button>
+      </div>
+
+      {/* {tool === "pen" && (
         <>
           <div className="color-grid">
             {colors.map((color) => (
@@ -344,6 +361,52 @@ const Canvas: React.FC = () => {
           />
         </>
       )}
+    </div>
+  );
+};
+
+export default Canvas; */}
+
+      {showColorPicker && (
+        <div className="container-color">
+          <div className="color-grid">
+            {colors.map((color) => (
+              <div
+                key={color}
+                className={`color-block ${
+                  penColor === color ? "selected" : ""
+                }`}
+                style={{ backgroundColor: color }}
+                onClick={() => setPenColor(color)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showSizeSlider && (
+        <>
+          <input
+            type="range"
+            min="1"
+            max="20"
+            value={strokeSize}
+            onChange={(e) =>
+              validateAndUpdateStrokeSize(parseInt(e.target.value))
+            }
+            className="stroke-size-slider"
+          />
+          <input
+            type="number"
+            value={strokeSize}
+            onChange={(e) =>
+              validateAndUpdateStrokeSize(parseInt(e.target.value))
+            }
+            className="stroke-size-input"
+          />
+        </>
+      )}
+      {/* ... other components ... */}
     </div>
   );
 };
