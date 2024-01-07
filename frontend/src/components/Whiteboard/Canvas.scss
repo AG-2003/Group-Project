@@ -56,4 +56,28 @@
         outline: none;
       }
     }
-    }
+
+      .eraser-size-slider {
+        position: absolute;
+          top: 90px; // Adjust as needed
+          left: 10px;
+          z-index: 10;
+        }
+  
+      .eraser-size-input {
+        position: absolute;
+          text-align: center;
+          top: 120px; // Adjust as needed
+          left: 55px;
+          z-index: 10;
+          width: 35px; // Adjust as needed
+        
+          &:hover {
+            outline: none;
+          }
+        
+          &:focus {
+            outline: none;
+          }
+        }
+  }

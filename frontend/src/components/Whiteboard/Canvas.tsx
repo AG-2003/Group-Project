@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Stage, Layer, Line, Text, StageProps } from "react-konva";
+import { Stage, Layer, Line, Text, StageProps, Circle } from "react-konva";
 import "./Canvas.scss";
 
 type Tool = "pen" | "eraser" | "text" | "clear";
@@ -113,12 +113,23 @@ const Canvas: React.FC = () => {
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
   const [strokeSize, setStrokeSize] = useState<number>(5); // Default stroke size
   const [lines, setLines] = useState<LineType[]>([]);
+  const [eraserSize, setEraserSize] = useState<number>(20); // Default eraser size
+  const [showEraserCue, setShowEraserCue] = useState<boolean>(false);
+  const [cursorPosition, setCursorPosition] = useState<{
+    x: number;
+    y: number;
+  }>({ x: 0, y: 0 });
   const [texts, setTexts] = useState<TextType[]>([]);
   const isDrawing = useRef(false);
 
   const validateAndUpdateStrokeSize = (size: number) => {
     const newSize = Math.max(1, Math.min(size, 20)); // Assuming max size is 20
     setStrokeSize(newSize);
+  };
+
+  const validateAndUpdateEraserSize = (size: number) => {
+    const newSize = Math.max(1, Math.min(size, 40)); // Assuming max size is 40
+    setEraserSize(newSize);
   };
 
   const handleMouseDown: StageProps["onMouseDown"] = (e) => {
@@ -130,7 +141,7 @@ const Canvas: React.FC = () => {
     const pos = e.target.getStage()?.getPointerPosition();
 
     if (pos) {
-      if (tool === "pen" || tool === "eraser") {
+      if (tool === "pen") {
         setLines([
           ...lines,
           {
@@ -138,6 +149,17 @@ const Canvas: React.FC = () => {
             points: [pos.x, pos.y],
             color: penColor,
             strokeWidth: strokeSize,
+          },
+        ]);
+      } else if (tool === "eraser") {
+        // Include the eraser size in the line data
+        setLines([
+          ...lines,
+          {
+            tool,
+            points: [pos.x, pos.y],
+            color: penColor,
+            strokeWidth: eraserSize,
           },
         ]);
       } else if (tool === "text") {
@@ -160,6 +182,12 @@ const Canvas: React.FC = () => {
       lastLine.points = lastLine.points.concat([point.x, point.y]);
       lines.splice(lines.length - 1, 1, lastLine);
       setLines(lines.concat());
+      if (point) {
+        setCursorPosition(point); // Update cursor position
+        if (tool === "eraser") {
+          setShowEraserCue(true); // Show eraser cue if eraser tool is selected
+        }
+      }
     }
   };
 
@@ -172,7 +200,20 @@ const Canvas: React.FC = () => {
       clearBoard();
     } else {
       setTool(selectedTool);
+      setShowEraserCue(selectedTool === "eraser");
     }
+  };
+
+  // // Show the eraser cue when the eraser tool is active and the mouse is over the canvas
+  // const handleMouseEnter: StageProps["onMouseEnter"] = () => {
+  //   if (tool === "eraser") {
+  //     setShowEraserCue(true);
+  //   }
+  // };
+
+  // Hide the eraser cue when the mouse leaves the canvas
+  const handleMouseLeave: StageProps["onMouseLeave"] = () => {
+    setShowEraserCue(false);
   };
 
   const clearBoard = () => {
@@ -193,6 +234,8 @@ const Canvas: React.FC = () => {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        // onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <Layer>
           {lines.map((line, i) => (
@@ -219,6 +262,20 @@ const Canvas: React.FC = () => {
               draggable
             />
           ))}
+          {showEraserCue && (
+            <Circle
+              x={cursorPosition.x}
+              y={cursorPosition.y}
+              radius={eraserSize / 2}
+              stroke="#000000" // Border color for the eraser cue
+              strokeWidth={1}
+              shadowColor="black"
+              shadowBlur={5}
+              shadowOffsetX={2}
+              shadowOffsetY={2}
+              shadowOpacity={0.5}
+            />
+          )}
         </Layer>
       </Stage>
       <select
@@ -262,6 +319,28 @@ const Canvas: React.FC = () => {
               validateAndUpdateStrokeSize(parseInt(e.target.value))
             }
             className="stroke-size-input"
+          />
+        </>
+      )}
+      {tool === "eraser" && (
+        <>
+          <input
+            type="range"
+            min="1"
+            max="40"
+            value={eraserSize}
+            onChange={(e) =>
+              validateAndUpdateEraserSize(parseInt(e.target.value))
+            }
+            className="eraser-size-slider"
+          />
+          <input
+            type="number"
+            value={eraserSize}
+            onChange={(e) =>
+              validateAndUpdateEraserSize(parseInt(e.target.value))
+            }
+            className="eraser-size-input"
           />
         </>
       )}
