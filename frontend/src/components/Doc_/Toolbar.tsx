@@ -1,6 +1,7 @@
 import "./ToolBar.scss";
 import {
   ButtonGroup,
+  Icon,
   IconButton,
   Menu,
   MenuButton,
@@ -36,8 +37,11 @@ import {
 
 const ToolBar = ({
   onSearch,
+  isSearchVisible,
+  toggleSearchVisibility,
   onUndo,
   onRedo,
+  onTextTypeChange,
   onFontChange,
   onFontSizeSelect,
   onBoldClick,
@@ -48,7 +52,27 @@ const ToolBar = ({
   onHighlightSelect,
   onLinkClick,
   onImageUpload,
+  onTextAlignmentChange,
 }) => {
+  const textTypes = [
+    { label: "Normal", value: "normal" },
+    { label: "Heading 1", value: "header", level: 1 },
+    { label: "Heading 2", value: "header", level: 2 },
+    { label: "Heading 3", value: "header", level: 3 },
+    { label: "Heading 4", value: "header", level: 4 },
+    { label: "Heading 5", value: "header", level: 5 },
+    { label: "Heading 6", value: "header", level: 6 },
+    { label: "Blockquote", value: "blockquote" },
+    { label: "Code Block", value: "code-block" },
+
+    // { label: "List Bullet", value: "list", level: "bullet" },
+    // { label: "List Ordered", value: "list", level: "ordered" },
+    // { label: "Script Sub", value: "script", level: "sub" },
+    // { label: "Script Super", value: "script", level: "super" },
+    // { label: "Small", value: "small" },
+    // { label: "Indented", value: "indent" },
+  ];
+
   const fonts = [
     "Arial",
     "Georgia",
@@ -150,19 +174,36 @@ const ToolBar = ({
     "#4c1130",
   ];
 
+  const alignmentOptions = [
+    { label: "Align Left", value: "", icon: FaAlignLeft },
+    { label: "Align Center", value: "center", icon: FaAlignCenter },
+    { label: "Align Right", value: "right", icon: FaAlignRight },
+    { label: "Align Justify", value: "justify", icon: FaAlignJustify },
+  ];
+
   return (
     <div className="container">
       <ButtonGroup className="toolbar">
-        <Tooltip label="Search" hasArrow>
-          <div>
-            <input
-              type="text"
-              placeholder="Search..."
-              onChange={(e) => onSearch(e.target.value)}
-              className="search-input"
+        <div className="search-container">
+          <Tooltip label="Search" hasArrow>
+            <IconButton
+              className="tool"
+              aria-label="Search"
+              icon={<FaSearch />}
+              onClick={toggleSearchVisibility}
             />
-          </div>
-        </Tooltip>
+          </Tooltip>
+          {isSearchVisible && (
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Search..."
+                onChange={(e) => onSearch(e.target.value)}
+                className="search-input"
+              />
+            </div>
+          )}
+        </div>
         <Tooltip label="Undo" hasArrow>
           <IconButton
             className="tool"
@@ -180,13 +221,45 @@ const ToolBar = ({
             onClick={onRedo}
           />
         </Tooltip>
-        <Select onChange={onFontChange} placeholder="Font">
-          {fonts.map((font) => (
-            <option key={font} value={font}>
-              {font}
-            </option>
-          ))}
-        </Select>
+        <Tooltip label="Heading" hasArrow>
+          <div>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<FaHeading />}
+                className="menu-button"
+              />
+              <MenuList>
+                {textTypes.map((type) => (
+                  <MenuItem
+                    key={type.label}
+                    onClick={() => onTextTypeChange(type.value, type.level)}
+                  >
+                    {type.label}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+          </div>
+        </Tooltip>
+        <Tooltip label="Font" hasArrow>
+          <div>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<FaFont />}
+                className="menu-button"
+              />
+              <MenuList>
+                {fonts.map((font) => (
+                  <MenuItem key={font} onClick={() => onFontChange(font)}>
+                    {font}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+          </div>
+        </Tooltip>
         <Tooltip label="Font Size" hasArrow>
           <div>
             <Menu>
@@ -310,6 +383,28 @@ const ToolBar = ({
             icon={<FaImage />}
             onClick={onImageUpload}
           />
+        </Tooltip>
+        <Tooltip label="Text Alignment" hasArrow>
+          <div className="alignment-container">
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<FaAlignLeft />}
+                className="alignment-button"
+              />
+              <MenuList className="alignment-menu-list">
+                {alignmentOptions.map((option) => (
+                  <MenuItem
+                    key={option.value}
+                    onClick={() => onTextAlignmentChange(option.value)}
+                    className="alignment-menu-item"
+                  >
+                    <Icon as={option.icon} className="alignment-icon" />
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+          </div>
         </Tooltip>
       </ButtonGroup>
     </div>

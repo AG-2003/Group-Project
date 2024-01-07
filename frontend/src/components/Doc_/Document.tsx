@@ -25,6 +25,12 @@ const Document = () => {
   const [value, setValue] = useState("");
   const quillRef = useRef(null);
 
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  const toggleSearchVisibility = () => {
+    setIsSearchVisible(!isSearchVisible);
+  };
+
   const handleSearch = debounce((searchTerm) => {
     if (searchTerm && quillRef.current) {
       const editor = quillRef.current.getEditor();
@@ -49,10 +55,20 @@ const Document = () => {
     editor.history.redo();
   };
 
-  const handleFontChange = (e) => {
-    const font = e.target.value;
+  const handleTextTypeChange = (format, level) => {
     const editor = quillRef.current.getEditor();
-    editor.format("font", font.toLowerCase().replace(/\s/g, "-")); // Format the font name as needed
+    if (format === "normal") {
+      editor.format("header", false); // Removes any header formatting
+    } else {
+      editor.format(format, level || false); // Apply header level or blockquote
+    }
+  };
+
+  const handleFontChange = (font) => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      editor.format("font", font.toLowerCase().replace(/\s/g, "-"));
+    }
   };
 
   const handleFontSizeSelect = (size) => {
@@ -121,6 +137,11 @@ const Document = () => {
     };
   };
 
+  const handleTextAlignmentChange = (alignment) => {
+    const editor = quillRef.current.getEditor();
+    editor.format("align", alignment);
+  };
+
   const modules = useMemo(
     () => ({
       toolbar: false, // If you're using a custom toolbar, this remains `false`
@@ -138,8 +159,11 @@ const Document = () => {
     <div>
       <ToolBar
         onSearch={handleSearch}
+        isSearchVisible={isSearchVisible}
+        toggleSearchVisibility={toggleSearchVisibility}
         onUndo={handleUndo}
         onRedo={handleRedo}
+        onTextTypeChange={handleTextTypeChange}
         onFontChange={handleFontChange}
         onFontSizeSelect={handleFontSizeSelect}
         onBoldClick={handleBoldClick}
@@ -150,6 +174,7 @@ const Document = () => {
         onHighlightSelect={handleHighlightSelect}
         onLinkClick={handleLinkClick}
         onImageUpload={handleImageUpload}
+        onTextAlignmentChange={handleTextAlignmentChange}
       />
       <div className="document">
         <ReactQuill
