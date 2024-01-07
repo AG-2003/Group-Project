@@ -1,12 +1,9 @@
 import { useRef, useState, useMemo } from "react";
 import ReactQuill from "react-quill";
-// import Quill from "quill";
-import ToolBar from "./ToolBar"; // Adjust the path as needed
-
+import ToolBar from "./ToolBar";
 import "react-quill/dist/quill.snow.css";
 import "./Document.scss";
 
-// A simple debounce function
 function debounce(func, wait) {
   let timeout;
 
@@ -24,13 +21,44 @@ function debounce(func, wait) {
 const Document = () => {
   const [value, setValue] = useState("");
   const quillRef = useRef(null);
-
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
   const toggleSearchVisibility = () => {
     setIsSearchVisible(!isSearchVisible);
   };
 
+  // Define the debounce function outside of the component
+  // const debounce = (func, wait) => {
+  //   let timeout;
+  //   return function executedFunction(...args) {
+  //     clearTimeout(timeout);
+  //     timeout = setTimeout(() => {
+  //       func(...args);
+  //     }, wait);
+  //   };
+  // };
+
+  // Inside your component:
+  // const debouncedSearch = useCallback(
+  //   debounce((searchTerm) => {
+  //     if (searchTerm && quillRef.current) {
+  //       const editor = quillRef.current.getEditor();
+  //       const text = editor.getText();
+  //       const startIndex = text.toLowerCase().indexOf(searchTerm.toLowerCase());
+  //       if (startIndex !== -1) {
+  //         editor.setSelection(startIndex, searchTerm.length);
+  //       } else {
+  //         editor.setSelection(0, 0);
+  //       }
+  //     }
+  //   }, 700),
+  //   [] // useCallback dependency array
+  // );
+
+  // const handleSearch = (event) => {
+  //   const searchTerm = event.target.value;
+  //   debouncedSearch(searchTerm);
+  // };
   const handleSearch = debounce((searchTerm) => {
     if (searchTerm && quillRef.current) {
       const editor = quillRef.current.getEditor();
@@ -238,8 +266,6 @@ const Document = () => {
         maxStack: 100,
         userOnly: true,
       },
-      // You don't need to include the 'list' configuration here if you are using a custom toolbar.
-      // The 'list' option should be included in the toolbar configuration if you were not using a custom toolbar.
     }),
     []
   );

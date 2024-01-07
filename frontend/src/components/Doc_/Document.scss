@@ -36,119 +36,55 @@
         height: auto;
       }
 
-      // .comments-section {
-      //   margin-top: 20px;
-      // }
-
-      // .comment {
-      //   background-color: #f1f1f1;
-      //   padding: 10px;
-      //   margin-bottom: 10px;
-      //   border-radius: 4px;
-      //   display: flex;
-      //   justify-content: space-between;
-      //   align-items: center;
-
-      //   .comment-text {
-      //     flex-grow: 1;
-      //   }
-
-      //   .commented-text-preview {
-      //     font-style: italic;
-      //     color: #666;
-      //   }
-
-      //   button {
-      //     background-color: #ff6b6b;
-      //     color: white;
-      //     border: none;
-      //     padding: 5px 10px;
-      //     border-radius: 4px;
-      //     cursor: pointer;
-
-      //     &:hover {
-      //       background-color: #ff5252;
-      //     }
-      //   }
-      // }
-
-      // .ql-editor .ql-commented-text {
-      //   background-color: #ffffe0; // Light yellow background for commented text
-      // }
-
             .comments-section {
               margin-top: 20px;
             }
       
             .comment {
-              background-color: #f1f1f1;
-              padding: 10px;
+              background-color: #ffffff;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow to lift the paper off the page
+              width: 200px;
+              padding: 15px;
               margin-bottom: 10px;
-              border-radius: 4px;
+              margin-left: 4rem;
+              border-radius: 10px;
               display: flex;
               flex-direction: column;
-              /* Stack children vertically */
             }
       
             .comment-text {
-              margin-bottom: 5px;
+              margin-bottom: 15px;
+              margin-left: 1rem;
+              font-weight: bold;
               /* Add space between the comment text and the button */
             }
       
             .commented-text-preview {
-              font-style: italic;
+              margin-top: 5px;
               color: #666;
               margin-bottom: 5px;
+              font-weight:lighter;
               /* Add space between the text preview and the button */
             }
       
             button {
+              position: relative;
+              left: 10px;
               align-self: flex-start;
-              /* Align the button to the start of the flex container */
-              background-color: #ff6b6b;
+              align-items: center;
+              background-color:#58458a;
               color: white;
               border: none;
               padding: 5px 10px;
               border-radius: 4px;
               cursor: pointer;
-      
-              &:hover {
-                background-color: #ff5252;
-              }
-            }
-      
-            /* Additional styles to improve the comment section */
-            .comment:hover {
-              background-color: #e8e8e8;
-              /* Lighter background on hover */
-            }
-      
-            /* Styles for the text of a comment to make it visually distinct */
-            .comment-text {
-              font-weight: bold;
-              /* Make the comment text bold */
-            }
-      
-            /* Style adjustments for the Remove Comment button */
-            button {
-              align-self: flex-end;
-              /* Align the button to the end of the flex container */
-              background-color: #dc3545;
-              /* Bootstrap's danger color for better visibility */
-              color: white;
-              padding: 6px 12px;
-              /* Bootstrap's button padding for consistency */
-              font-size: 0.875rem;
-              /* Smaller font size for button text */
               transition: background-color 0.15s ease-in-out;
       
-              /* Smooth transition for hover effect */
               &:hover {
-                background-color: #c82333;
-                /* Darken the button on hover for interactivity */
+                background-color: #47386e;
               }
             }
-      
+            
             /* Optional: Adjustments for mobile responsiveness */
             @media (max-width: 768px) {
               .comment {
