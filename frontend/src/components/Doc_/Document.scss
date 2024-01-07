@@ -3,53 +3,38 @@
   }
 
 .document {
-  .DraftEditor-root {
-      /* Style the editor container */
-    }
-  
     .DraftEditor-editorContainer {
-      /* Style the editor content area */
       min-height: 6em;
-      /* For example, set a minimum height */
     }
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; // Align to the top
-  padding: 1rem 0; // Padding at the top and bottom only
-  margin-top: -1rem; // Adjust for the top padding of the navbar and toolbar if needed
-  height: calc(100vh - 2rem);
-  background-color: #eeeeff;
-  overflow: auto; // Use main scroll instead of internal scroll
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; // Align to the top
+    padding: 1rem 0; // Padding at the top and bottom only
+    margin-top: -1rem; // Adjust for the top padding of the navbar and toolbar if needed
+    height: calc(100vh - 2rem);
+    background-color: #eeeeff;
+    overflow: auto; 
 
-  .editable-area {
-    width: 210mm; // Width of A4 paper
-    min-height: 297mm; // Minimum height of A4 paper
-    margin: 1rem 0; // Margin top and bottom for aesthetics
-    padding: 3rem; // Padding inside the editable area
-    border: 1px solid #ddd; // Border to visualize the A4 paper edges
-    background-color: #fff; // White background for the editable area
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow to lift the paper off the page
-    overflow: hidden; // Hide overflow
-    resize: none; // Disable resizing of the textarea
-  }
-    // &:focus {
-    //   outline: none;
-    //   border: 1px solid transparent;
+    .editable-area {
+        width: 210mm; // Width of A4 paper
+        min-height: 297mm; // Minimum height of A4 paper
+        margin: 1rem 0; // Margin top and bottom for aesthetics
+        padding: 3rem; // Padding inside the editable area
+        border: 1px solid #ddd; // Border to visualize the A4 paper edges
+        background-color: #fff; // White background for the editable area
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow to lift the paper off the page
+        overflow: hidden; // Hide overflow
+        resize: none; // Disable resizing of the textarea
+      
+        &:focus {
+          outline: none;
+          border: 1px solid transparent;
+        }
+      }
+      
+      .ql-container.ql-snow {
+        border: none;
+        height: auto;
+      }
 
-    //   // Webkit-specific removal of highlight border
-    //   &:focus {
-    //     outline: none;
-    //     border: 1px solid transparent;
-    //     box-shadow: none; // Remove if you don't want any focus indication
-
-    //     // Webkit and Mozilla browsers
-    //     &::-moz-focus-inner {
-    //       border: 0;
-    //     }
-
-    //     &:-webkit-focus-ring-color {
-    //       outline: none;
-    //     }
-    //   }
-    // }
 }

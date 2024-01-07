@@ -55,16 +55,6 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
         <div className="nav-item">Extensions</div>
         <div className="nav-item">Help</div>
       </div>
-      {/* <div className="title-area">
-        <input
-          className="title-input"
-          value={title}
-          onChange={handleTitleChange}
-          onBlur={handleBlur}
-          placeholder="Untitled"
-          aria-label="Document Title"
-        />
-      </div> */}
       <div className="title-area">
         <input
           className="title-input"
