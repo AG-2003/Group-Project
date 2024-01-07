@@ -24,6 +24,15 @@
       background-color: #cdcdff; // A light hover effect.
     }
   }
+
+  .tool-check{
+    font-size: 20px;
+    background-color: inherit;
+
+    &:hover{
+      background-color: #cdcdff; // A light hover effect.
+    }
+  }
 }
 .menu-button{
   background-color: #bcbcdc; // A muted color similar to the second image.
@@ -121,7 +130,11 @@
   }
 }
 
-.alignment-icon {
-  // If additional icon styling is needed
+.tool.spellcheck-button {
+
+  // Add a distinct style when spell check is enabled
+  &.active {
+    background-color: #d6d6ff; // for example, a light green background
+  }
 }
 }

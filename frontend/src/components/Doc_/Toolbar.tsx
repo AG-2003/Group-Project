@@ -7,7 +7,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Select,
   Tooltip,
 } from "@chakra-ui/react";
 import {
@@ -23,7 +22,6 @@ import {
   FaBold,
   FaItalic,
   FaUnderline,
-  FaList,
   FaAlignLeft,
   FaAlignCenter,
   FaAlignRight,
@@ -33,14 +31,19 @@ import {
   FaHeading,
   FaStrikethrough,
   FaTextHeight,
+  FaListUl,
+  FaIndent,
+  FaOutdent,
 } from "react-icons/fa";
-
+import { VscChecklist } from "react-icons/vsc";
 const ToolBar = ({
   onSearch,
   isSearchVisible,
   toggleSearchVisibility,
   onUndo,
   onRedo,
+  onToggleSpellCheck,
+  isSpellCheckEnabled,
   onTextTypeChange,
   onFontChange,
   onFontSizeSelect,
@@ -51,8 +54,14 @@ const ToolBar = ({
   onColorSelect,
   onHighlightSelect,
   onLinkClick,
+  onAddComment,
   onImageUpload,
   onTextAlignmentChange,
+  onChecklistClick,
+  onUnorderedListClick,
+  onOrderedListClick,
+  onIndentClick,
+  onOutdentClick,
 }) => {
   const textTypes = [
     { label: "Normal", value: "normal" },
@@ -221,6 +230,16 @@ const ToolBar = ({
             onClick={onRedo}
           />
         </Tooltip>
+        <Tooltip label="Spell Check" hasArrow>
+          <IconButton
+            className={`tool spellcheck-button ${
+              isSpellCheckEnabled ? "active" : ""
+            }`}
+            aria-label="Toggle Spell Check"
+            icon={<FaSpellCheck />} // Make sure to import the correct icon
+            onClick={onToggleSpellCheck}
+          />
+        </Tooltip>
         <Tooltip label="Heading" hasArrow>
           <div>
             <Menu>
@@ -376,6 +395,14 @@ const ToolBar = ({
             onClick={onLinkClick}
           />
         </Tooltip>
+        <Tooltip label="Add Comment" hasArrow>
+          <IconButton
+            className="tool"
+            aria-label="Add Comment"
+            icon={<FaComment />} // Make sure to import the correct icon
+            onClick={onAddComment}
+          />
+        </Tooltip>
         <Tooltip label="Insert Image" hasArrow>
           <IconButton
             className="tool"
@@ -405,6 +432,46 @@ const ToolBar = ({
               </MenuList>
             </Menu>
           </div>
+        </Tooltip>
+        <Tooltip label="Checklist" hasArrow>
+          <IconButton
+            className="tool-check"
+            aria-label="Toggle Checklist"
+            icon={<VscChecklist />} // Assuming FaListUl is the icon you want for the checklist
+            onClick={onChecklistClick}
+          />
+        </Tooltip>
+        <Tooltip label="Bullet List" hasArrow>
+          <IconButton
+            className="tool"
+            aria-label="Unordered List"
+            icon={<FaListUl />} // Assuming FaListUl is the icon for the unordered list
+            onClick={onUnorderedListClick}
+          />
+        </Tooltip>
+        <Tooltip label="Numbered List" hasArrow>
+          <IconButton
+            className="tool"
+            aria-label="Ordered List"
+            icon={<FaListOl />} // Assuming FaListOl is the icon for the ordered list
+            onClick={onOrderedListClick}
+          />
+        </Tooltip>
+        <Tooltip label="Indent" hasArrow>
+          <IconButton
+            className="tool"
+            aria-label="Indent"
+            icon={<FaIndent />} // Icon for indent
+            onClick={() => onIndentClick("indent")}
+          />
+        </Tooltip>
+        <Tooltip label="Outdent" hasArrow>
+          <IconButton
+            className="tool"
+            aria-label="Outdent"
+            icon={<FaOutdent />} // Icon for outdent
+            onClick={() => onIndentClick("outdent")}
+          />
         </Tooltip>
       </ButtonGroup>
     </div>
