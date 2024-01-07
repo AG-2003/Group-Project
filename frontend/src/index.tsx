@@ -5,6 +5,22 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { BrowserRouter as Router } from "react-router-dom";
+import { Quill } from "react-quill";
+
+const Size = Quill.import("attributors/style/size");
+Size.whitelist = ["10px", "12px", "14px", "16px", "18px", "20px"]; // Add your font sizes
+Quill.register(Size, true);
+
+const Font = Quill.import("formats/font");
+Font.whitelist = [
+  "arial",
+  "georgia",
+  "impact",
+  "tahoma",
+  "times new roman",
+  "verdana",
+];
+Quill.register(Font, true);
 
 const theme = extendTheme({
   styles: {

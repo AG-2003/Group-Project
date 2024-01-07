@@ -5,7 +5,7 @@
   align-items: center; // Center children vertically
   padding: 1rem;
   background-color: #eeeeff;
-}
+  margin-bottom: 1rem;
 
 .toolbar {
   padding: 0.25rem; // Reduced padding for less space around buttons.
@@ -24,4 +24,47 @@
       background-color: #cdcdff; // A light hover effect.
     }
   }
+}
+.menu-button{
+  background-color: #bcbcdc; // A muted color similar to the second image.
+
+&:hover {
+  background-color: #cdcdff; // A light hover effect.
+}
+}
+.menu-list {
+  padding: 0.5rem;
+  background-color: #ffffff; // Use a white background for the color palette
+  border-radius: 4px; // Optional: round corners for the color palette
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); // Add a subtle shadow
+  width: auto; // Allow the menu to size based on content
+  display: flex; // Use flexbox
+  flex-wrap: wrap; // Allow wrapping
+  justify-content: start; // Align to the start of the flex container
+}
+
+.color-swatch {
+  width: 20px; // Adjust the size to fit 10 in a row
+  height: 20px; // Adjust the size to fit 10 in a row
+  border-radius: 50%; // Circular swatches
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  margin-right: 2px; // Add margin for spacing between swatches
+  margin-bottom: 2px; // Add margin for spacing between swatches
+}
+
+// Adapt the container to have a fixed width enough to fit 10 color swatches plus margin
+.menu-list {
+  width: 300px; // Width for 10 swatches + margins
+  flex-direction: row; // Align swatches in a row
+  flex-wrap: wrap; // Allow wrapping to next line
+}
+
+.search-input {
+  height: 30px; // Match the height with other toolbar items
+  border: 1px solid #ccc; // Give it a border
+  border-radius: 4px; // Round the corners
+  padding: 0 10px; // Add some padding
+  margin-left: 10px; // Add some left margin if needed
+}
 }

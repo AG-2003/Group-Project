@@ -1,27 +1,53 @@
-// import React from "react";
-// import "./Document.scss";
-
-// const Document: React.FC = () => {
-//   return (
-//     <div className="document">
-//       <textarea className="editable-area"></textarea>
-//     </div>
-//   );
-// };
-
-// export default Document;
-
-// Editor.js or Editor.tsx
-import React, { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import ReactQuill from "react-quill";
+import Quill from "quill";
 import ToolBar from "./ToolBar"; // Adjust the path as needed
 
 import "react-quill/dist/quill.snow.css";
 import "./Document.scss";
 
+// A simple debounce function
+function debounce(func, wait) {
+  let timeout;
+
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 const Document = () => {
   const [value, setValue] = useState("");
   const quillRef = useRef(null);
+
+  const handleSearch = debounce((searchTerm) => {
+    if (searchTerm && quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const text = editor.getText();
+      const startIndex = text.toLowerCase().indexOf(searchTerm.toLowerCase());
+
+      if (startIndex !== -1) {
+        editor.setSelection(startIndex, searchTerm.length); // Highlight the found text
+      } else {
+        editor.setSelection(0, 0); // Reset selection if not found
+      }
+    }
+  }, 700);
+
+  const handleUndo = () => {
+    const editor = quillRef.current.getEditor();
+    editor.history.undo();
+  };
+
+  const handleRedo = () => {
+    const editor = quillRef.current.getEditor();
+    editor.history.redo();
+  };
 
   const handleFontChange = (e) => {
     const font = e.target.value;
@@ -97,15 +123,23 @@ const Document = () => {
 
   const modules = useMemo(
     () => ({
-      toolbar: false,
+      toolbar: false, // If you're using a custom toolbar, this remains `false`
+      history: {
+        delay: 500,
+        maxStack: 100,
+        userOnly: true,
+      },
+      // ... other modules
     }),
     []
   );
 
   return (
     <div>
-      {/* <NavBar /> */}
       <ToolBar
+        onSearch={handleSearch}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
         onFontChange={handleFontChange}
         onFontSizeSelect={handleFontSizeSelect}
         onBoldClick={handleBoldClick}
@@ -121,7 +155,6 @@ const Document = () => {
         <ReactQuill
           className="editable-area"
           ref={quillRef}
-          // theme="snow"
           value={value}
           onChange={setValue}
           modules={modules}

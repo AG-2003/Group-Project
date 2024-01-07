@@ -1,220 +1,4 @@
-// // import React, { useState } from "react";
-// // import { Editor, EditorState, RichUtils } from "draft-js";
-// import "./ToolBar.scss";
-// import {
-//   ButtonGroup,
-//   IconButton,
-//   Menu,
-//   MenuButton,
-//   MenuItem,
-//   MenuList,
-//   Tooltip,
-// } from "@chakra-ui/react";
-// import {
-//   FaSearch,
-//   FaUndo,
-//   FaRedo,
-//   FaSpellCheck,
-//   FaPlus,
-//   FaMinus,
-//   FaPaintBrush,
-//   FaHighlighter,
-//   FaLink,
-//   FaComment,
-//   FaImage,
-//   FaBold,
-//   FaItalic,
-//   FaUnderline,
-//   FaStrikethrough,
-//   FaList,
-//   FaAlignLeft,
-//   FaAlignCenter,
-//   FaAlignRight,
-//   FaAlignJustify,
-//   FaFont,
-//   FaListOl,
-//   FaHeading,
-// } from "react-icons/fa";
-
-// const ToolBar: React.FC = () => {
-//   return (
-//     <div className="container">
-//       <ButtonGroup className="toolbar">
-//         <Tooltip label="Search" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Search"
-//             icon={<FaSearch />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Undo" hasArrow>
-//           <IconButton className="tool" aria-label="Undo" icon={<FaUndo />} />
-//         </Tooltip>
-//         <Tooltip label="Redo" hasArrow>
-//           <IconButton className="tool" aria-label="Redo" icon={<FaRedo />} />
-//         </Tooltip>
-//         <Tooltip label="Spellcheck" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Spellcheck"
-//             icon={<FaSpellCheck />}
-//           />
-//         </Tooltip>
-//         <Menu>
-//           <Tooltip label="Headings" hasArrow>
-//             <MenuButton
-//               as={IconButton}
-//               className="tool"
-//               aria-label="Headings"
-//               icon={<FaHeading />}
-//             />
-//           </Tooltip>
-//           <MenuList>
-//             <MenuItem>Heading 1</MenuItem>
-//             <MenuItem>Heading 2</MenuItem>
-//             <MenuItem>Heading 3</MenuItem>
-//             <MenuItem>Heading 4</MenuItem>
-//             <MenuItem>Heading 5</MenuItem>
-//             <MenuItem>Heading 6</MenuItem>
-//           </MenuList>
-//         </Menu>
-//         <Menu>
-//           <Tooltip label="Font Style" hasArrow>
-//             <MenuButton
-//               as={IconButton}
-//               className="tool"
-//               aria-label="Font Style"
-//               icon={<FaFont />}
-//             />
-//           </Tooltip>
-//           <MenuList>
-//             <MenuItem>Arial</MenuItem>
-//             <MenuItem>Times New Roman</MenuItem>
-//             <MenuItem>Helvetica</MenuItem>
-//             {/* ... other font options */}
-//           </MenuList>
-//         </Menu>
-//         <Tooltip label="Increase Font Size" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Increase Font Size"
-//             icon={<FaPlus />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Decrease Font Size" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Decrease Font Size"
-//             icon={<FaMinus />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Bold" hasArrow>
-//           <IconButton className="tool" aria-label="Search" icon={<FaBold />} />
-//         </Tooltip>
-//         <Tooltip label="Italic" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Italic"
-//             icon={<FaItalic />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Underline" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Underline"
-//             icon={<FaUnderline />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Strikethrough" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Strikethrough"
-//             icon={<FaStrikethrough />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Text Color" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Text Color"
-//             icon={<FaPaintBrush />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Highlight Text" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Highlight Text"
-//             icon={<FaHighlighter />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Insert Link" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Insert Link"
-//             icon={<FaLink />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Add Comment" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Add Comment"
-//             icon={<FaComment />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Add Image" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Add Image"
-//             icon={<FaImage />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Align Left" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Align Left"
-//             icon={<FaAlignLeft />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Align Center" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Align Center"
-//             icon={<FaAlignCenter />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Align Right" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Align Right"
-//             icon={<FaAlignRight />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Align Justify" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Align Justify"
-//             icon={<FaAlignJustify />}
-//           />
-//         </Tooltip>
-//         <Tooltip label="Bullets" hasArrow>
-//           <IconButton className="tool" aria-label="Bullets" icon={<FaList />} />
-//         </Tooltip>
-//         <Tooltip label="Numbered" hasArrow>
-//           <IconButton
-//             className="tool"
-//             aria-label="Numbered"
-//             icon={<FaListOl />}
-//           />
-//         </Tooltip>
-//       </ButtonGroup>
-//     </div>
-//   );
-// };
-
-// export default ToolBar;
-
-import React, { useRef } from "react";
 import "./ToolBar.scss";
-
 import {
   ButtonGroup,
   IconButton,
@@ -230,8 +14,6 @@ import {
   FaUndo,
   FaRedo,
   FaSpellCheck,
-  FaPlus,
-  FaMinus,
   FaPaintBrush,
   FaHighlighter,
   FaLink,
@@ -253,6 +35,9 @@ import {
 } from "react-icons/fa";
 
 const ToolBar = ({
+  onSearch,
+  onUndo,
+  onRedo,
   onFontChange,
   onFontSizeSelect,
   onBoldClick,
@@ -277,25 +62,124 @@ const ToolBar = ({
 
   const colors = [
     "#000000",
-    "#FF5733",
-    "#33FF57",
-    "#3357FF",
-    "#F333FF",
-    "#57FF33",
-  ];
+    "#434343",
+    "#666666",
+    "#999999",
+    "#b7b7b7",
+    "#cccccc",
+    "#d9d9d9",
+    "#efefef",
+    "#f3f3f3",
+    "#ffffff",
 
-  const highlightColors = [
-    "transparent",
+    "#980000",
+    "#ff0000",
+    "#ff9900",
     "#ffff00",
     "#00ff00",
     "#00ffff",
-    "#ff00ff",
+    "#4a86e8",
     "#0000ff",
+    "#9900ff",
+    "#ff00ff",
+
+    "#e6b8af",
+    "#f4cccc",
+    "#fce5cd",
+    "#fff2cc",
+    "#d9ead3",
+    "#d0e0e3",
+    "#c9daf8",
+    "#cfe2f3",
+    "#d9d2e9",
+    "#ead1dc",
+
+    "#dd7e6b",
+    "#ea9999",
+    "#f9cb9c",
+    "#ffe599",
+    "#b6d7a8",
+    "#a2c4c9",
+    "#a4c2f4",
+    "#9fc5e8",
+    "#b4a7d6",
+    "#d5a6bd",
+
+    "#cc4125",
+    "#e06666",
+    "#e06666",
+    "#ffd966",
+    "#93c47d",
+    "#76a5af",
+    "#6d9eeb",
+    "#6fa8dc",
+    "#8e7cc3",
+    "#c27ba0",
+
+    "#a61c00",
+    "#cc0000",
+    "#e69138",
+    "#f1c232",
+    "#6aa84f",
+    "#45818e",
+    "#3c78d8",
+    "#3d85c6",
+    "#674ea7",
+    "#a64d79",
+
+    "#85200c",
+    "#990000",
+    "#b45f06",
+    "#bf9000",
+    "#38761d",
+    "#134f5c",
+    "#1155cc",
+    "#0b5394",
+    "#351c75",
+    "#741b47",
+
+    "#5b0f00",
+    "#660000",
+    "#783f04",
+    "#7f6000",
+    "#274e13",
+    "#0c343d",
+    "#1c4587",
+    "#073763",
+    "#20124d",
+    "#4c1130",
   ];
 
   return (
     <div className="container">
       <ButtonGroup className="toolbar">
+        <Tooltip label="Search" hasArrow>
+          <div>
+            <input
+              type="text"
+              placeholder="Search..."
+              onChange={(e) => onSearch(e.target.value)}
+              className="search-input"
+            />
+          </div>
+        </Tooltip>
+        <Tooltip label="Undo" hasArrow>
+          <IconButton
+            className="tool"
+            aria-label="Undo"
+            icon={<FaUndo />}
+            onClick={onUndo}
+          />
+        </Tooltip>
+
+        <Tooltip label="Redo" hasArrow>
+          <IconButton
+            className="tool"
+            aria-label="Redo"
+            icon={<FaRedo />}
+            onClick={onRedo}
+          />
+        </Tooltip>
         <Select onChange={onFontChange} placeholder="Font">
           {fonts.map((font) => (
             <option key={font} value={font}>
@@ -304,16 +188,26 @@ const ToolBar = ({
           ))}
         </Select>
         <Tooltip label="Font Size" hasArrow>
-          <Menu>
-            <MenuButton as={IconButton} icon={<FaTextHeight />} />
-            <MenuList>
-              {fontSizes.map((size) => (
-                <MenuItem key={size} onClick={() => onFontSizeSelect(size)}>
-                  {size}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
+          <div>
+            <Menu>
+              <MenuButton
+                className="menu-button"
+                as={IconButton}
+                icon={<FaTextHeight />}
+              />
+              <MenuList>
+                {fontSizes.map((size) => (
+                  <MenuItem
+                    className="menu-item"
+                    key={size}
+                    onClick={() => onFontSizeSelect(size)}
+                  >
+                    {size}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+          </div>
         </Tooltip>
         <Tooltip label="Bold" hasArrow>
           <IconButton
@@ -348,48 +242,59 @@ const ToolBar = ({
           />
         </Tooltip>
         <Tooltip label="Text Color" hasArrow>
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaPaintBrush />}
-              className="menu-button"
-            />
-            <MenuList className="menu-list">
-              {colors.map((color) => (
-                <MenuItem
-                  className="menu-item"
-                  key={color}
-                  onClick={() => onColorSelect(color)}
-                >
-                  <div
-                    className="color-swatch"
-                    style={{ backgroundColor: color }}
-                  ></div>
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
+          <div>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<FaPaintBrush />}
+                className="menu-button"
+              />
+              <MenuList className="menu-list">
+                {colors.map((color) => (
+                  <MenuItem
+                    className="menu-item"
+                    key={color}
+                    onClick={() => onColorSelect(color)}
+                    style={{
+                      backgroundColor: color,
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "50%",
+                      margin: "2px",
+                    }}
+                  />
+                ))}
+              </MenuList>
+            </Menu>
+          </div>
         </Tooltip>
         <Tooltip label="Highlight Color" hasArrow>
-          <Menu>
-            <MenuButton as={IconButton} icon={<FaHighlighter />} />
-            <MenuList>
-              {highlightColors.map((color) => (
-                <MenuItem
-                  key={color}
-                  onClick={() => onHighlightSelect(color)}
-                  style={{
-                    backgroundColor: color,
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    margin: "2px",
-                  }}
-                />
-              ))}
-            </MenuList>
-          </Menu>
+          <div>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<FaHighlighter />}
+                className="menu-button"
+              />
+              <MenuList className="menu-list">
+                {colors.map((color) => (
+                  <MenuItem
+                    key={color}
+                    onClick={() => onHighlightSelect(color)}
+                    style={{
+                      backgroundColor: color,
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "50%",
+                      margin: "2px",
+                    }}
+                  />
+                ))}
+              </MenuList>
+            </Menu>
+          </div>
         </Tooltip>
+
         <Tooltip label="Insert Link" hasArrow>
           <IconButton
             className="tool"

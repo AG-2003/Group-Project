@@ -18,7 +18,6 @@
     .editable-area {
         width: 210mm; // Width of A4 paper
         min-height: 297mm; // Minimum height of A4 paper
-        margin: 1rem 0; // Margin top and bottom for aesthetics
         padding: 3rem; // Padding inside the editable area
         border: 1px solid #ddd; // Border to visualize the A4 paper edges
         background-color: #fff; // White background for the editable area
@@ -31,7 +30,7 @@
           border: 1px solid transparent;
         }
       }
-      
+
       .ql-container.ql-snow {
         border: none;
         height: auto;
