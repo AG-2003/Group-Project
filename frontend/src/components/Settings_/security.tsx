@@ -1,7 +1,24 @@
 import { Box, Button, Divider, Flex, Heading, Text } from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
+import { auth } from '../../firebase-config'
+import { signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+const Security = () => {
+  const navigate = useNavigate();
 
-const security = () => {
+  const logOut = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    signOut(auth)
+      .then(() => {
+        console.log('Successful Sign out');
+        navigate('/auth')
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <>
       <div className="head">
@@ -29,7 +46,7 @@ const security = () => {
         {/* Log out of Account */}
         <Flex my={5} gap={195}>
           <Text>Log out of your account</Text>
-          <Button colorScheme="purple" size="sm">
+          <Button colorScheme="purple" size="sm" onClick={logOut}>
             Logout
           </Button>
         </Flex>
@@ -47,4 +64,4 @@ const security = () => {
   );
 };
 
-export default security;
+export default Security;

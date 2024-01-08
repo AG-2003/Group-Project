@@ -9,6 +9,7 @@ import { NewPassword } from "./pages/Auth/NewPassword";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
+import ProtectedRoutes from "./RoutingSecurity/ProtectedRoutes";
 
 function App() {
   return (
@@ -17,12 +18,14 @@ function App() {
       <Route path="/auth" element={<Login />} />
       <Route path="/loginEmail" element={<EmailLogin />} />
       <Route path="/loginPassword" element={<LoginPassword />} />
-      <Route path="/index" element={<Dashboard />} />
       <Route path="/forgotPwd" element={<ForgotPassword />} />
       <Route path="/signUpEmail" element={<SignUpEmail />} />
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
-      <Route path="/Settings" element={<Settings />} />
+      <Route element={<ProtectedRoutes/>}>
+        <Route path='/index' element={<Dashboard />} />
+        <Route path="/Settings" element={<Settings />} />
+      </Route>
     </Routes>
   );
 }
