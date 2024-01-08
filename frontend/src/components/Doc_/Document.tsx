@@ -27,38 +27,6 @@ const Document = () => {
     setIsSearchVisible(!isSearchVisible);
   };
 
-  // Define the debounce function outside of the component
-  // const debounce = (func, wait) => {
-  //   let timeout;
-  //   return function executedFunction(...args) {
-  //     clearTimeout(timeout);
-  //     timeout = setTimeout(() => {
-  //       func(...args);
-  //     }, wait);
-  //   };
-  // };
-
-  // Inside your component:
-  // const debouncedSearch = useCallback(
-  //   debounce((searchTerm) => {
-  //     if (searchTerm && quillRef.current) {
-  //       const editor = quillRef.current.getEditor();
-  //       const text = editor.getText();
-  //       const startIndex = text.toLowerCase().indexOf(searchTerm.toLowerCase());
-  //       if (startIndex !== -1) {
-  //         editor.setSelection(startIndex, searchTerm.length);
-  //       } else {
-  //         editor.setSelection(0, 0);
-  //       }
-  //     }
-  //   }, 700),
-  //   [] // useCallback dependency array
-  // );
-
-  // const handleSearch = (event) => {
-  //   const searchTerm = event.target.value;
-  //   debouncedSearch(searchTerm);
-  // };
   const handleSearch = debounce((searchTerm) => {
     if (searchTerm && quillRef.current) {
       const editor = quillRef.current.getEditor();

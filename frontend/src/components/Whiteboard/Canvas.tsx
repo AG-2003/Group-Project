@@ -68,7 +68,7 @@ const colors = [
 
   "#cc4125",
   "#e06666",
-  "#e06666",
+  "#f7b558",
   "#ffd966",
   "#93c47d",
   "#76a5af",
@@ -128,10 +128,12 @@ const Canvas: React.FC = () => {
     setShowPenFeatures(!showPenFeatures);
   };
 
-  // Event handler for the FaDroplet button
-  const handleColorClick = () => {
+  const toggleColorPicker = () => {
     setShowColorPicker(!showColorPicker);
-    setShowSizeSlider(false); // Hide the size slider if it's open
+    // Optionally, if you want to hide other UI elements when the color picker is open:
+    if (showSizeSlider && showColorPicker) {
+      setShowSizeSlider(false);
+    }
   };
 
   // Event handler for the FaBrush button
@@ -276,7 +278,8 @@ const Canvas: React.FC = () => {
             <FaPen />
           </button>
           <div className="pen-features">
-            <button onClick={handleColorClick}>
+            {/* <button onClick={handleColorClick}> */}
+            <button onClick={toggleColorPicker} className="drop-button">
               <FaDroplet />
             </button>
             <button onClick={handleSizeClick}>
@@ -368,24 +371,21 @@ const Canvas: React.FC = () => {
 export default Canvas; */}
 
       {showColorPicker && (
-        <div className="container-color">
-          <div className="color-grid">
-            {colors.map((color) => (
-              <div
-                key={color}
-                className={`color-block ${
-                  penColor === color ? "selected" : ""
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => setPenColor(color)}
-              />
-            ))}
-          </div>
+        // <div className="color-grid">
+        <div className={`color-grid ${showColorPicker ? "active" : ""}`}>
+          {colors.map((color) => (
+            <div
+              key={color}
+              className={`color-block ${penColor === color ? "selected" : ""}`}
+              style={{ backgroundColor: color }}
+              onClick={() => setPenColor(color)}
+            />
+          ))}
         </div>
       )}
 
       {showSizeSlider && (
-        <>
+        <div className="containerSlider">
           <input
             type="range"
             min="1"
@@ -404,7 +404,7 @@ export default Canvas; */}
             }
             className="stroke-size-input"
           />
-        </>
+        </div>
       )}
       {/* ... other components ... */}
     </div>
