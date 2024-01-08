@@ -1,6 +1,6 @@
-import { Navbar } from "../components/Landing/Navbar";
-import { Body } from "../components/Landing/Body";
-import { Footer } from "../components/Landing/Footer";
+import { Navbar } from "../components/Landing/navbar";
+import { Body } from "../components/Landing/body";
+import { Footer } from "../components/Landing/footer";
 
 const Landing: React.FC = () => {
   return (

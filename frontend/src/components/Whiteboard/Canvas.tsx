@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Line, Text, StageProps } from "react-konva";
 import { FaPen, FaEraser, FaTextHeight, FaTrash } from "react-icons/fa"; // Import necessary icons
 import { FaDroplet, FaBrush } from "react-icons/fa6";
@@ -124,22 +124,48 @@ const Canvas: React.FC = () => {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showSizeSlider, setShowSizeSlider] = useState(false);
 
+  const [activeElement, setActiveElement] = useState<Element | null>(null);
+
   const handlePenClick = () => {
     setShowPenFeatures(!showPenFeatures);
   };
 
+  // const toggleColorPicker = () => {
+  //   setShowColorPicker(!showColorPicker);
+  //   setActiveElement(document.querySelector(".color-grid"));
+  //   if (showSizeSlider) setShowSizeSlider(false);
+  //   // if (showSizeSlider && showColorPicker) {
+  //   //   setShowSizeSlider(false);
+  //   // }
+  // };
+
+  // const handleSizeClick = () => {
+  //   setShowSizeSlider(!showSizeSlider);
+  //   setActiveElement(document.querySelector(".containerSlider"));
+  //   if (showColorPicker) setShowColorPicker(false);
+  //   // setShowColorPicker(false);
+  // };
+
   const toggleColorPicker = () => {
-    setShowColorPicker(!showColorPicker);
-    // Optionally, if you want to hide other UI elements when the color picker is open:
-    if (showSizeSlider && showColorPicker) {
-      setShowSizeSlider(false);
+    const newShowColorPicker = !showColorPicker;
+    setShowColorPicker(newShowColorPicker);
+    if (newShowColorPicker) {
+      setActiveElement(document.querySelector(".color-grid"));
+    } else {
+      setActiveElement(null);
     }
+    if (showSizeSlider) setShowSizeSlider(false);
   };
 
-  // Event handler for the FaBrush button
   const handleSizeClick = () => {
-    setShowSizeSlider(!showSizeSlider);
-    setShowColorPicker(false); // Hide the color picker if it's open
+    const newShowSizeSlider = !showSizeSlider;
+    setShowSizeSlider(newShowSizeSlider);
+    if (newShowSizeSlider) {
+      setActiveElement(document.querySelector(".containerSlider"));
+    } else {
+      setActiveElement(null);
+    }
+    if (showColorPicker) setShowColorPicker(false);
   };
 
   const validateAndUpdateStrokeSize = (size: number) => {
@@ -219,6 +245,41 @@ const Canvas: React.FC = () => {
       setTool(selectedTool);
     }
   };
+
+  // const handleClickOutside = (event) => {
+  //   if (activeElement && !activeElement.contains(event.target)) {
+  //     setShowColorPicker(false);
+  //     setShowSizeSlider(false);
+  //     setActiveElement(null); // Reset the active element
+  //   }
+  // };
+
+  useEffect(() => {
+    function handleOutsideClick(event: MouseEvent) {
+      // Cast the target of the click to an Element
+      const target = event.target as Element;
+
+      // Check if the click was outside both the color picker and size slider
+      if (
+        showColorPicker &&
+        !document.querySelector(".color-grid")?.contains(target)
+      ) {
+        setShowColorPicker(false);
+      }
+      if (
+        showSizeSlider &&
+        !document.querySelector(".containerSlider")?.contains(target)
+      ) {
+        setShowSizeSlider(false);
+      }
+    }
+
+    // Add the event listener to the document
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    // Remove the event listener on cleanup
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [showColorPicker, showSizeSlider]); // This effect should run when activeElement changes
 
   const clearBoard = () => {
     const confirmClear = window.confirm(

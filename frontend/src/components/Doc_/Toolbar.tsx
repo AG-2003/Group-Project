@@ -1,4 +1,4 @@
-import "./ToolBar.scss";
+import "./Toolbar.scss";
 import {
   ButtonGroup,
   Icon,
@@ -232,9 +232,8 @@ const ToolBar = ({
         </Tooltip>
         <Tooltip label="Spell Check" hasArrow>
           <IconButton
-            className={`tool spellcheck-button ${
-              isSpellCheckEnabled ? "active" : ""
-            }`}
+            className={`tool spellcheck-button ${isSpellCheckEnabled ? "active" : ""
+              }`}
             aria-label="Toggle Spell Check"
             icon={<FaSpellCheck />} // Make sure to import the correct icon
             onClick={onToggleSpellCheck}
