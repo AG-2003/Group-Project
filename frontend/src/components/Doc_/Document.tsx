@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo } from "react";
 import ReactQuill from "react-quill";
-import ToolBar from "./ToolBar";
+import ToolBar from "./Toolbar";
 import "react-quill/dist/quill.snow.css";
 import "./Document.scss";
 
