@@ -10,6 +10,10 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import ProtectedRoutes from "./RoutingSecurity/ProtectedRoutes";
+import Doc from "./pages/Doc";
+import Whiteboard from "./pages/Whiteboard";
+
+import "draft-js/dist/Draft.css";
 
 function App() {
   return (
@@ -26,8 +30,18 @@ function App() {
         <Route path='/index' element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
       </Route>
+      <Route path="/Doc" element={<Doc />} />
+      <Route path="/Board" element={<Whiteboard />} />;
     </Routes>
   );
 }
 
 export default App;
+
+// import Whiteboard from "./pages/Whiteboard";
+
+// function App() {
+//   return <Whiteboard />;
+// }
+
+// export default App;

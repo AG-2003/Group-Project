@@ -1,0 +1,105 @@
+.document .editable-area:focus {
+  outline: none; // Remove the default focus outline
+  }
+
+.document {
+    .DraftEditor-editorContainer {
+      min-height: 6em;
+    }
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; // Align to the top
+    padding: 1rem 0; // Padding at the top and bottom only
+    margin-top: -1rem; // Adjust for the top padding of the navbar and toolbar if needed
+    height: calc(100vh - 2rem);
+    background-color: #eeeeff;
+    overflow: auto; 
+
+    .editable-area {
+        width: 210mm; // Width of A4 paper
+        min-height: 297mm; // Minimum height of A4 paper
+        padding: 3rem; // Padding inside the editable area
+        border: 1px solid #ddd; // Border to visualize the A4 paper edges
+        background-color: #fff; // White background for the editable area
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow to lift the paper off the page
+        overflow: hidden; // Hide overflow
+        resize: none; // Disable resizing of the textarea
+      
+        &:focus {
+          outline: none;
+          border: 1px solid transparent;
+        }
+      }
+
+      .ql-container.ql-snow {
+        border: none;
+        height: auto;
+      }
+
+            .comments-section {
+              margin-top: 20px;
+            }
+      
+            .comment {
+              background-color: #ffffff;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow to lift the paper off the page
+              width: 200px;
+              padding: 15px;
+              margin-bottom: 10px;
+              margin-left: 4rem;
+              border-radius: 10px;
+              display: flex;
+              flex-direction: column;
+            }
+      
+            .comment-text {
+              margin-bottom: 15px;
+              margin-left: 1rem;
+              font-weight: bold;
+              /* Add space between the comment text and the button */
+            }
+      
+            .commented-text-preview {
+              margin-top: 5px;
+              color: #666;
+              margin-bottom: 5px;
+              font-weight:lighter;
+              /* Add space between the text preview and the button */
+            }
+      
+            button {
+              position: relative;
+              left: 10px;
+              align-self: flex-start;
+              align-items: center;
+              background-color:#58458a;
+              color: white;
+              border: none;
+              padding: 5px 10px;
+              border-radius: 4px;
+              cursor: pointer;
+              transition: background-color 0.15s ease-in-out;
+      
+              &:hover {
+                background-color: #47386e;
+              }
+            }
+            
+            /* Optional: Adjustments for mobile responsiveness */
+            @media (max-width: 768px) {
+              .comment {
+                padding: 15px;
+                /* Increase padding for touch targets */
+              }
+      
+              button {
+                padding: 8px 16px;
+                /* Increase button padding on smaller screens */
+              }
+            }
+
+      
+      
+
+}
+
