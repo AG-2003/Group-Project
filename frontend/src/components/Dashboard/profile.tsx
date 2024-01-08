@@ -19,7 +19,7 @@ const Profile = () => {
         justifyContent="space-between"
         alignItems="center"
         p={5}
-        bg="#e1ecf7"
+        bg="#dcdcf6"
         rounded={15}
       >
         <Flex align="center" p={3}>

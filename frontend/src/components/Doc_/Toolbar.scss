@@ -1,0 +1,140 @@
+
+.container {
+  display: flex; // Use flexbox to align children
+  justify-content: center; // Center children horizontally
+  align-items: center; // Center children vertically
+  padding: 1rem;
+  background-color: #eeeeff;
+  margin-bottom: 1rem;
+
+.toolbar {
+  padding: 0.25rem; // Reduced padding for less space around buttons.
+  background-color: #bcbcdc; // A muted color similar to the second image.
+  border-radius: 8px; // Less rounded corners compared to the first image.
+  display: flex; // Ensure the buttons are flexibly placed.
+  box-shadow: 0 0 10px rgba(0.1, 0.1, 0.1, 0.1); // Shadow to lift the paper off the page
+  // gap: 4px; // Adds a gap between buttons.
+
+  .tool {
+    background-color: transparent; // No background color for a flat look.
+    color: #2c2c2c; // Muted icon color.
+    border: none; // Remove borders if any.
+
+    &:hover {
+      background-color: #cdcdff; // A light hover effect.
+    }
+  }
+
+  .tool-check{
+    font-size: 20px;
+    background-color: inherit;
+
+    &:hover{
+      background-color: #cdcdff; // A light hover effect.
+    }
+  }
+}
+.menu-button{
+  background-color: #bcbcdc; // A muted color similar to the second image.
+
+&:hover {
+  background-color: #cdcdff; // A light hover effect.
+}
+}
+.menu-list {
+  padding: 0.5rem;
+  background-color: #ffffff; // Use a white background for the color palette
+  border-radius: 4px; // Optional: round corners for the color palette
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); // Add a subtle shadow
+  width: auto; // Allow the menu to size based on content
+  display: flex; // Use flexbox
+  flex-wrap: wrap; // Allow wrapping
+  justify-content: start; // Align to the start of the flex container
+}
+
+.color-swatch {
+  width: 20px; // Adjust the size to fit 10 in a row
+  height: 20px; // Adjust the size to fit 10 in a row
+  border-radius: 50%; // Circular swatches
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  margin-right: 2px; // Add margin for spacing between swatches
+  margin-bottom: 2px; // Add margin for spacing between swatches
+}
+
+.menu-list {
+  width: 300px; // Width for 10 swatches + margins
+  flex-direction: row; // Align swatches in a row
+  flex-wrap: wrap; // Allow wrapping to next line
+}
+
+.search-container {
+  position: relative; // This allows absolute positioning within the container
+}
+
+.search-bar {
+  position: absolute;
+  top: 125%; // Position the search bar right below the toolbar
+  left: 240%; // Center it horizontally
+  transform: translateX(-50%); // Align the center of the search bar with the icon
+  z-index: 10; // Ensure it's above other content
+  width: 200px; // Width of the search bar
+}
+
+.search-input {
+  width: 100%; // Take up the full width of its container
+  padding: 0.5rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); // Optional: add a drop shadow
+  &:focus {
+      outline: none;
+    }
+}
+.alignment-container {
+  position: relative;
+}
+
+.alignment-button {
+  // Styles for the button that triggers the alignment dropdown
+  margin-right: 0.5rem;
+  background-color: inherit;
+  &:hover{
+    background-color: #cdcdff;
+  }
+}
+
+.alignment-menu-list {
+  display: flex; // Align menu items horizontally
+  padding: 0px;
+  margin-top: 0.5rem; // Give some space between the button and the dropdown
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); // Shadow for dropdown
+  border-radius: 4px; // Rounded corners for dropdown
+}
+
+.alignment-menu-item {
+  display: flex; // Use flexbox for horizontal alignment
+  justify-content: center; // Center items horizontally
+  align-items: center; // Center items vertically
+  padding: 12px; // Padding inside each menu item
+  border-right: 1px solid #eee; // Separator between items
+  flex: 1; // Distribute space evenly
+  min-width: 0; // Allow the items to shrink below their content size
+  overflow: hidden; // Prevent content from overflowing
+
+  &:last-child {
+    border-right: none; // No border for the last item
+  }
+
+  &:hover {
+    background-color: #f7f7f7; // Hover background color
+  }
+}
+
+.tool.spellcheck-button {
+
+  // Add a distinct style when spell check is enabled
+  &.active {
+    background-color: #d6d6ff; // for example, a light green background
+  }
+}
+}

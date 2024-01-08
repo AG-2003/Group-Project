@@ -1,0 +1,47 @@
+.footer {
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.35rem;
+
+  .zoom-slider {
+    margin-right: 4.25rem;
+    position: fixed;
+    -webkit-appearance: none; // Removes default webkit styles
+    appearance: none;
+    width: 150px; // Adjust the width as needed
+    height: 2.5px; // Adjust the height of the slider track
+    background: #ddd; // Slider track color
+    outline: none;
+    opacity: 0.7; // Slider opacity
+    -webkit-transition: .2s; // Transition for smoothness
+    transition: opacity .2s;
+
+    &:hover {
+      opacity: 1; // Full opacity on hover
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none; // Required for custom thumb style
+      appearance: none;
+      width: 15px; // Thumb width
+      height: 15px; // Thumb height
+      background: #444; // Thumb color
+      cursor: pointer;
+      border-radius: 50%; // Round thumb
+    }
+
+    &::-moz-range-thumb {
+      width: 20px; // Thumb width
+      height: 20px; // Thumb height
+      background: #444; // Thumb color
+      cursor: pointer;
+      border-radius: 50%; // Round thumb
+    }
+  }
+
+  .zoom-percentage {
+    margin-right: 1rem;
+  }
+}

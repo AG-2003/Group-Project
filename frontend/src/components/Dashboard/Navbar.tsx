@@ -20,7 +20,7 @@ interface Props {
   onToggle: () => void;
 }
 
-const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
+const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
   const iconStyle = {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
@@ -49,13 +49,14 @@ const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
       alignItems="center"
       p={1}
       height="30px"
-      bg={"#dcdcf6"}
+      bg={"#484c6c"}
     >
       <IconButton
         bg="inherit"
         aria-label="Menu"
         fontSize="20px"
-        color="black"
+        color="white"
+        colorScheme="purple.100"
         icon={<HamburgerIcon style={iconStyle} />}
         onClick={onToggle}
       />
@@ -71,12 +72,15 @@ const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
             Create a design
           </MenuButton>
           <MenuList>
-            <MenuItem icon={<FiFileText />} onClick={openModal}>
+            {/* <MenuItem icon={<FiFileText />} onClick={openModal}>
               Docs
-            </MenuItem>
+            </MenuItem> */}
+            <MenuItem icon={<FiFileText />}>Docs</MenuItem>
             <MenuItem icon={<LuPresentation />}>Slides</MenuItem>
             <MenuItem icon={<FiGrid />}>Spreadsheets</MenuItem>
-            <MenuItem icon={<FiClipboard />}>Whiteboard</MenuItem>
+            <MenuItem icon={<FiClipboard />} onClick={openModal}>
+              Whiteboard
+            </MenuItem>
           </MenuList>
         </Menu>
         <Link to="/settings">
@@ -87,4 +91,4 @@ const Navbar = ({ onToggle, isSidebarOpen }: Props) => {
   );
 };
 
-export default Navbar;
+export default NavBar;
