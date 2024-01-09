@@ -26,12 +26,13 @@ function App() {
       <Route path="/signUpEmail" element={<SignUpEmail />} />
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
-      <Route element={<ProtectedRoutes/>}>
-        <Route path='/index' element={<Dashboard />} />
+      <Route element={<ProtectedRoutes />}>
+        <Route path="/index" element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
       </Route>
       <Route path="/Doc" element={<Doc />} />
       <Route path="/Board" element={<Whiteboard />} />;
+      <Route path="/chat" element={<QuickChat />} />;
     </Routes>
   );
 }

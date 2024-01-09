@@ -67,6 +67,19 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
           onClose={closeModal}
           onConfirm={handleConfirm}
         />
+
+        <Link to="/chat">
+          <IconButton
+            borderRadius="10%" // To make it a circular button
+            bg="white"
+            p={2}
+            mr={4}
+            icon={<FaUserFriends />}
+            cursor="pointer"
+            aria-label={""}
+          />
+        </Link>
+
         <Menu>
           <MenuButton as={Button} colorScheme="purple" mr={4} size="sm">
             Create a design
