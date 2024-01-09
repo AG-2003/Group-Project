@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Divider, Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
-import NavBar from "../components/Dashboard/Navbar";
+import NavBar from "../components/Dashboard/NavBar";
 import Projects from "../components/Dashboard/Projects";
-import Profile from "../components/Dashboard/profile";
+import Profile from "../components/Dashboard/Profile";
 import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
-import Trash from "../components/Trash/trashAlt";
+import Trash from "../components/Trash/TrashAlt";
 
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

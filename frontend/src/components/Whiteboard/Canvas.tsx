@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Line, Text, StageProps } from "react-konva";
 import { FaPen, FaEraser, FaTextHeight, FaTrash } from "react-icons/fa"; // Import necessary icons
 import { FaDroplet, FaBrush } from "react-icons/fa6";
@@ -68,7 +68,7 @@ const colors = [
 
   "#cc4125",
   "#e06666",
-  "#e06666",
+  "#f7b558",
   "#ffd966",
   "#93c47d",
   "#76a5af",
@@ -123,21 +123,60 @@ const Canvas: React.FC = () => {
   const [showPenFeatures, setShowPenFeatures] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showSizeSlider, setShowSizeSlider] = useState(false);
+  const [activeElement, setActiveElement] = useState<Element | null>(null);
+  const [showEraserFeatures, setShowEraserFeatures] = useState(false);
+
+  // const handlePenClick = () => {
+  //   setShowPenFeatures(!showPenFeatures);
+  // };
 
   const handlePenClick = () => {
+    setTool("pen");
     setShowPenFeatures(!showPenFeatures);
+    setShowEraserFeatures(false);
   };
 
-  // Event handler for the FaDroplet button
-  const handleColorClick = () => {
-    setShowColorPicker(!showColorPicker);
-    setShowSizeSlider(false); // Hide the size slider if it's open
+  const toggleColorPicker = () => {
+    const newShowColorPicker = !showColorPicker;
+    setShowColorPicker(newShowColorPicker);
+    if (newShowColorPicker) {
+      setActiveElement(document.querySelector(".color-grid"));
+    } else {
+      setActiveElement(null);
+    }
+    if (showSizeSlider) setShowSizeSlider(false);
   };
 
-  // Event handler for the FaBrush button
   const handleSizeClick = () => {
-    setShowSizeSlider(!showSizeSlider);
-    setShowColorPicker(false); // Hide the color picker if it's open
+    const newShowSizeSlider = !showSizeSlider;
+    setShowSizeSlider(newShowSizeSlider);
+    if (newShowSizeSlider) {
+      setActiveElement(document.querySelector(".containerSlider"));
+    } else {
+      setActiveElement(null);
+    }
+    if (showColorPicker) setShowColorPicker(false);
+  };
+
+  // const handleEraserClick = () => {
+  //   // If the eraser tool is already selected, toggle its features visibility
+  //   if (tool === "eraser") {
+  //     setShowEraserFeatures(!showEraserFeatures);
+  //   } else {
+  //     // If the eraser tool is not selected, select it and show its features
+  //     handleToolChange("eraser");
+  //     setShowEraserFeatures(true);
+  //   }
+  //   // Hide pen features if any are visible
+  //   setShowPenFeatures(false);
+  //   setShowColorPicker(false);
+  //   setShowSizeSlider(false);
+  // };
+
+  const handleEraserClick = () => {
+    setTool("eraser");
+    setShowEraserFeatures(!showEraserFeatures);
+    setShowPenFeatures(false);
   };
 
   const validateAndUpdateStrokeSize = (size: number) => {
@@ -207,16 +246,56 @@ const Canvas: React.FC = () => {
     isDrawing.current = false;
   };
 
+  // const handleToolChange = (selectedTool: Tool) => {
+  //   if (selectedTool === "clear") {
+  //     clearBoard();
+  //   }
+  //   if (selectedTool !== "pen") {
+  //     setShowPenFeatures(false);
+  //   }
+  //   if (selectedTool !== "eraser") {
+  //     setShowEraserFeatures(false);
+  //   } else {
+  //     setTool(selectedTool);
+  //   }
+  // };
+
   const handleToolChange = (selectedTool: Tool) => {
     if (selectedTool === "clear") {
-      clearBoard();
+      // Clear the board logic
     }
-    if (selectedTool !== "pen") {
-      setShowPenFeatures(false);
-    } else {
-      setTool(selectedTool);
-    }
+
+    setTool(selectedTool);
+    setShowPenFeatures(false);
+    setShowEraserFeatures(false);
+    // Close other feature panels if needed
   };
+
+  useEffect(() => {
+    function handleOutsideClick(event: MouseEvent) {
+      // Cast the target of the click to an Element
+      const target = event.target as Element;
+
+      if (
+        showColorPicker &&
+        !document.querySelector(".color-grid")?.contains(target)
+      ) {
+        setShowColorPicker(false);
+      }
+      if (
+        showSizeSlider &&
+        !document.querySelector(".containerSlider")?.contains(target)
+      ) {
+        setShowSizeSlider(false);
+      }
+    }
+
+    // Add the event listener to the document
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    // Remove the event listener on cleanup
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [showColorPicker, showSizeSlider]); // This effect should run when activeElement changes
 
   const clearBoard = () => {
     const confirmClear = window.confirm(
@@ -267,7 +346,9 @@ const Canvas: React.FC = () => {
       </Stage>
       <div className="toolbar">
         <div
-          className={`pen-container ${showPenFeatures ? "show-features" : ""}`}
+          className={`pen-container ${showPenFeatures ? "show-features" : ""} ${
+            showEraserFeatures ? "move-with-eraser" : ""
+          }`}
         >
           <button
             className={`tool-button ${tool === "pen" ? "selected" : ""}`}
@@ -275,8 +356,10 @@ const Canvas: React.FC = () => {
           >
             <FaPen />
           </button>
-          <div className="pen-features">
-            <button onClick={handleColorClick}>
+          <div
+            className={`pen-features ${showPenFeatures ? "show-features" : ""}`}
+          >
+            <button onClick={toggleColorPicker} className="drop-button">
               <FaDroplet />
             </button>
             <button onClick={handleSizeClick}>
@@ -285,21 +368,29 @@ const Canvas: React.FC = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => handleToolChange("eraser")}
-          className={`tool-button ${tool === "eraser" ? "selected" : ""}`}
+        <div
+          className={`eraser-container ${
+            showEraserFeatures ? "show-features" : ""
+          }`}
         >
-          <FaEraser />
-        </button>
+          <button
+            className={`tool-button ${tool === "eraser" ? "selected" : ""}`}
+            onClick={handleEraserClick}
+          >
+            <FaEraser />
+          </button>
+          {/* Placeholder for eraser features if any */}
+        </div>
+
         <button
-          onClick={() => handleToolChange("text")}
           className={`tool-button ${tool === "text" ? "selected" : ""}`}
+          onClick={() => handleToolChange("text")}
         >
           <FaTextHeight />
         </button>
         <button
-          onClick={() => handleToolChange("clear")}
           className="tool-button"
+          onClick={() => handleToolChange("clear")}
         >
           <FaTrash />
         </button>
@@ -368,24 +459,20 @@ const Canvas: React.FC = () => {
 export default Canvas; */}
 
       {showColorPicker && (
-        <div className="container-color">
-          <div className="color-grid">
-            {colors.map((color) => (
-              <div
-                key={color}
-                className={`color-block ${
-                  penColor === color ? "selected" : ""
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => setPenColor(color)}
-              />
-            ))}
-          </div>
+        <div className={`color-grid ${showColorPicker ? "active" : ""}`}>
+          {colors.map((color) => (
+            <div
+              key={color}
+              className={`color-block ${penColor === color ? "selected" : ""}`}
+              style={{ backgroundColor: color }}
+              onClick={() => setPenColor(color)}
+            />
+          ))}
         </div>
       )}
 
       {showSizeSlider && (
-        <>
+        <div className="containerSlider">
           <input
             type="range"
             min="1"
@@ -404,7 +491,29 @@ export default Canvas; */}
             }
             className="stroke-size-input"
           />
-        </>
+        </div>
+      )}
+      {showEraserFeatures && (
+        <div className="eraser-features">
+          <input
+            type="range"
+            min="1"
+            max="40"
+            value={eraserSize}
+            onChange={(e) =>
+              validateAndUpdateEraserSize(parseInt(e.target.value))
+            }
+            className="eraser-size-slider"
+          />
+          <input
+            type="number"
+            value={eraserSize}
+            onChange={(e) =>
+              validateAndUpdateEraserSize(parseInt(e.target.value))
+            }
+            className="eraser-size-input"
+          />
+        </div>
       )}
       {/* ... other components ... */}
     </div>

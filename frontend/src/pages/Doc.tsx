@@ -24,11 +24,3 @@ const Doc: React.FC = () => {
 };
 
 export default Doc;
-
-// import Editor from "../components/Doc_/TestEditor";
-
-// const Doc: React.FC = () => {
-//   return <Editor />;
-// };
-
-// export default Doc;
