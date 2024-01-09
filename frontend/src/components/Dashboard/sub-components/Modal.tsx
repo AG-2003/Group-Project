@@ -18,7 +18,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm }) => {
     onConfirm(title);
     setTitle(""); // Clear the title after confirmation
     // navigate("/Doc"); // Navigate to the Docs page
-    navigate("/Board"); // Navigate to the Docs page
+    navigate("/Board");
   };
 
   return (

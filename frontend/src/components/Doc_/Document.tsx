@@ -27,7 +27,7 @@ const Document = () => {
     setIsSearchVisible(!isSearchVisible);
   };
 
-  const handleSearch = debounce((searchTerm) => {
+  const handleSearch = debounce((searchTerm:string) => {
     if (searchTerm && quillRef.current) {
       const editor = quillRef.current.getEditor();
       const text = editor.getText();
