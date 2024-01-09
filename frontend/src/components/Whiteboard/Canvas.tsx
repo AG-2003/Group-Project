@@ -346,7 +346,9 @@ const Canvas: React.FC = () => {
       </Stage>
       <div className="toolbar">
         <div
-          className={`pen-container ${showPenFeatures ? "show-features" : ""}`}
+          className={`pen-container ${showPenFeatures ? "show-features" : ""} ${
+            showEraserFeatures ? "move-with-eraser" : ""
+          }`}
         >
           <button
             className={`tool-button ${tool === "pen" ? "selected" : ""}`}
@@ -354,8 +356,9 @@ const Canvas: React.FC = () => {
           >
             <FaPen />
           </button>
-          <div className="pen-features">
-            {/* <button onClick={handleColorClick}> */}
+          <div
+            className={`pen-features ${showPenFeatures ? "show-features" : ""}`}
+          >
             <button onClick={toggleColorPicker} className="drop-button">
               <FaDroplet />
             </button>
@@ -376,17 +379,18 @@ const Canvas: React.FC = () => {
           >
             <FaEraser />
           </button>
-          {/* Eraser features here */}
+          {/* Placeholder for eraser features if any */}
         </div>
+
         <button
-          onClick={() => handleToolChange("text")}
           className={`tool-button ${tool === "text" ? "selected" : ""}`}
+          onClick={() => handleToolChange("text")}
         >
           <FaTextHeight />
         </button>
         <button
-          onClick={() => handleToolChange("clear")}
           className="tool-button"
+          onClick={() => handleToolChange("clear")}
         >
           <FaTrash />
         </button>
