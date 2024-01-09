@@ -81,10 +81,7 @@ const Document = () => {
     }
   };
 
-  const handleTextTypeChange = (
-    format: string,
-    level: string | number | boolean
-  ) => {
+  const handleTextTypeChange = (format: string, level?: number) => {
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
       if (format === "normal") {
@@ -102,7 +99,7 @@ const Document = () => {
     }
   };
 
-  const handleFontSizeSelect = (size: number) => {
+  const handleFontSizeSelect = (size: string) => {
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
       editor.format("size", size);

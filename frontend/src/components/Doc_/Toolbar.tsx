@@ -36,7 +36,47 @@ import {
   FaOutdent,
 } from "react-icons/fa";
 import { VscChecklist } from "react-icons/vsc";
-const ToolBar = ({
+
+// Define the types for the functions used as props
+type SearchFunction = (searchTerm: string) => void;
+type SimpleFunction = () => void;
+type TextTypeChangeFunction = (format: string, level?: number) => void;
+type FontChangeFunction = (font: string) => void;
+type FontSizeSelectFunction = (size: string) => void;
+type ColorSelectFunction = (color: string) => void;
+type TextAlignmentChangeFunction = (alignment: string) => void;
+type IndentClickFunction = (direction: string) => void;
+
+// Define the props interface
+interface ToolBarProps {
+  onSearch: SearchFunction;
+  isSearchVisible: boolean;
+  toggleSearchVisibility: SimpleFunction;
+  onUndo: SimpleFunction;
+  onRedo: SimpleFunction;
+  onToggleSpellCheck: SimpleFunction;
+  isSpellCheckEnabled: boolean;
+  onTextTypeChange: TextTypeChangeFunction;
+  onFontChange: FontChangeFunction;
+  onFontSizeSelect: FontSizeSelectFunction;
+  onBoldClick: SimpleFunction;
+  onItalicClick: SimpleFunction;
+  onUnderlineClick: SimpleFunction;
+  onStrikeClick: SimpleFunction;
+  onColorSelect: ColorSelectFunction;
+  onHighlightSelect: ColorSelectFunction;
+  onLinkClick: SimpleFunction;
+  onAddComment: SimpleFunction;
+  onImageUpload: SimpleFunction;
+  onTextAlignmentChange: TextAlignmentChangeFunction;
+  onChecklistClick: SimpleFunction;
+  onUnorderedListClick: SimpleFunction;
+  onOrderedListClick: SimpleFunction;
+  onIndentClick: IndentClickFunction;
+  onOutdentClick: IndentClickFunction;
+}
+
+const ToolBar: React.FC<ToolBarProps> = ({
   onSearch,
   isSearchVisible,
   toggleSearchVisibility,
@@ -73,13 +113,6 @@ const ToolBar = ({
     { label: "Heading 6", value: "header", level: 6 },
     { label: "Blockquote", value: "blockquote" },
     { label: "Code Block", value: "code-block" },
-
-    // { label: "List Bullet", value: "list", level: "bullet" },
-    // { label: "List Ordered", value: "list", level: "ordered" },
-    // { label: "Script Sub", value: "script", level: "sub" },
-    // { label: "Script Super", value: "script", level: "super" },
-    // { label: "Small", value: "small" },
-    // { label: "Indented", value: "indent" },
   ];
 
   const fonts = [
@@ -232,8 +265,9 @@ const ToolBar = ({
         </Tooltip>
         <Tooltip label="Spell Check" hasArrow>
           <IconButton
-            className={`tool spellcheck-button ${isSpellCheckEnabled ? "active" : ""
-              }`}
+            className={`tool spellcheck-button ${
+              isSpellCheckEnabled ? "active" : ""
+            }`}
             aria-label="Toggle Spell Check"
             icon={<FaSpellCheck />} // Make sure to import the correct icon
             onClick={onToggleSpellCheck}
