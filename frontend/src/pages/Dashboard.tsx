@@ -8,6 +8,7 @@ import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/TrashAlt";
 
+// meow
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
