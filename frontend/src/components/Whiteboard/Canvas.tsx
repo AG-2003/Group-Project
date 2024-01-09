@@ -368,7 +368,8 @@ const Canvas: React.FC = () => {
       <div className="toolbar">
         <div
           className={`undo-redo ${
-            showPenFeatures ? "move-undo-redo-with-pen" : ""}${showEraserFeatures ? "move-undo-redo-with-eraser" : ""}`}
+            showPenFeatures ? "move-undo-redo-with-pen" : ""
+          }${showEraserFeatures ? "move-undo-redo-with-eraser" : ""}`}
         >
           <button
             onClick={handleUndo}
@@ -388,7 +389,7 @@ const Canvas: React.FC = () => {
         <div
           className={`pen-container ${
             showPenFeatures ? "show-pen-features" : ""
-          } ${showEraserFeatures ? "move-pen-with-tools" : ""}`}
+          } ${showEraserFeatures ? "move-pen-with-eraser" : ""}`}
         >
           <button
             className={`tool-button ${tool === "pen" ? "selected" : ""}`}
@@ -401,10 +402,10 @@ const Canvas: React.FC = () => {
               showPenFeatures ? "show-pen-features" : ""
             }`}
           >
-            <button onClick={toggleColorPicker}>
+            <button className="tool-button-feature" onClick={toggleColorPicker}>
               <FaDroplet />
             </button>
-            <button onClick={handleSizeClick}>
+            <button className="tool-button-feature" onClick={handleSizeClick}>
               <FaSliders />
             </button>
           </div>
@@ -425,7 +426,10 @@ const Canvas: React.FC = () => {
               showEraserFeatures ? "show-eraser-features" : ""
             }`}
           >
-            <button onClick={handleEraserSizeClick}>
+            <button
+              className="tool-button-feature"
+              onClick={handleEraserSizeClick}
+            >
               <FaSliders />
             </button>
           </div>

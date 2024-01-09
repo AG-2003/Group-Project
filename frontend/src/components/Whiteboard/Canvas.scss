@@ -42,6 +42,12 @@
     }
   }
 
+  .tool-button-feature{
+    &:hover{
+      color: #6d3fb8;
+    }
+  }
+
     .pen-container {
       display: flex;
       position: relative;
@@ -66,9 +72,9 @@
       }
     }
 
-        .move-pen-with-tools {
-          transform: translateX(-75%); // Move left when the pen or eraser icon is clicked
-        }
+    .move-pen-with-eraser {
+      transform: translateX(-75%); // Move left when the pen or eraser icon is clicked
+    }
 
 
     .eraser-container {
