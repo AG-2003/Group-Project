@@ -246,6 +246,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             </div>
           )}
         </div>
+
         <Tooltip label="Undo" hasArrow>
           <IconButton
             className="tool"
@@ -263,6 +264,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onRedo}
           />
         </Tooltip>
+
         <Tooltip label="Spell Check" hasArrow>
           <IconButton
             className={`tool spellcheck-button ${
@@ -273,6 +275,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onToggleSpellCheck}
           />
         </Tooltip>
+
         <Tooltip label="Heading" hasArrow>
           <div>
             <Menu>
@@ -294,6 +297,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Font" hasArrow>
           <div>
             <Menu>
@@ -312,6 +316,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Font Size" hasArrow>
           <div>
             <Menu>
@@ -334,6 +339,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Bold" hasArrow>
           <IconButton
             className="tool"
@@ -342,6 +348,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onBoldClick}
           />
         </Tooltip>
+
         <Tooltip label="Italic" hasArrow>
           <IconButton
             className="tool"
@@ -350,6 +357,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onItalicClick}
           />
         </Tooltip>
+
         <Tooltip label="Underline" hasArrow>
           <IconButton
             className="tool"
@@ -358,6 +366,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onUnderlineClick}
           />
         </Tooltip>
+
         <Tooltip label="Strike" hasArrow>
           <IconButton
             className="tool"
@@ -366,6 +375,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onStrikeClick}
           />
         </Tooltip>
+
         <Tooltip label="Text Color" hasArrow>
           <div>
             <Menu>
@@ -393,6 +403,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Highlight Color" hasArrow>
           <div>
             <Menu>
@@ -428,6 +439,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onLinkClick}
           />
         </Tooltip>
+
         <Tooltip label="Add Comment" hasArrow>
           <IconButton
             className="tool"
@@ -436,6 +448,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onAddComment}
           />
         </Tooltip>
+
         <Tooltip label="Insert Image" hasArrow>
           <IconButton
             className="tool"
@@ -444,6 +457,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onImageUpload}
           />
         </Tooltip>
+
         <Tooltip label="Text Alignment" hasArrow>
           <div className="alignment-container">
             <Menu>
@@ -466,6 +480,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Checklist" hasArrow>
           <IconButton
             className="tool-check"
@@ -474,6 +489,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onChecklistClick}
           />
         </Tooltip>
+
         <Tooltip label="Bullet List" hasArrow>
           <IconButton
             className="tool"
@@ -482,6 +498,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onUnorderedListClick}
           />
         </Tooltip>
+
         <Tooltip label="Numbered List" hasArrow>
           <IconButton
             className="tool"
@@ -490,6 +507,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={onOrderedListClick}
           />
         </Tooltip>
+
         <Tooltip label="Indent" hasArrow>
           <IconButton
             className="tool"
@@ -498,6 +516,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
             onClick={() => onIndentClick("indent")}
           />
         </Tooltip>
+
         <Tooltip label="Outdent" hasArrow>
           <IconButton
             className="tool"

@@ -1,0 +1,191 @@
+
+.toolbar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .undo-redo {
+    display: flex;
+    transition: transform 0.3s ease-out;
+    right: 210px; // Adjust as needed
+  }
+
+  .move-undo-redo-with-pen {
+    transform: translateX(-65%); // Move left when the pen or eraser icon is clicked
+  }
+
+  .move-undo-redo-with-eraser {
+    transform: translateX(-35%); // Move left when the pen or eraser icon is clicked
+  }
+
+
+  .tool-button {
+    background: none;
+    border: none;
+    margin: 0 5px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    color: #333;
+
+    &:hover {
+      color: #6d3fb8;
+    }
+  }
+
+  .tool-button-feature {
+    &:hover {
+      color: #6d3fb8;
+    }
+  }
+
+  .pen-container {
+    display: flex;
+    position: relative;
+    transition: transform 0.3s ease-out;
+  }
+
+  .pen-features {
+    display: flex;
+    gap: 20px;
+    position: absolute;
+    font-size: 18px;
+    top: 14px;
+    left: 250%; // Initially positioned to the right
+    visibility: hidden; // Hide by default
+  }
+
+  .show-pen-features {
+    transform: translateX(-135%);
+
+    .pen-features {
+      visibility: visible; // Make features visible
+    }
+  }
+
+  .move-pen-with-eraser {
+    transform: translateX(-75%); // Move left when the pen or eraser icon is clicked
+  }
+
+
+  .eraser-container {
+    display: flex;
+    position: relative;
+    transition: transform 0.3s ease-out;
+  }
+
+
+  .eraser-features {
+    display: flex;
+    gap: 20px;
+    position: absolute;
+    font-size: 18px;
+    top: 14px;
+    left: 145%; // Initially positioned to the right
+    visibility: hidden; // Hide by default
+  }
+
+  .show-eraser-features {
+    transform: translateX(-70%);
+
+    .eraser-features {
+      visibility: visible; // Make features visible
+    }
+  }
+}
+
+  .color-grid {
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr); // 10 columns
+  grid-gap: 5px;
+  position: absolute;
+  top: 223px;
+  left: 410px;
+  z-index: 10;
+  opacity: 0; // Start fully transparent
+  transform: translateY(100vh); // Start off-screen, below the viewable area
+  transition: transform 0.3s ease-out;
+  display: grid; // Ensure the grid is always set to display to enable transition
+  pointer-events: none; // Initially, don't allow interactions
+
+  &.active {
+    opacity: 1; // End fully visible
+    transform: translateY(0); // End at final position
+    pointer-events: all; // Allow interactions when visible
+  }
+  }
+
+  .color-block {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(143, 143, 143, 0.2);
+
+  &.selected {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  }
+  }
+
+  .konvajs-content {
+  user-select: none; // prevent text selection while drawing
+  }
+
+.containerSlider,
+.eraserSlider {
+  position: absolute;
+  justify-content: center;
+  padding: 10px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  top: 403px; // Adjust as needed
+  left: 508px;
+  z-index: 10;
+
+  &.active {
+    display: flex; // Show when active
+  }
+
+  .stroke-size-slider,
+  .eraser-size-slider {
+    position: relative;
+    top: 2px;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    z-index: 10;
+    margin-right: 10px;
+  }
+
+  .stroke-size-input,
+  .eraser-size-input {
+    text-align: center;
+    top: 430px; // Adjust as needed
+    left: 552px;
+    z-index: 10;
+    width: 30px; // Adjust as needed
+    height: 30px;
+    border-radius: 15px;
+
+    &:hover {
+      outline: none;
+      box-shadow: 0 2px 5px rgba(143, 143, 143, 0.2);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+  }
+}

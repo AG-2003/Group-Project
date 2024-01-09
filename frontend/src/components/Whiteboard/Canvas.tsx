@@ -1,14 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Line, Text, StageProps } from "react-konva";
-import {
-  FaPen,
-  FaEraser,
-  FaTextHeight,
-  FaTrash,
-  FaUndo,
-  FaRedo,
-} from "react-icons/fa"; // Import necessary icons
-import { FaDroplet, FaSliders } from "react-icons/fa6";
+import Toolbar from "./Toolbar";
 import "./Canvas.scss";
 
 type Tool = "pen" | "eraser" | "text" | "clear";
@@ -139,7 +131,6 @@ const Canvas: React.FC = () => {
     setTool("pen");
     const isPenFeaturesVisible = !showPenFeatures;
     setShowPenFeatures(isPenFeaturesVisible);
-    // Add this line to toggle the move-with-pen class
     setShowEraserFeatures(false);
   };
 
@@ -365,90 +356,21 @@ const Canvas: React.FC = () => {
           ))}
         </Layer>
       </Stage>
-      <div className="toolbar">
-        <div
-          className={`undo-redo ${
-            showPenFeatures ? "move-undo-redo-with-pen" : ""
-          }${showEraserFeatures ? "move-undo-redo-with-eraser" : ""}`}
-        >
-          <button
-            onClick={handleUndo}
-            disabled={undoStack.length === 0}
-            className="tool-button"
-          >
-            <FaUndo />
-          </button>
-          <button
-            onClick={handleRedo}
-            disabled={redoStack.length === 0}
-            className="tool-button"
-          >
-            <FaRedo />
-          </button>
-        </div>
-        <div
-          className={`pen-container ${
-            showPenFeatures ? "show-pen-features" : ""
-          } ${showEraserFeatures ? "move-pen-with-eraser" : ""}`}
-        >
-          <button
-            className={`tool-button ${tool === "pen" ? "selected" : ""}`}
-            onClick={handlePenClick}
-          >
-            <FaPen />
-          </button>
-          <div
-            className={`pen-features ${
-              showPenFeatures ? "show-pen-features" : ""
-            }`}
-          >
-            <button className="tool-button-feature" onClick={toggleColorPicker}>
-              <FaDroplet />
-            </button>
-            <button className="tool-button-feature" onClick={handleSizeClick}>
-              <FaSliders />
-            </button>
-          </div>
-        </div>
-        <div
-          className={`eraser-container ${
-            showEraserFeatures ? "show-eraser-features" : ""
-          }`}
-        >
-          <button
-            className={`tool-button ${tool === "eraser" ? "selected" : ""}`}
-            onClick={handleEraserClick}
-          >
-            <FaEraser />
-          </button>
-          <div
-            className={`eraser-features ${
-              showEraserFeatures ? "show-eraser-features" : ""
-            }`}
-          >
-            <button
-              className="tool-button-feature"
-              onClick={handleEraserSizeClick}
-            >
-              <FaSliders />
-            </button>
-          </div>
-        </div>
-
-        <button
-          className={`tool-button ${tool === "text" ? "selected" : ""}`}
-          onClick={() => handleToolChange("text")}
-        >
-          <FaTextHeight />
-        </button>
-        <button
-          className="tool-button"
-          onClick={() => handleToolChange("clear")}
-        >
-          <FaTrash />
-        </button>
-      </div>
-
+      <Toolbar
+        tool={tool}
+        showPenFeatures={showPenFeatures}
+        showEraserFeatures={showEraserFeatures}
+        undoStack={undoStack}
+        redoStack={redoStack}
+        handlePenClick={handlePenClick}
+        handleEraserClick={handleEraserClick}
+        handleToolChange={handleToolChange}
+        handleUndo={handleUndo}
+        handleRedo={handleRedo}
+        toggleColorPicker={toggleColorPicker}
+        handleSizeClick={handleSizeClick}
+        handleEraserSizeClick={handleEraserSizeClick}
+      />
       {showColorPicker && (
         <div className={`color-grid ${showColorPicker ? "active" : ""}`}>
           {colors.map((color) => (
