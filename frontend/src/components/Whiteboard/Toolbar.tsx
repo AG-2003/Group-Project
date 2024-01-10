@@ -8,10 +8,12 @@ import {
   FaRedo,
 } from "react-icons/fa"; // Import necessary icons
 import { FaDroplet, FaSliders } from "react-icons/fa6";
+import { FaSquare, FaCircle, FaSlash } from "react-icons/fa"; // Example shape icons
+
 import "./Toolbar.scss";
 
-
 type Tool = "pen" | "eraser" | "text" | "clear";
+type Shape = "rectangle" | "circle" | "line";
 
 interface ToolbarProps {
   tool: string;
@@ -21,7 +23,7 @@ interface ToolbarProps {
   redoStack: any[];
   handlePenClick: () => void;
   handleEraserClick: () => void;
-  handleToolChange: (tool: Tool) => void;
+  handleToolChange: (tool: Tool | Shape) => void;
   handleUndo: () => void;
   handleRedo: () => void;
   toggleColorPicker: () => void;
@@ -124,6 +126,27 @@ const Toolbar: React.FC<ToolbarProps> = ({
       <button className="tool-button" onClick={() => handleToolChange("clear")}>
         <FaTrash />
       </button>
+
+      <div className="shape-buttons">
+        <button
+          className={`tool-button ${tool === "rectangle" ? "selected" : ""}`}
+          onClick={() => handleToolChange("rectangle")}
+        >
+          <FaSquare />
+        </button>
+        <button
+          className="tool-button"
+          onClick={() => handleToolChange("circle")}
+        >
+          <FaCircle />
+        </button>
+        <button
+          className="tool-button"
+          onClick={() => handleToolChange("line")}
+        >
+          <FaSlash />
+        </button>
+      </div>
     </div>
   );
 };

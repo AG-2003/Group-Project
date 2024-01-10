@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Stage, Layer, Line, Text, StageProps } from "react-konva";
+import { Stage, Layer, Line, Text, StageProps, Rect } from "react-konva";
 import Toolbar from "./Toolbar";
 import "./Canvas.scss";
 
-type Tool = "pen" | "eraser" | "text" | "clear";
+type Tool = "pen" | "eraser" | "text" | "clear" | "none";
+type Shape = "rectangle" | "circle" | "line";
 
 interface LineType {
   tool: Tool;
@@ -17,6 +18,14 @@ interface TextType {
   x: number;
   y: number;
   text: string;
+}
+
+interface RectangleType {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
 }
 
 const colors = [
@@ -109,6 +118,10 @@ const colors = [
   "#4c1130",
 ];
 
+function isShape(tool: string): tool is Shape {
+  return ["rectangle", "circle", "line"].includes(tool);
+}
+
 const Canvas: React.FC = () => {
   const [tool, setTool] = useState<Tool>("pen");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
@@ -126,6 +139,10 @@ const Canvas: React.FC = () => {
   const [showEraserSizeSlider, setShowEraserSizeSlider] = useState(false);
   const [undoStack, setUndoStack] = useState<LineType[][]>([]);
   const [redoStack, setRedoStack] = useState<LineType[][]>([]);
+  const [selectedShape, setSelectedShape] = useState<Shape | null>(null);
+  const [currentRectangle, setCurrentRectangle] =
+    useState<RectangleType | null>(null);
+  const [rectangles, setRectangles] = useState<RectangleType[]>([]);
 
   const handlePenClick = () => {
     setTool("pen");
@@ -207,7 +224,8 @@ const Canvas: React.FC = () => {
             strokeWidth: strokeSize,
           },
         ]);
-      } else if (tool === "eraser") {
+      }
+      if (tool === "eraser") {
         setUndoStack([...undoStack, [...lines]]);
         setRedoStack([]);
         setLines([
@@ -219,42 +237,135 @@ const Canvas: React.FC = () => {
             strokeWidth: eraserSize,
           },
         ]);
-      } else if (tool === "text") {
+      }
+      if (tool === "text") {
         const text = prompt("Enter the text:");
         if (text) {
           setTexts([...texts, { tool, x: pos.x, y: pos.y, text }]);
         }
       }
+      if (selectedShape === "rectangle") {
+        const stage = e.target.getStage();
+        const point = stage?.getPointerPosition();
+
+        if (point) {
+          setCurrentRectangle({
+            x: point.x,
+            y: point.y,
+            width: 0,
+            height: 0,
+            fill: penColor, // Use the current pen color for the rectangle fill
+          });
+          console.log("Rectangle drawing started", currentRectangle);
+        }
+      }
     }
   };
 
+  // const handleMouseMove: StageProps["onMouseMove"] = (e) => {
+  //   if (!isDrawing.current || tool === "text") {
+  //     return;
+  //   }
+  //   const stage = e.target.getStage();
+  //   const point = stage?.getPointerPosition();
+
+  //   if (point) {
+  //     let lastLine = lines[lines.length - 1];
+  //     lastLine.points = lastLine.points.concat([point.x, point.y]);
+  //     lines.splice(lines.length - 1, 1, lastLine);
+  //     setLines(lines.concat());
+  //   }
+  // };
+
+  // const handleMouseMove: StageProps["onMouseMove"] = (e) => {
+  //   if (!isDrawing.current || tool === "text") {
+  //     return;
+  //   }
+
+  //   const stage = e.target.getStage();
+  //   if (stage && currentRectangle) {
+  //     const point = stage?.getPointerPosition();
+  //     if (point) {
+  //       const width = point.x - currentRectangle.x;
+  //       const height = point.y - currentRectangle.y;
+  //       setCurrentRectangle({ ...currentRectangle, width, height });
+  //     }
+  //   }
+  // };
+
   const handleMouseMove: StageProps["onMouseMove"] = (e) => {
-    if (!isDrawing.current || tool === "text") {
+    if (!isDrawing.current) {
       return;
     }
+
     const stage = e.target.getStage();
     const point = stage?.getPointerPosition();
-    if (point) {
-      let lastLine = lines[lines.length - 1];
-      lastLine.points = lastLine.points.concat([point.x, point.y]);
-      lines.splice(lines.length - 1, 1, lastLine);
-      setLines(lines.concat());
+
+    if (!point) {
+      return;
     }
+
+    // Handle drawing for pen tool
+    if (tool === "pen" && lines.length > 0) {
+      let lastLine = lines[lines.length - 1];
+      // Check if lastLine is not undefined before trying to access points
+      if (lastLine) {
+        const newPoints = lastLine.points.concat([point.x, point.y]);
+        // Update the last line with new points without mutating the original lines array
+        setLines(
+          lines.map((line, index) =>
+            index === lines.length - 1 ? { ...line, points: newPoints } : line
+          )
+        );
+      }
+    }
+
+    // Handle drawing for shapes
+    if (selectedShape === "rectangle" && currentRectangle) {
+      const newWidth = Math.abs(point.x - currentRectangle.x);
+      const newHeight = Math.abs(point.y - currentRectangle.y);
+      const newX = point.x < currentRectangle.x ? point.x : currentRectangle.x;
+      const newY = point.y < currentRectangle.y ? point.y : currentRectangle.y;
+
+      setCurrentRectangle({
+        ...currentRectangle,
+        x: newX,
+        y: newY,
+        width: newWidth,
+        height: newHeight,
+      });
+    }
+
+    // Add similar conditions for other shapes if needed
+    // ...
   };
 
   const handleMouseUp: StageProps["onMouseUp"] = () => {
+    if (selectedShape === "rectangle" && currentRectangle) {
+      if (currentRectangle.width !== 0 && currentRectangle.height !== 0) {
+        setRectangles([...rectangles, currentRectangle]);
+        console.log("Rectangle drawing finished", currentRectangle);
+      }
+      setCurrentRectangle(null);
+    }
     isDrawing.current = false;
   };
 
-  const handleToolChange = (selectedTool: Tool) => {
+  const handleToolChange = (selectedTool: Tool | Shape) => {
     if (selectedTool === "clear") {
-      // Clear the board logic
+      setLines([]);
+      setTexts([]);
+      setRectangles([]);
+      setCurrentRectangle(null);
+    } else if (isShape(selectedTool)) {
+      setSelectedShape(selectedTool);
+      setTool("none"); // Assuming you can have 'null' as a value for no tool selected
+    } else {
+      setTool(selectedTool as Tool);
+      setSelectedShape(null);
     }
-
-    setTool(selectedTool);
     setShowPenFeatures(false);
     setShowEraserFeatures(false);
-    // Close other feature panels if needed
   };
 
   useEffect(() => {
@@ -354,6 +465,27 @@ const Canvas: React.FC = () => {
               draggable
             />
           ))}
+          {rectangles.map((rect, i) => (
+            <Rect
+              key={i}
+              x={rect.x}
+              y={rect.y}
+              width={rect.width}
+              height={rect.height}
+              fill={rect.fill}
+              // draggable
+            />
+          ))}
+          {currentRectangle && (
+            <Rect
+              x={currentRectangle.x}
+              y={currentRectangle.y}
+              width={currentRectangle.width}
+              height={currentRectangle.height}
+              fill={currentRectangle.fill}
+              // draggable
+            />
+          )}
         </Layer>
       </Stage>
       <Toolbar
