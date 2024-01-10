@@ -10,25 +10,9 @@
   align-items: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 20px;
-  padding: 10px;
+  padding: 5px;
   width: 50%;
   background-color: #eeeeff;
-
-
-  .undo-redo {
-    display: flex;
-    transition: transform 0.3s ease-out;
-    right: 210px; // Adjust as needed
-  }
-
-  .move-undo-redo-with-pen {
-    transform: translateX(-65%); // Move left when the pen or eraser icon is clicked
-  }
-
-  .move-undo-redo-with-eraser {
-    transform: translateX(-35%); // Move left when the pen or eraser icon is clicked
-  }
-
 
   .tool-button {
     background: none;
@@ -36,72 +20,13 @@
     margin: 0 5px;
     padding: 10px;
     cursor: pointer;
-    font-size: 24px;
+    font-size: 20px;
     color: #333;
 
-    &:hover {
+    &:hover,&:focus {
       color: #6d3fb8;
     }
-  }
 
-  .tool-button-feature {
-    &:hover {
-      color: #6d3fb8;
-    }
-  }
-
-  .pen-container {
-    display: flex;
-    position: relative;
-    transition: transform 0.3s ease-out;
-  }
-
-  .pen-features {
-    display: flex;
-    gap: 20px;
-    position: absolute;
-    font-size: 18px;
-    top: 14px;
-    left: 250%; // Initially positioned to the right
-    visibility: hidden; // Hide by default
-  }
-
-  .show-pen-features {
-    transform: translateX(-135%);
-
-    .pen-features {
-      visibility: visible; // Make features visible
-    }
-  }
-
-  .move-pen-with-eraser {
-    transform: translateX(-75%); // Move left when the pen or eraser icon is clicked
-  }
-
-
-  .eraser-container {
-    display: flex;
-    position: relative;
-    transition: transform 0.3s ease-out;
-  }
-
-
-  .eraser-features {
-    display: flex;
-    gap: 20px;
-    position: absolute;
-    font-size: 18px;
-    top: 14px;
-    left: 145%; // Initially positioned to the right
-    visibility: hidden; // Hide by default
-  }
-
-  .show-eraser-features {
-    transform: translateX(-70%);
-
-    .eraser-features {
-      visibility: visible; // Make features visible
-    }
   }
 }
 
@@ -115,7 +40,7 @@
   grid-gap: 5px;
   position: absolute;
   top: 223px;
-  left: 410px;
+  left: 596px;
   z-index: 10;
   opacity: 0; // Start fully transparent
   transform: translateY(100vh); // Start off-screen, below the viewable area
@@ -148,24 +73,22 @@
   user-select: none; // prevent text selection while drawing
   }
 
-.containerSlider,
-.eraserSlider {
+.containerSlider {
   position: absolute;
   justify-content: center;
   padding: 10px;
   background-color: #FFFFFF;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 20px;
-  top: 403px; // Adjust as needed
-  left: 508px;
+  top: 400px; // Adjust as needed
+  left: 695px;
   z-index: 10;
 
   &.active {
     display: flex; // Show when active
   }
 
-  .stroke-size-slider,
-  .eraser-size-slider {
+  .stroke-size-slider{
     position: relative;
     top: 2px;
     background-color: #FFFFFF;
@@ -174,8 +97,7 @@
     margin-right: 10px;
   }
 
-  .stroke-size-input,
-  .eraser-size-input {
+  .stroke-size-input{
     text-align: center;
     top: 430px; // Adjust as needed
     left: 552px;

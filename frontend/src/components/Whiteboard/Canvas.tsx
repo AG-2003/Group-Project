@@ -125,32 +125,20 @@ function isShape(tool: string): tool is Shape {
 const Canvas: React.FC = () => {
   const [tool, setTool] = useState<Tool>("pen");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
-  const [strokeSize, setStrokeSize] = useState<number>(5); // Default stroke size
+  const [size, setSize] = useState<number>(5); // Default stroke size
   const [lines, setLines] = useState<LineType[]>([]);
-  const [eraserSize, setEraserSize] = useState<number>(20); // Default eraser size
   const stageRef = useRef<any>(null); // Ref for the Konva Stage
   const [texts, setTexts] = useState<TextType[]>([]);
   const isDrawing = useRef(false);
-  const [showPenFeatures, setShowPenFeatures] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showSizeSlider, setShowSizeSlider] = useState(false);
   const [activeElement, setActiveElement] = useState<Element | null>(null);
-  const [showEraserFeatures, setShowEraserFeatures] = useState(false);
-  const [showEraserSizeSlider, setShowEraserSizeSlider] = useState(false);
   const [undoStack, setUndoStack] = useState<LineType[][]>([]);
   const [redoStack, setRedoStack] = useState<LineType[][]>([]);
   const [selectedShape, setSelectedShape] = useState<Shape | null>(null);
   const [currentRectangle, setCurrentRectangle] =
     useState<RectangleType | null>(null);
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
-
-  const handlePenClick = () => {
-    setTool("pen");
-    setSelectedShape(null); // Add this line to reset the selected shape
-    const isPenFeaturesVisible = !showPenFeatures;
-    setShowPenFeatures(isPenFeaturesVisible);
-    setShowEraserFeatures(false);
-  };
 
   const toggleColorPicker = () => {
     const newShowColorPicker = !showColorPicker;
@@ -174,35 +162,9 @@ const Canvas: React.FC = () => {
     if (showColorPicker) setShowColorPicker(false);
   };
 
-  const handleEraserClick = () => {
-    setTool("eraser");
-    setSelectedShape(null); // Reset the selected shape
-    setShowEraserFeatures(!showEraserFeatures);
-    setShowPenFeatures(false);
-    setShowEraserSizeSlider(false); // Hide the eraser size slider when the eraser is clicked
-  };
-
-  const handleEraserSizeClick = () => {
-    const newShowEraserSizeSlider = !showEraserSizeSlider;
-    setShowEraserSizeSlider(newShowEraserSizeSlider);
-    if (newShowEraserSizeSlider) {
-      setActiveElement(document.querySelector(".eraserSlider"));
-    } else {
-      setActiveElement(null);
-    }
-    // Hide other sliders or color pickers
-    if (showSizeSlider) setShowSizeSlider(false);
-    if (showColorPicker) setShowColorPicker(false);
-  };
-
-  const validateAndUpdateStrokeSize = (size: number) => {
-    const newSize = Math.max(1, Math.min(size, 20)); // Assuming max size is 20
-    setStrokeSize(newSize);
-  };
-
-  const validateAndUpdateEraserSize = (size: number) => {
-    const newSize = Math.max(1, Math.min(size, 40)); // Assuming max size is 40
-    setEraserSize(newSize);
+  const validateAndUpdateSize = (size: number) => {
+    const newSize = Math.max(1, Math.min(size, 40)); // Assuming max size is 20
+    setSize(newSize);
   };
 
   const handleMouseDown: StageProps["onMouseDown"] = (e) => {
@@ -223,7 +185,7 @@ const Canvas: React.FC = () => {
             tool,
             points: [pos.x, pos.y],
             color: penColor,
-            strokeWidth: strokeSize,
+            strokeWidth: size,
           },
         ]);
       }
@@ -234,7 +196,7 @@ const Canvas: React.FC = () => {
             tool,
             points: [pos.x, pos.y],
             color: "rgba(0,0,0,1)", // Eraser color, set alpha to 1 for full erasing
-            strokeWidth: eraserSize,
+            strokeWidth: size,
           },
         ]);
       }
@@ -262,37 +224,6 @@ const Canvas: React.FC = () => {
       }
     }
   };
-
-  // const handleMouseMove: StageProps["onMouseMove"] = (e) => {
-  //   if (!isDrawing.current || tool === "text") {
-  //     return;
-  //   }
-  //   const stage = e.target.getStage();
-  //   const point = stage?.getPointerPosition();
-
-  //   if (point) {
-  //     let lastLine = lines[lines.length - 1];
-  //     lastLine.points = lastLine.points.concat([point.x, point.y]);
-  //     lines.splice(lines.length - 1, 1, lastLine);
-  //     setLines(lines.concat());
-  //   }
-  // };
-
-  // const handleMouseMove: StageProps["onMouseMove"] = (e) => {
-  //   if (!isDrawing.current || tool === "text") {
-  //     return;
-  //   }
-
-  //   const stage = e.target.getStage();
-  //   if (stage && currentRectangle) {
-  //     const point = stage?.getPointerPosition();
-  //     if (point) {
-  //       const width = point.x - currentRectangle.x;
-  //       const height = point.y - currentRectangle.y;
-  //       setCurrentRectangle({ ...currentRectangle, width, height });
-  //     }
-  //   }
-  // };
 
   const handleMouseMove: StageProps["onMouseMove"] = (e) => {
     if (!isDrawing.current) {
@@ -360,23 +291,6 @@ const Canvas: React.FC = () => {
     isDrawing.current = false;
   };
 
-  // const handleToolChange = (selectedTool: Tool | Shape) => {
-  //   if (selectedTool === "clear") {
-  //     setLines([]);
-  //     setTexts([]);
-  //     setRectangles([]);
-  //     setCurrentRectangle(null);
-  //   } else if (isShape(selectedTool)) {
-  //     setSelectedShape(selectedTool);
-  //     setTool("none"); // Assuming you can have 'null' as a value for no tool selected
-  //   } else {
-  //     setTool(selectedTool as Tool);
-  //     setSelectedShape(null);
-  //   }
-  //   setShowPenFeatures(false);
-  //   setShowEraserFeatures(false);
-  // };
-
   const handleToolChange = (selectedTool: Tool | Shape) => {
     if (selectedTool === "clear") {
       setLines([]);
@@ -394,9 +308,6 @@ const Canvas: React.FC = () => {
         setSelectedShape(null); // Clear any selected shape.
       }
     }
-
-    setShowPenFeatures(false);
-    setShowEraserFeatures(false);
   };
 
   useEffect(() => {
@@ -416,12 +327,6 @@ const Canvas: React.FC = () => {
       ) {
         setShowSizeSlider(false);
       }
-      if (
-        showEraserSizeSlider &&
-        !document.querySelector(".eraserSlider")?.contains(target)
-      ) {
-        setShowEraserSizeSlider(false);
-      }
     }
 
     // Add the event listener to the document
@@ -429,17 +334,7 @@ const Canvas: React.FC = () => {
 
     // Remove the event listener on cleanup
     return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [showColorPicker, showSizeSlider, showEraserSizeSlider]); // This effect should run when activeElement changes
-
-  const clearBoard = () => {
-    const confirmClear = window.confirm(
-      "Are you sure you want to clear the board?"
-    );
-    if (confirmClear) {
-      setLines([]);
-      setTexts([]);
-    }
-  };
+  }, [showColorPicker, showSizeSlider]);
 
   const handleUndo = () => {
     if (undoStack.length > 0) {
@@ -462,7 +357,7 @@ const Canvas: React.FC = () => {
   };
 
   return (
-    <div className="canvas-container" onDoubleClick={clearBoard}>
+    <div className="canvas-container">
       <Stage
         ref={stageRef}
         width={window.innerWidth}
@@ -520,18 +415,13 @@ const Canvas: React.FC = () => {
       </Stage>
       <Toolbar
         tool={tool}
-        showPenFeatures={showPenFeatures}
-        showEraserFeatures={showEraserFeatures}
         undoStack={undoStack}
         redoStack={redoStack}
-        handlePenClick={handlePenClick}
-        handleEraserClick={handleEraserClick}
         handleToolChange={handleToolChange}
         handleUndo={handleUndo}
         handleRedo={handleRedo}
         toggleColorPicker={toggleColorPicker}
         handleSizeClick={handleSizeClick}
-        handleEraserSizeClick={handleEraserSizeClick}
       />
       {showColorPicker && (
         <div className={`color-grid ${showColorPicker ? "active" : ""}`}>
@@ -551,42 +441,16 @@ const Canvas: React.FC = () => {
           <input
             type="range"
             min="1"
-            max="20"
-            value={strokeSize}
-            onChange={(e) =>
-              validateAndUpdateStrokeSize(parseInt(e.target.value))
-            }
+            max="40"
+            value={size}
+            onChange={(e) => validateAndUpdateSize(parseInt(e.target.value))}
             className="stroke-size-slider"
           />
           <input
             type="number"
-            value={strokeSize}
-            onChange={(e) =>
-              validateAndUpdateStrokeSize(parseInt(e.target.value))
-            }
+            value={size}
+            onChange={(e) => validateAndUpdateSize(parseInt(e.target.value))}
             className="stroke-size-input"
-          />
-        </div>
-      )}
-      {showEraserSizeSlider && (
-        <div className="eraserSlider">
-          <input
-            type="range"
-            min="1"
-            max="40"
-            value={eraserSize}
-            onChange={(e) =>
-              validateAndUpdateEraserSize(parseInt(e.target.value))
-            }
-            className="eraser-size-slider"
-          />
-          <input
-            type="number"
-            value={eraserSize}
-            onChange={(e) =>
-              validateAndUpdateEraserSize(parseInt(e.target.value))
-            }
-            className="eraser-size-input"
           />
         </div>
       )}
