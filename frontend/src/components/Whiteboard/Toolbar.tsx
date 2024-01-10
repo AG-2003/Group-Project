@@ -6,16 +6,17 @@ import {
   FaTrash,
   FaUndo,
   FaRedo,
-  FaRegSquare,
+  // FaRegSquare,
   // FaRegCircle,
   // FaSlash,
   FaMousePointer,
+  FaShapes,
 } from "react-icons/fa"; // Import necessary icons
 import { FaDroplet, FaSliders } from "react-icons/fa6";
 
 import "./Toolbar.scss";
 
-type Tool = "pen" | "eraser" | "text" | "clear" | "pointer";
+type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
 type Shape = "rectangle" | "circle" | "line";
 
 interface ToolbarProps {
@@ -27,6 +28,7 @@ interface ToolbarProps {
   handleRedo: () => void;
   toggleColorPicker: () => void;
   handleSizeClick: () => void;
+  toggleShapeMenu: () => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -38,6 +40,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   handleRedo,
   toggleColorPicker,
   handleSizeClick,
+  toggleShapeMenu,
 }) => {
   return (
     <div className="toolbar">
@@ -79,26 +82,21 @@ const Toolbar: React.FC<ToolbarProps> = ({
       >
         <FaTextHeight />
       </button>
-      <div className="shape-buttons">
+      {/* <div className="shape-buttons">
         <button
           className={`tool-button ${tool === "rectangle" ? "selected" : ""}`}
-          onClick={() => handleToolChange("rectangle")}
+          // onClick={() => handleToolChange("rectangle")}
+          onClick={toggleShapeMenu}
         >
           <FaRegSquare />
         </button>
-        {/* <button
-          className="tool-button"
-          onClick={() => handleToolChange("circle")}
-        >
-          <FaRegCircle />
-        </button>
-        <button
-          className="tool-button"
-          onClick={() => handleToolChange("line")}
-        >
-          <FaSlash />
-        </button> */}
-      </div>
+      </div> */}
+      <button
+        className={`tool-button ${tool === "shape" ? "selected" : ""}`}
+        onClick={toggleShapeMenu}
+      >
+        <FaShapes />
+      </button>
       <button className="tool-button" onClick={toggleColorPicker}>
         <FaDroplet />
       </button>

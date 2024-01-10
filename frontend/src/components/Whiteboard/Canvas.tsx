@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Line, Text, StageProps, Rect } from "react-konva";
 import Toolbar from "./Toolbar";
 import "./Canvas.scss";
+import { FaRegCircle, FaRegSquare } from "react-icons/fa";
 
-type Tool = "pen" | "eraser" | "text" | "clear" | "pointer";
+type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
 type Shape = "rectangle" | "circle" | "line";
 
 interface LineType {
@@ -139,6 +140,7 @@ const Canvas: React.FC = () => {
   const [currentRectangle, setCurrentRectangle] =
     useState<RectangleType | null>(null);
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
+  const [showShapeMenu, setShowShapeMenu] = useState(false);
 
   const toggleColorPicker = () => {
     const newShowColorPicker = !showColorPicker;
@@ -160,6 +162,14 @@ const Canvas: React.FC = () => {
       setActiveElement(null);
     }
     if (showColorPicker) setShowColorPicker(false);
+  };
+
+  const toggleShapeMenu = () => {
+    console.log("Toggling shape menu");
+    setShowShapeMenu((prev) => {
+      console.log("Previous state: ", prev);
+      return !prev;
+    });
   };
 
   const validateAndUpdateSize = (size: number) => {
@@ -301,6 +311,9 @@ const Canvas: React.FC = () => {
       setCurrentRectangle(null);
     } else {
       // If the selected tool is a shape, we update the selectedShape state.
+      if (selectedTool !== "shape") {
+        setShowShapeMenu(false);
+      }
       if (isShape(selectedTool)) {
         setSelectedShape(selectedTool);
         setTool("pointer"); // 'none' indicates no drawing tool is selected.
@@ -425,6 +438,7 @@ const Canvas: React.FC = () => {
         handleRedo={handleRedo}
         toggleColorPicker={toggleColorPicker}
         handleSizeClick={handleSizeClick}
+        toggleShapeMenu={toggleShapeMenu}
       />
       {showColorPicker && (
         <div className={`color-grid ${showColorPicker ? "active" : ""}`}>
@@ -455,6 +469,22 @@ const Canvas: React.FC = () => {
             onChange={(e) => validateAndUpdateSize(parseInt(e.target.value))}
             className="stroke-size-input"
           />
+        </div>
+      )}
+      {showShapeMenu && (
+        <div className="shape-menu">
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("rectangle")}
+          >
+            <FaRegSquare />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("circle")}
+          >
+            <FaRegCircle />
+          </button>
         </div>
       )}
       {/* ... other components ... */}
