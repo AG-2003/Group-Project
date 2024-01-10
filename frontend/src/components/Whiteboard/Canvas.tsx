@@ -146,6 +146,7 @@ const Canvas: React.FC = () => {
 
   const handlePenClick = () => {
     setTool("pen");
+    setSelectedShape(null); // Add this line to reset the selected shape
     const isPenFeaturesVisible = !showPenFeatures;
     setShowPenFeatures(isPenFeaturesVisible);
     setShowEraserFeatures(false);
@@ -175,6 +176,7 @@ const Canvas: React.FC = () => {
 
   const handleEraserClick = () => {
     setTool("eraser");
+    setSelectedShape(null); // Reset the selected shape
     setShowEraserFeatures(!showEraserFeatures);
     setShowPenFeatures(false);
     setShowEraserSizeSlider(false); // Hide the eraser size slider when the eraser is clicked
@@ -226,18 +228,17 @@ const Canvas: React.FC = () => {
         ]);
       }
       if (tool === "eraser") {
-        setUndoStack([...undoStack, [...lines]]);
-        setRedoStack([]);
         setLines([
           ...lines,
           {
             tool,
             points: [pos.x, pos.y],
-            color: penColor,
+            color: "rgba(0,0,0,1)", // Eraser color, set alpha to 1 for full erasing
             strokeWidth: eraserSize,
           },
         ]);
       }
+
       if (tool === "text") {
         const text = prompt("Enter the text:");
         if (text) {
@@ -308,16 +309,24 @@ const Canvas: React.FC = () => {
     // Handle drawing for pen tool
     if (tool === "pen" && lines.length > 0) {
       let lastLine = lines[lines.length - 1];
-      // Check if lastLine is not undefined before trying to access points
       if (lastLine) {
         const newPoints = lastLine.points.concat([point.x, point.y]);
-        // Update the last line with new points without mutating the original lines array
         setLines(
           lines.map((line, index) =>
             index === lines.length - 1 ? { ...line, points: newPoints } : line
           )
         );
       }
+    }
+
+    if (tool === "eraser" && lines.length > 0) {
+      const lastLine = lines[lines.length - 1];
+      const newPoints = lastLine.points.concat([point.x, point.y]);
+      setLines(
+        lines.map((line, index) =>
+          index === lines.length - 1 ? { ...line, points: newPoints } : line
+        )
+      );
     }
 
     // Handle drawing for shapes
@@ -351,19 +360,41 @@ const Canvas: React.FC = () => {
     isDrawing.current = false;
   };
 
+  // const handleToolChange = (selectedTool: Tool | Shape) => {
+  //   if (selectedTool === "clear") {
+  //     setLines([]);
+  //     setTexts([]);
+  //     setRectangles([]);
+  //     setCurrentRectangle(null);
+  //   } else if (isShape(selectedTool)) {
+  //     setSelectedShape(selectedTool);
+  //     setTool("none"); // Assuming you can have 'null' as a value for no tool selected
+  //   } else {
+  //     setTool(selectedTool as Tool);
+  //     setSelectedShape(null);
+  //   }
+  //   setShowPenFeatures(false);
+  //   setShowEraserFeatures(false);
+  // };
+
   const handleToolChange = (selectedTool: Tool | Shape) => {
     if (selectedTool === "clear") {
       setLines([]);
       setTexts([]);
       setRectangles([]);
       setCurrentRectangle(null);
-    } else if (isShape(selectedTool)) {
-      setSelectedShape(selectedTool);
-      setTool("none"); // Assuming you can have 'null' as a value for no tool selected
     } else {
-      setTool(selectedTool as Tool);
-      setSelectedShape(null);
+      // If the selected tool is a shape, we update the selectedShape state.
+      if (isShape(selectedTool)) {
+        setSelectedShape(selectedTool);
+        setTool("none"); // 'none' indicates no drawing tool is selected.
+      } else {
+        // If the selected tool is not a shape, we update the tool state and clear the shape.
+        setTool(selectedTool as Tool);
+        setSelectedShape(null); // Clear any selected shape.
+      }
     }
+
     setShowPenFeatures(false);
     setShowEraserFeatures(false);
   };
@@ -473,7 +504,7 @@ const Canvas: React.FC = () => {
               width={rect.width}
               height={rect.height}
               fill={rect.fill}
-              // draggable
+              draggable
             />
           ))}
           {currentRectangle && (
@@ -483,7 +514,6 @@ const Canvas: React.FC = () => {
               width={currentRectangle.width}
               height={currentRectangle.height}
               fill={currentRectangle.fill}
-              // draggable
             />
           )}
         </Layer>
