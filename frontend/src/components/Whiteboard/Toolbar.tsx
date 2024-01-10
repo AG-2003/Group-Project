@@ -6,12 +6,9 @@ import {
   FaTrash,
   FaUndo,
   FaRedo,
-  // FaRegSquare,
-  // FaRegCircle,
-  // FaSlash,
   FaMousePointer,
   FaShapes,
-} from "react-icons/fa"; // Import necessary icons
+} from "react-icons/fa";
 import { FaDroplet, FaSliders } from "react-icons/fa6";
 
 import "./Toolbar.scss";
@@ -82,15 +79,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
       >
         <FaTextHeight />
       </button>
-      {/* <div className="shape-buttons">
-        <button
-          className={`tool-button ${tool === "rectangle" ? "selected" : ""}`}
-          // onClick={() => handleToolChange("rectangle")}
-          onClick={toggleShapeMenu}
-        >
-          <FaRegSquare />
-        </button>
-      </div> */}
       <button
         className={`tool-button ${tool === "shape" ? "selected" : ""}`}
         onClick={toggleShapeMenu}

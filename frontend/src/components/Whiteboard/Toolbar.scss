@@ -39,13 +39,12 @@
   grid-template-columns: repeat(10, 1fr); // 10 columns
   grid-gap: 5px;
   position: absolute;
-  top: 223px;
+  top: 225px;
   left: 596px;
   z-index: 10;
   opacity: 0; // Start fully transparent
   transform: translateY(100vh); // Start off-screen, below the viewable area
   transition: transform 0.3s ease-out;
-  display: grid; // Ensure the grid is always set to display to enable transition
   pointer-events: none; // Initially, don't allow interactions
 
   &.active {
@@ -118,12 +117,18 @@
   }
     
 }
+
 .shape-menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); // 10 columns
   position: absolute;
-  top: 40px;
-  left: 0;
-  background: white;
-  border: 1px solid #ccc;
-  z-index: 1000;
+  justify-content: center;
+  padding: 5px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  top: 400px;
+  left: 560px;
+  z-index: 10;
   display: block;
 }

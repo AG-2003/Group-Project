@@ -2,10 +2,19 @@ import React, { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Line, Text, StageProps, Rect } from "react-konva";
 import Toolbar from "./Toolbar";
 import "./Canvas.scss";
-import { FaRegCircle, FaRegSquare } from "react-icons/fa";
+import { FaRegSquare, FaRegCircle, FaSlash, FaRegStar } from "react-icons/fa";
+import { FiTriangle } from "react-icons/fi";
+import { BsArrowUpRight } from "react-icons/bs";
 
 type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
-type Shape = "rectangle" | "circle" | "line";
+type Shape =
+  | "rectangle"
+  | "circle"
+  | "line"
+  | "ellipse"
+  | "triangle"
+  | "star"
+  | "arrow";
 
 interface LineType {
   tool: Tool;
@@ -124,7 +133,7 @@ function isShape(tool: string): tool is Shape {
 }
 
 const Canvas: React.FC = () => {
-  const [tool, setTool] = useState<Tool>("pen");
+  const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
   const [size, setSize] = useState<number>(5); // Default stroke size
   const [lines, setLines] = useState<LineType[]>([]);
@@ -425,6 +434,7 @@ const Canvas: React.FC = () => {
               width={currentRectangle.width}
               height={currentRectangle.height}
               fill={currentRectangle.fill}
+              draggable={tool === "pointer"}
             />
           )}
         </Layer>
@@ -484,6 +494,30 @@ const Canvas: React.FC = () => {
             onClick={() => handleToolChange("circle")}
           >
             <FaRegCircle />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("line")}
+          >
+            <FaSlash />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("triangle")}
+          >
+            <FiTriangle />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("star")}
+          >
+            <FaRegStar />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("arrow")}
+          >
+            <BsArrowUpRight />
           </button>
         </div>
       )}
