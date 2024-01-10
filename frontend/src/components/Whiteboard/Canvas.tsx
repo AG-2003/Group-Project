@@ -3,7 +3,7 @@ import { Stage, Layer, Line, Text, StageProps, Rect } from "react-konva";
 import Toolbar from "./Toolbar";
 import "./Canvas.scss";
 
-type Tool = "pen" | "eraser" | "text" | "clear" | "none";
+type Tool = "pen" | "eraser" | "text" | "clear" | "pointer";
 type Shape = "rectangle" | "circle" | "line";
 
 interface LineType {
@@ -207,6 +207,7 @@ const Canvas: React.FC = () => {
           setTexts([...texts, { tool, x: pos.x, y: pos.y, text }]);
         }
       }
+
       if (selectedShape === "rectangle") {
         const stage = e.target.getStage();
         const point = stage?.getPointerPosition();
@@ -215,11 +216,10 @@ const Canvas: React.FC = () => {
           setCurrentRectangle({
             x: point.x,
             y: point.y,
-            width: 0,
+            width: 0, // Keep these as zero initially
             height: 0,
-            fill: penColor, // Use the current pen color for the rectangle fill
+            fill: penColor,
           });
-          console.log("Rectangle drawing started", currentRectangle);
         }
       }
     }
@@ -275,7 +275,6 @@ const Canvas: React.FC = () => {
         height: newHeight,
       });
     }
-
     // Add similar conditions for other shapes if needed
     // ...
   };
@@ -292,6 +291,9 @@ const Canvas: React.FC = () => {
   };
 
   const handleToolChange = (selectedTool: Tool | Shape) => {
+    if (selectedTool === "pointer") {
+      setTool("pointer");
+    }
     if (selectedTool === "clear") {
       setLines([]);
       setTexts([]);
@@ -301,7 +303,7 @@ const Canvas: React.FC = () => {
       // If the selected tool is a shape, we update the selectedShape state.
       if (isShape(selectedTool)) {
         setSelectedShape(selectedTool);
-        setTool("none"); // 'none' indicates no drawing tool is selected.
+        setTool("pointer"); // 'none' indicates no drawing tool is selected.
       } else {
         // If the selected tool is not a shape, we update the tool state and clear the shape.
         setTool(selectedTool as Tool);
@@ -379,6 +381,7 @@ const Canvas: React.FC = () => {
               globalCompositeOperation={
                 line.tool === "eraser" ? "destination-out" : "source-over"
               }
+              draggable={tool === "pointer"}
             />
           ))}
           {texts.map((textItem, i) => (
@@ -388,7 +391,7 @@ const Canvas: React.FC = () => {
               y={textItem.y}
               text={textItem.text}
               fontSize={20}
-              draggable
+              draggable={tool === "pointer"}
             />
           ))}
           {rectangles.map((rect, i) => (
@@ -399,7 +402,7 @@ const Canvas: React.FC = () => {
               width={rect.width}
               height={rect.height}
               fill={rect.fill}
-              draggable
+              draggable={tool === "pointer"}
             />
           ))}
           {currentRectangle && (

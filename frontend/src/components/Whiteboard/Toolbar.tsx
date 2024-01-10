@@ -6,13 +6,16 @@ import {
   FaTrash,
   FaUndo,
   FaRedo,
+  FaRegSquare,
+  // FaRegCircle,
+  // FaSlash,
+  FaMousePointer,
 } from "react-icons/fa"; // Import necessary icons
 import { FaDroplet, FaSliders } from "react-icons/fa6";
-import { FaSquare, FaCircle, FaSlash } from "react-icons/fa"; // Example shape icons
 
 import "./Toolbar.scss";
 
-type Tool = "pen" | "eraser" | "text" | "clear";
+type Tool = "pen" | "eraser" | "text" | "clear" | "pointer";
 type Shape = "rectangle" | "circle" | "line";
 
 interface ToolbarProps {
@@ -38,6 +41,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
 }) => {
   return (
     <div className="toolbar">
+      <button
+        className={`tool-button ${tool === "pointer" ? "selected" : ""}`}
+        onClick={() => handleToolChange("pointer")}
+      >
+        <FaMousePointer />
+      </button>
       <button
         onClick={handleUndo}
         disabled={undoStack.length === 0}
@@ -75,13 +84,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
           className={`tool-button ${tool === "rectangle" ? "selected" : ""}`}
           onClick={() => handleToolChange("rectangle")}
         >
-          <FaSquare />
+          <FaRegSquare />
         </button>
         {/* <button
           className="tool-button"
           onClick={() => handleToolChange("circle")}
         >
-          <FaCircle />
+          <FaRegCircle />
         </button>
         <button
           className="tool-button"
