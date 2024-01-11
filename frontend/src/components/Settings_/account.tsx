@@ -13,7 +13,7 @@ import {
 import EditableTextField from "./sub-components/EditableTextField";
 import { useState } from "react";
 // import { sendEmailVerification } from "firebase/auth";
-// import { auth } from "../../firebase-config";
+import { auth } from "../../firebase-config";
 
 const Account = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -29,6 +29,8 @@ const Account = () => {
   };
 
   // logic for checking if users Email address is verified.
+
+
 
   return (
     <>

@@ -19,7 +19,7 @@ export function LoginForm() {
   const [user] = useAuthState(auth);
 
   //Remove the line if you want to test out log In page
-  if(user!=null){
+  if (user != null) {
     navigate('/index')
   }
 
@@ -50,9 +50,9 @@ export function LoginForm() {
       const userRef = doc(db, "users", user.email as string);
       setDoc(userRef, {
         email: user?.email,
-        isVerified: true,
-        userName: null
-      }as DocumentData);
+        isVerified: user?.emailVerified,
+        userName: user.displayName
+      } as DocumentData);
     }
   };
 
@@ -61,6 +61,7 @@ export function LoginForm() {
     try {
       const result = await getRedirectResult(auth);
       const user = result?.user;
+      console.log(user);
       if (user) {
         await saveUser(user)
 

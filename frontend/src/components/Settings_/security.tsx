@@ -1,33 +1,34 @@
-import { Box,
-             Button,
-             Divider,
-             Flex,
-             Heading,
-             Text,
-             Modal, ModalOverlay,
-             ModalContent, ModalHeader,
-             ModalCloseButton,
-             ModalBody,
-             ModalFooter,
-             Input,
-             FormErrorMessage
-            } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Heading,
+  Text,
+  Modal, ModalOverlay,
+  ModalContent, ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Input,
+  FormErrorMessage
+} from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
-import { auth, db } from '../../firebase-config'
-import { signOut } from "firebase/auth";
+import { auth, db, googleProvider, microsoftProvider } from '../../firebase-config'
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { doc, deleteDoc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider} from "firebase/auth";
+import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider, reauthenticateWithRedirect, signOut, getRedirectResult } from "firebase/auth";
+
 
 const Security = () => {
   const navigate = useNavigate();
 
-  const logOut = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const logOut = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    signOut(auth)
+    await signOut(auth)
       .then(() => {
         console.log('Successful Sign out');
         navigate('/auth')
@@ -43,11 +44,11 @@ const Security = () => {
   const [error, setError] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      // Do something with the user email
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     // Do something with the user email
+  //   }
+  // }, [user]);
 
   const openPopup = () => {
     setIsOpen(true);
@@ -60,39 +61,73 @@ const Security = () => {
     setIsDeleting(false);
   };
 
-  const handleDeny = () => {
-    closePopup();
-  };
 
-  const handleSignOut = () => {
-    auth.signOut();
-  };
+
 
   const handleConfirm = async () => {
-    if (user && password && user.email) {
+    if (user) {
       try {
         setIsDeleting(true);
         setError('');
 
-        // Reauthenticate the user
-        const credential = EmailAuthProvider.credential(user.email as string, password);
-        await reauthenticateWithCredential(auth.currentUser as User, credential);
+        const providerId: string = user.providerData[0].providerId;
 
-        // Delete the document from Firestore
-        const userDocRef = doc(db, 'users', user.email);
-        await deleteDoc(userDocRef);
+        if (providerId === 'google.com') {
+          await reauthenticateWithRedirect(user, googleProvider)
+            .then(async () => {
+              const result = await getRedirectResult(auth);
+              if (result && result.user) {
+                const userDocRef = doc(db, 'users', result?.user?.email as string);
+                await deleteDoc(userDocRef);
+                await deleteUser(result?.user);
+                closePopup();
+                signOut(auth);
+                window.location.reload();
+                navigate('/auth')
+              }
 
-        // Delete the user from Firebase Authentication
-        await deleteUser(auth.currentUser as User);
+            })
+            .catch((err) => {
+              console.error(err);
+            })
+        } else if (providerId === 'microsoft.com') {
+          await reauthenticateWithRedirect(user, microsoftProvider)
+            .then(async () => {
+              const result = await getRedirectResult(auth);
+              if (result && result.user) {
+                const userDocRef = doc(db, 'users', result?.user?.email as string);
+                await deleteDoc(userDocRef);
+                await deleteUser(result?.user);
+                closePopup();
+                signOut(auth);
+                window.location.reload();
+                navigate('/auth')
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+            })
+        } else {
+          // Reauthenticate the user
+          const credential = EmailAuthProvider.credential(user.email as string, password);
+          await reauthenticateWithCredential(user, credential);
 
-        // Close the popup
-        closePopup();
+          // Delete the document from Firestore
+          const userDocRef = doc(db, 'users', user.email as string);
+          await deleteDoc(userDocRef);
 
-        handleSignOut();
+          // Delete the user from Firebase Authentication
+          await deleteUser(user);
 
-        window.location.reload();
+          // Close the popup
+          closePopup();
+          signOut(auth);
+          window.location.reload();
+          navigate('/auth')
+        }
 
-        navigate('/auth')
+
+
       } catch (error: any) {
         setError('Invalid password');
         setIsDeleting(false);
@@ -100,6 +135,8 @@ const Security = () => {
       }
     }
   };
+
+
 
 
   return (
@@ -143,35 +180,35 @@ const Security = () => {
           </Button>
           {/* Pop up for Account deletion confirmation */}
           <Modal isOpen={isOpen} onClose={closePopup} blockScrollOnMount={false} motionPreset="none" isCentered>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              <ModalCloseButton onClick={closePopup} />
-            </ModalHeader>
-            <ModalBody>
-              <p className="popup-text">Are you sure you would like to remove this account from the site? This action may not be undone.</p>
-              <br/>
-              <Input
-                type="password"
-                placeholder="Confirm your password to proceed"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                isInvalid={error !== ''}
-              />
-              <FormErrorMessage>{error}</FormErrorMessage>
-            </ModalBody>
-            <ModalFooter>
-              <Flex justifyContent="space-between">
-                <Button colorScheme="red" flex="1" mr={2} onClick={handleConfirm} isLoading={isDeleting}>
-                  Confirm
-                </Button>
-                <Button flex="1" variant="outline" onClick={handleDeny}>
-                  Deny
-                </Button>
-              </Flex>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>
+                <ModalCloseButton onClick={closePopup} />
+              </ModalHeader>
+              <ModalBody>
+                <p className="popup-text">Are you sure you would like to remove this account from the site? This action may not be undone.</p>
+                <br />
+                <Input
+                  type="password"
+                  placeholder="Confirm your password to proceed"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  isInvalid={error !== ''}
+                />
+                <FormErrorMessage>{error}</FormErrorMessage>
+              </ModalBody>
+              <ModalFooter>
+                <Flex justifyContent="space-between">
+                  <Button colorScheme="red" flex="1" mr={2} onClick={handleConfirm} isLoading={isDeleting}>
+                    Confirm
+                  </Button>
+                  <Button flex="1" variant="outline" onClick={closePopup}>
+                    Deny
+                  </Button>
+                </Flex>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </Flex>
       </div>
     </>
