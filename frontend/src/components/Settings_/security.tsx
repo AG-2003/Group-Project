@@ -30,7 +30,6 @@ const Security = () => {
 
     await signOut(auth)
       .then(() => {
-        console.log('Successful Sign out');
         navigate('/auth')
       })
       .catch((err) => {
@@ -47,13 +46,16 @@ const Security = () => {
   const [isExternalAcc, setIsExternalAcc] = useState(false)
 
   useEffect(() => {
-    if (curUser) {
-      if (curUser.providerData.length > 0) {
-        setIsExternalAcc(true)
-      } else {
-        // The user signed in with email/password or another non-external provider
-        setIsExternalAcc(false)
-      }
+    const isUsingEmailPasswordProvider = curUser?.providerData.some(
+      (provider) => provider.providerId === 'password'
+    );
+
+    if (curUser && isUsingEmailPasswordProvider) {
+      // The user signed in with email/password
+      setIsExternalAcc(false);
+    } else {
+      // The user signed in with an external provider or there is no user
+      setIsExternalAcc(true);
     }
   }, [curUser]);
 
@@ -80,49 +82,45 @@ const Security = () => {
 
   const handleConfirm = async () => {
     //if((there is an email account logged in)||(If there is an external account logged in))
-    if ((user && password && user.email) || (user && user.email && isExternalAcc)) {
-      try {
-        //Chakra UI delete confirmation po up functionality
-        setIsDeleting(true);
-        setError('');
+    if ((user && password && user.email)||(user && user.email && isExternalAcc)) {
+     try {
+      //Chakra UI delete confirmation pop up functionality
+       setIsDeleting(true);
+       setError('');
 
-        //If it is not an external account, reauthenticate the email
-        if (!isExternalAcc) {
-          const credential = EmailAuthProvider.credential(user.email as string, password);
-          await reauthenticateWithCredential(curUser, credential);
-          deleteAccount();
-        }
-        //Else if it is an external account (G account), reauthenticate using googleAuthProvider
-        else {
-          //  reauthenticateWithRedirect(curUser, googleProvider);
-          onAuthStateChanged(auth, (user) => {
-            if (user) {
-              console.log('deleteAccount');
-              deleteAccount();
-            } else {
-              console.log('error in authentication state validation')
-            }
-          });
-        }
-      } catch (error: any) {
-        setError('Invalid password');
-        setIsDeleting(false);
-        console.error('Error deleting document:', (error as Error).message);
-      }
+       //If it is not an external account, reauthenticate the email
+       if(!isExternalAcc){
+         const credential = EmailAuthProvider.credential(user.email as string, password);
+         await reauthenticateWithCredential(curUser, credential);
+         deleteAccount();
+       }
+       //Else if it is an external account (G account), reauthenticate using googleAuthProvider
+       else {
+         onAuthStateChanged(auth, (user) => {
+           if (user) {
+             deleteAccount();
+           } else {
+            console.log('error in authentication state validation')
+           }
+         });
+       }
+     } catch (error: any) {
+       setError('Invalid password');
+       setIsDeleting(false);
+       console.error('Error deleting document:', (error as Error).message);
+     }
     }
   };
 
   const deleteAccount = async () => {
     try {
       // Delete the document from Firestore
-      console.log('Before Account deletion');
       const userDocRef = doc(db, 'users', (user as User).email as string);
       await deleteDoc(userDocRef);
 
       // Delete the user from Firebase Authentication
       await deleteUser(curUser);
 
-      console.log('Account deleted');
     } catch (error: any) {
       console.error('Error deleting account:', (error as Error).message);
     } finally {
