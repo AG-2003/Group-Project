@@ -1,4 +1,5 @@
 import { Flex, Text, Badge, Stack, Avatar, Button } from "@chakra-ui/react";
+import { auth } from "../../firebase-config";
 
 const Profile = () => {
   const teams = [
@@ -13,6 +14,7 @@ const Profile = () => {
     // ... more communities
   ];
 
+  const user = auth.currentUser;
   return (
     <div>
       <Flex
@@ -25,7 +27,7 @@ const Profile = () => {
         <Flex align="center" p={3}>
           <Avatar ml={3} />
           <Text fontSize="25" ml={8}>
-            Your Name
+            {user?.displayName}
           </Text>
         </Flex>
 
