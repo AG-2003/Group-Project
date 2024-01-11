@@ -19,7 +19,7 @@ import {
   createUserWithEmailAndPassword,
   //   sendEmailVerification,
 } from "firebase/auth";
-import { setDoc, doc, collection } from "firebase/firestore";
+import { setDoc, doc, collection, DocumentData } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import "./passwordForm.scss";
 
@@ -44,13 +44,17 @@ export function SignUpPasswordForm() {
         const user = userCredential.user;
         console.log(user);
         const usersCollectionRef = collection(db, "users");
-        const userRef = doc(usersCollectionRef, email);
+        const userRef = doc(usersCollectionRef, user.email as string);
 
         await setDoc(userRef, {
-          email: user.email,
-          isVerified: user.emailVerified,
-          userName: user.displayName,
-        });
+          email: user?.email,
+          emailVerified: user?.emailVerified,
+          displayName: user.displayName,
+          desc: null,
+          userType: '',
+          userTheme: 'light',
+          photoURL: user.photoURL
+        } as DocumentData);
         navigate("/index");
       })
       .catch((err) => {

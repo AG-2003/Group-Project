@@ -1,33 +1,34 @@
-import { Box,
-             Button,
-             Divider,
-             Flex,
-             Heading,
-             Text,
-             Modal, ModalOverlay,
-             ModalContent, ModalHeader,
-             ModalCloseButton,
-             ModalBody,
-             ModalFooter,
-             Input,
-             FormErrorMessage
-            } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Heading,
+  Text,
+  Modal, ModalOverlay,
+  ModalContent, ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Input,
+  FormErrorMessage
+} from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
-import { auth, db} from '../../firebase-config'
-import {  onAuthStateChanged, signOut } from "firebase/auth";
+import { auth, db } from '../../firebase-config'
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider} from "firebase/auth";
+import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider, signOut, getRedirectResult, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
+
 
 const Security = () => {
   const navigate = useNavigate();
 
-  const logOut = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const logOut = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    signOut(auth)
+    await signOut(auth)
       .then(() => {
         console.log('Successful Sign out');
         navigate('/auth')
@@ -71,6 +72,7 @@ const Security = () => {
     closePopup();
   };
 
+
   const handleSignOut = () => {
     auth.signOut();
   };
@@ -78,37 +80,37 @@ const Security = () => {
 
   const handleConfirm = async () => {
     //if((there is an email account logged in)||(If there is an external account logged in))
-    if ((user && password && user.email)||(user && user.email && isExternalAcc)) {
-     try {
-      //Chakra UI delete confirmation po up functionality
-       setIsDeleting(true);
-       setError('');
+    if ((user && password && user.email) || (user && user.email && isExternalAcc)) {
+      try {
+        //Chakra UI delete confirmation po up functionality
+        setIsDeleting(true);
+        setError('');
 
-       //If it is not an external account, reauthenticate the email
-       if(!isExternalAcc){
-         const credential = EmailAuthProvider.credential(user.email as string, password);
-         await reauthenticateWithCredential(curUser, credential);
-         deleteAccount();
-       }
-       //Else if it is an external account (G account), reauthenticate using googleAuthProvider
-       else {
-        //  reauthenticateWithRedirect(curUser, googleProvider);
-         onAuthStateChanged(auth, (user) => {
-           if (user) {
-             console.log('deleteAccount');
-             deleteAccount();
-           } else {
-            console.log('error in authentication state validation')
-           }
-         });
-       }
-     } catch (error: any) {
-       setError('Invalid password');
-       setIsDeleting(false);
-       console.error('Error deleting document:', (error as Error).message);
-     }
+        //If it is not an external account, reauthenticate the email
+        if (!isExternalAcc) {
+          const credential = EmailAuthProvider.credential(user.email as string, password);
+          await reauthenticateWithCredential(curUser, credential);
+          deleteAccount();
+        }
+        //Else if it is an external account (G account), reauthenticate using googleAuthProvider
+        else {
+          //  reauthenticateWithRedirect(curUser, googleProvider);
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+              console.log('deleteAccount');
+              deleteAccount();
+            } else {
+              console.log('error in authentication state validation')
+            }
+          });
+        }
+      } catch (error: any) {
+        setError('Invalid password');
+        setIsDeleting(false);
+        console.error('Error deleting document:', (error as Error).message);
+      }
     }
-   };
+  };
 
   const deleteAccount = async () => {
     try {
@@ -136,6 +138,36 @@ const Security = () => {
   };
 
 
+
+
+  const handleEmailVerification = async () => {
+    if (auth.currentUser) {
+      try {
+        await sendEmailVerification(auth.currentUser);
+        const userRef = doc(db, "users", auth.currentUser.email as string)
+        await updateDoc(userRef, {
+          emailVerified: auth.currentUser.emailVerified
+        })
+        console.log(`email sent to ${auth.currentUser.email}`)
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+
+  const handlePasswordReset = async () => {
+    if (auth.currentUser && auth.currentUser.email) {
+      try {
+        await sendPasswordResetEmail(auth, auth.currentUser.email)
+        alert(`email sent to ${auth.currentUser.email}`)
+        signOut(auth);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+
   return (
     <>
       <div className="head">
@@ -148,7 +180,15 @@ const Security = () => {
           <Heading size="sm" mb={3}>
             Password
           </Heading>
-          <EditableTextField b1="Edit" />
+          <Flex align="center">
+            <Text
+
+              mr={280}
+            >
+              ***********
+            </Text>
+            <Button onClick={handlePasswordReset}>Reset</Button>
+          </Flex>
         </Box>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
@@ -156,7 +196,20 @@ const Security = () => {
           <Heading size="sm" mb={3}>
             Verification Status
           </Heading>
-          <Text>Haven't recieved email ? Resend.</Text>
+          <Flex align="center">
+            <Text
+              color={auth.currentUser?.emailVerified ? 'green' : 'red'}
+              mr={280}
+            >
+              {auth.currentUser?.emailVerified ? 'Verified' : 'Not Verified'}
+            </Text>
+
+            {!auth.currentUser?.emailVerified &&
+              (<Button onClick={handleEmailVerification}>Click to verify</Button>
+              )}
+          </Flex>
+
+
         </Box>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 

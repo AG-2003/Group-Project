@@ -11,24 +11,91 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import { sendEmailVerification } from "firebase/auth";
-// import { auth } from "../../firebase-config";
+import { auth, db } from "../../firebase-config";
+import { updateProfile, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+
 
 const Account = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [avatarUrl, setAvatarUrl] = useState("");
 
-  const handleFileChange = (event: any | null) => {
+
+  const handleImageSelection = async (event: any | null) => {
+
+
     const file = event.target.files[0];
-    if (file) {
+    if (file && auth.currentUser) {
       // Create a URL for the file
       const newAvatarUrl = URL.createObjectURL(file);
       setAvatarUrl(newAvatarUrl);
+      try {
+        await updateProfile(auth.currentUser, {
+          photoURL: avatarUrl
+        })
+        const userRef = doc(db, "users", auth.currentUser.email as string)
+        await updateDoc(userRef, {
+          photoURL: avatarUrl
+        })
+        console.log("Profile photo updated successfully");
+      } catch (err) {
+        console.log(err);
+        console.log("Error updating profile photo:", err);
+      }
     }
-  };
+  }
 
-  // logic for checking if users Email address is verified.
+
+
+  const handleUsernameSave = async (newUsername: string) => {
+
+    if (auth.currentUser) {
+      try {
+        await updateProfile(auth.currentUser, {
+          displayName: newUsername
+        });
+        // TODO: handle database update here
+        const userRef = doc(db, "users", auth.currentUser.email as string)
+        await updateDoc(userRef, {
+          displayName: newUsername
+        })
+        console.log(`updated username to ${auth.currentUser.displayName}`);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+
+  const [userDescription, setUserDescription] = useState<string>('Write about yourself !');
+
+  const handleDescriptionSave = async (description: string) => {
+    if (auth.currentUser) {
+      try {
+        const userRef = doc(db, "users", auth.currentUser.email as string)
+        await updateDoc(userRef, {
+          desc: description
+        })
+        console.log(`description updated to ${description}`);
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists()) {
+          console.log(docSnap.data().desc);
+          setUserDescription(docSnap.data().desc);
+        }
+
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  const handleUserTypeSave = () => {
+
+  }
+
+
 
   return (
     <>
@@ -42,7 +109,7 @@ const Account = () => {
       <div className="body">
         {/* Profile Picture */}
         <Flex>
-          <Avatar src={avatarUrl} className="avatar" />
+          <Avatar src={auth.currentUser?.photoURL || ''} referrerPolicy="no-referrer" className="avatar" />
           <Box className="upload-section">
             <Box className="text">Update your profile photo</Box>
             <Input
@@ -50,13 +117,13 @@ const Account = () => {
               accept="image/*"
               hidden
               id="file-upload"
-              onChange={handleFileChange}
+              onChange={handleImageSelection}
             />
             <Button
               className="button button-upload"
               colorScheme="purple"
               size="sm"
-            // onClick={() => document.getElementById('file-upload').click()}
+              onClick={() => document.getElementById('file-upload')?.click()}
             >
               Upload
             </Button>
@@ -69,7 +136,10 @@ const Account = () => {
           <Heading size="sm" mb={3}>
             Display Name
           </Heading>
-          <EditableTextField b1="Edit" />
+          <EditableTextField
+            b1="Edit"
+            initialValue={auth.currentUser?.displayName ? auth.currentUser.displayName : 'click on edit to set username'}
+            onSave={handleUsernameSave} />
         </Box>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
@@ -78,7 +148,7 @@ const Account = () => {
           <Heading size="sm" mb={3}>
             Description
           </Heading>
-          <EditableTextField b1="Edit" />
+          <EditableTextField b1="Edit" initialValue={userDescription} onSave={handleDescriptionSave} />
         </Box>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
