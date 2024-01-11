@@ -67,13 +67,7 @@ export function LoginForm() {
         navigate("/index"); // Navigate to /index here
       }
     } catch (error: any) {
-      if ((error as AuthError).code === 'auth/account-exists-with-different-credential') {
-        // Handle account exists with different credential error
-        alert("Error: this account already exists with a different credential")
-      } else {
-        // Handle other errors
-        console.error('Error signing in:', (error as AuthError).message);
-      }
+      alert(error)
     }
   };
 

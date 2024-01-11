@@ -46,15 +46,20 @@ const Security = () => {
   const [isExternalAcc, setIsExternalAcc] = useState(false)
 
   useEffect(() => {
-    if (curUser) {
-      if (curUser.providerData.length > 0) {
-        setIsExternalAcc(true)
-      } else {
-        // The user signed in with email/password or another non-external provider
-        setIsExternalAcc(false)
-      }
+    const isUsingEmailPasswordProvider = curUser?.providerData.some(
+      (provider) => provider.providerId === 'password'
+    );
+
+    if (curUser && isUsingEmailPasswordProvider) {
+      // The user signed in with email/password
+      setIsExternalAcc(false);
+    } else {
+      // The user signed in with an external provider or there is no user
+      setIsExternalAcc(true);
     }
   }, [curUser]);
+
+  console.log(isExternalAcc)
 
   const openPopup = () => {
     setIsOpen(true);
@@ -80,7 +85,7 @@ const Security = () => {
     //if((there is an email account logged in)||(If there is an external account logged in))
     if ((user && password && user.email)||(user && user.email && isExternalAcc)) {
      try {
-      //Chakra UI delete confirmation po up functionality
+      //Chakra UI delete confirmation pop up functionality
        setIsDeleting(true);
        setError('');
 
@@ -92,7 +97,6 @@ const Security = () => {
        }
        //Else if it is an external account (G account), reauthenticate using googleAuthProvider
        else {
-        //  reauthenticateWithRedirect(curUser, googleProvider);
          onAuthStateChanged(auth, (user) => {
            if (user) {
              console.log('deleteAccount');
