@@ -19,7 +19,7 @@ export function LoginForm() {
   const [user] = useAuthState(auth);
 
   //Remove the line if you want to test out log In page
-  if(user!=null){
+  if (user != null) {
     navigate('/index')
   }
 
@@ -50,9 +50,13 @@ export function LoginForm() {
       const userRef = doc(db, "users", user.email as string);
       setDoc(userRef, {
         email: user?.email,
-        isVerified: true,
-        userName: null
-      }as DocumentData);
+        emailVerified: user?.emailVerified,
+        displayName: user.displayName,
+        desc: null,
+        userType: '',
+        userTheme: 'light',
+        photoURL: user.photoURL
+      } as DocumentData);
     }
   };
 
@@ -61,19 +65,14 @@ export function LoginForm() {
     try {
       const result = await getRedirectResult(auth);
       const user = result?.user;
+      console.log(user);
       if (user) {
         await saveUser(user)
 
         navigate("/index"); // Navigate to /index here
       }
     } catch (error: any) {
-      if ((error as AuthError).code === 'auth/account-exists-with-different-credential') {
-        // Handle account exists with different credential error
-        alert("Error: this account already exists with a different credential")
-      } else {
-        // Handle other errors
-        console.error('Error signing in:', (error as AuthError).message);
-      }
+      alert(error)
     }
   };
 
