@@ -50,8 +50,12 @@ export function LoginForm() {
       const userRef = doc(db, "users", user.email as string);
       setDoc(userRef, {
         email: user?.email,
-        isVerified: user?.emailVerified,
-        userName: user.displayName
+        emailVerified: user?.emailVerified,
+        displayName: user.displayName,
+        desc: null,
+        userType: '',
+        userTheme: 'light',
+        photoURL: user.photoURL
       } as DocumentData);
     }
   };
