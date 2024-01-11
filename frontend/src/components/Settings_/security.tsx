@@ -13,13 +13,13 @@ import { Box,
              FormErrorMessage
             } from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
-import { auth, db } from '../../firebase-config'
-import { signOut } from "firebase/auth";
+import { auth, db, googleProvider } from '../../firebase-config'
+import { getRedirectResult, onAuthStateChanged, reauthenticateWithRedirect, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { doc, deleteDoc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider} from "firebase/auth";
+import { deleteUser, User, reauthenticateWithCredential, signInWithRedirect, EmailAuthProvider} from "firebase/auth";
 
 const Security = () => {
   const navigate = useNavigate();
@@ -42,12 +42,19 @@ const Security = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const curUser = auth.currentUser as User
+  const [isExternalAcc, setIsExternalAcc] = useState(false)
 
   useEffect(() => {
-    if (user) {
-      // Do something with the user email
+    if (curUser) {
+      if (curUser.providerData.length > 0) {
+        setIsExternalAcc(true)
+      } else {
+        // The user signed in with email/password or another non-external provider
+        setIsExternalAcc(false)
+      }
     }
-  }, [user]);
+  }, [curUser]);
 
   const openPopup = () => {
     setIsOpen(true);
@@ -68,36 +75,63 @@ const Security = () => {
     auth.signOut();
   };
 
+
   const handleConfirm = async () => {
-    if (user && password && user.email) {
-      try {
-        setIsDeleting(true);
-        setError('');
+    //if((there is an email account logged in)||(If there is an external account logged in))
+    if ((user && password && user.email)||(user && user.email && isExternalAcc)) {
+     try {
+      //Chakra UI delete confirmation po up functionality
+       setIsDeleting(true);
+       setError('');
 
-        // Reauthenticate the user
-        const credential = EmailAuthProvider.credential(user.email as string, password);
-        await reauthenticateWithCredential(auth.currentUser as User, credential);
+       //If it is not an external account, reauthenticate the email
+       if(!isExternalAcc){
+         const credential = EmailAuthProvider.credential(user.email as string, password);
+         await reauthenticateWithCredential(curUser, credential);
+         deleteAccount();
+       }
+       //Else if it is an external account (G account), reauthenticate using googleAuthProvider
+       else {
+        //  reauthenticateWithRedirect(curUser, googleProvider);
+         onAuthStateChanged(auth, (user) => {
+           if (user) {
+             console.log('deleteAccount');
+             deleteAccount();
+           } else {
+            console.log('error in authentication state validation')
+           }
+         });
+       }
+     } catch (error: any) {
+       setError('Invalid password');
+       setIsDeleting(false);
+       console.error('Error deleting document:', (error as Error).message);
+     }
+    }
+   };
 
-        // Delete the document from Firestore
-        const userDocRef = doc(db, 'users', user.email);
-        await deleteDoc(userDocRef);
+  const deleteAccount = async () => {
+    try {
+      // Delete the document from Firestore
+      console.log('Before Account deletion');
+      const userDocRef = doc(db, 'users', (user as User).email as string);
+      await deleteDoc(userDocRef);
 
-        // Delete the user from Firebase Authentication
-        await deleteUser(auth.currentUser as User);
+      // Delete the user from Firebase Authentication
+      await deleteUser(curUser);
 
-        // Close the popup
-        closePopup();
+      console.log('Account deleted');
+    } catch (error: any) {
+      console.error('Error deleting account:', (error as Error).message);
+    } finally {
+      // Close the popup
+      closePopup();
 
-        handleSignOut();
+      handleSignOut();
 
-        window.location.reload();
+      window.location.reload();
 
-        navigate('/auth')
-      } catch (error: any) {
-        setError('Invalid password');
-        setIsDeleting(false);
-        console.error('Error deleting document:', (error as Error).message);
-      }
+      navigate('/auth');
     }
   };
 
@@ -151,13 +185,16 @@ const Security = () => {
             <ModalBody>
               <p className="popup-text">Are you sure you would like to remove this account from the site? This action may not be undone.</p>
               <br/>
-              <Input
-                type="password"
-                placeholder="Confirm your password to proceed"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                isInvalid={error !== ''}
-              />
+              <p style={{ fontSize: '0.9rem' }}>(You are required to re-authenticate your account details)</p>
+              {!isExternalAcc && (
+                <Input
+                  type="password"
+                  placeholder="Confirm your password to proceed"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  isInvalid={error !== ''}
+                />
+              )}
               <FormErrorMessage>{error}</FormErrorMessage>
             </ModalBody>
             <ModalFooter>
