@@ -13,13 +13,13 @@ import { Box,
              FormErrorMessage
             } from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
-import { auth, db, googleProvider } from '../../firebase-config'
-import { getRedirectResult, onAuthStateChanged, reauthenticateWithRedirect, signOut } from "firebase/auth";
+import { auth, db} from '../../firebase-config'
+import {  onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { doc, deleteDoc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { deleteUser, User, reauthenticateWithCredential, signInWithRedirect, EmailAuthProvider} from "firebase/auth";
+import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider} from "firebase/auth";
 
 const Security = () => {
   const navigate = useNavigate();
