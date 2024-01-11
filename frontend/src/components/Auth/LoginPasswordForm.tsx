@@ -20,10 +20,15 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../../firebase-config";
-import "./PasswordForm.scss";
+import "./passwordForm.scss";
 
 export function LoginPasswordForm() {
   const [pwd, setPwd] = useState("");
+
+  const [isPwdIncorrect, setIsPwdIncorrect] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+
+
 
   const navigate = useNavigate();
 
@@ -39,12 +44,17 @@ export function LoginPasswordForm() {
       .then((userCredential) => {
         const user = userCredential.user;
         console.log(user);
+        setIsPwdIncorrect(false);
+        setFailedAttempts(0);
         alert(`you have signed in into ${user.email}`);
         navigate("/index");
       })
       .catch((err) => {
         console.log(err.message);
-        navigate("/forgotpwd"); // not implemented yet.
+        setIsPwdIncorrect(true);
+        setFailedAttempts(prev => prev + 1); // Increment failed attempts
+        console.log(failedAttempts)
+        alert(err.code);
       });
   }
 
@@ -85,11 +95,15 @@ export function LoginPasswordForm() {
 
           <InputGroup>
             <Input
-              className="pwd-input"
+              className={`pwd-input ${isPwdIncorrect ? 'input-incorrect' : ''}`}
               placeholder="Enter password"
               type={showPwd ? "text" : "password"}
               value={pwd}
-              onChange={(e) => setPwd(e.target.value)}
+              onChange={(e) => {
+                setPwd(e.target.value);
+                setIsPwdIncorrect(false);
+                // setFailedAttempts(0);
+              }}
             />
             <InputRightElement className="pwd-icon">
               <IconButton
@@ -111,7 +125,8 @@ export function LoginPasswordForm() {
             Continue
           </Button>
 
-          <Text className="forgot" onClick={handleRecoveryEmailSubmission}>
+          <Text className={`forgot ${failedAttempts > 3 ? 'incorrect-input' : ''}`}
+            onClick={handleRecoveryEmailSubmission}>
             Forgot Password?
           </Text>
         </FormControl>
