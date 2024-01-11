@@ -22,14 +22,6 @@ const Account = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [avatarUrl, setAvatarUrl] = useState("");
 
-  const handleFileChange = (event: any | null) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Create a URL for the file
-      const newAvatarUrl = URL.createObjectURL(file);
-      setAvatarUrl(newAvatarUrl);
-    }
-  };
 
   const handleImageSelection = async (event: any | null) => {
 
