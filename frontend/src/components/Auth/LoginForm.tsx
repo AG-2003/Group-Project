@@ -11,7 +11,7 @@ import {
 import { getRedirectResult, signInWithRedirect, AuthError } from "firebase/auth";
 import { setDoc, doc, DocumentData } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
-import "./loginForm.scss";
+import "./LoginForm.scss";
 import { useAuthState } from 'react-firebase-hooks/auth'
 
 export function LoginForm() {

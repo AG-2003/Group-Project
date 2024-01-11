@@ -74,7 +74,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, modalType }) => {
         navigate("/slides");
         break;
       case "Spreadsheet":
-        navigate("/spreadsheets");
+        navigate("/sheet");
         break;
       case "Whiteboard":
         navigate("/board");
