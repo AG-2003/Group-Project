@@ -5,3 +5,20 @@
 }
 
 
+ .tool-button {
+   background: none;
+   border: none;
+   margin: 0 5px;
+   padding: 10px;
+   cursor: pointer;
+   font-size: 20px;
+   color: #333;
+
+   &:hover,
+   &:focus {
+     color: #6d3fb8;
+   }
+
+ }
+ 
+

@@ -6,120 +6,90 @@ import {
   FaTrash,
   FaUndo,
   FaRedo,
-} from "react-icons/fa"; // Import necessary icons
+  FaMousePointer,
+  FaShapes,
+} from "react-icons/fa";
 import { FaDroplet, FaSliders } from "react-icons/fa6";
+
 import "./Toolbar.scss";
 
-
-type Tool = "pen" | "eraser" | "text" | "clear";
+type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
+type Shape = "rectangle" | "circle" | "line";
 
 interface ToolbarProps {
   tool: string;
-  showPenFeatures: boolean;
-  showEraserFeatures: boolean;
   undoStack: any[];
   redoStack: any[];
-  handlePenClick: () => void;
-  handleEraserClick: () => void;
-  handleToolChange: (tool: Tool) => void;
+  handleToolChange: (tool: Tool | Shape) => void;
   handleUndo: () => void;
   handleRedo: () => void;
   toggleColorPicker: () => void;
   handleSizeClick: () => void;
-  handleEraserSizeClick: () => void;
+  toggleShapeMenu: () => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
   tool,
-  showPenFeatures,
-  showEraserFeatures,
   undoStack,
   redoStack,
-  handlePenClick,
-  handleEraserClick,
   handleToolChange,
   handleUndo,
   handleRedo,
   toggleColorPicker,
   handleSizeClick,
-  handleEraserSizeClick,
+  toggleShapeMenu,
 }) => {
   return (
     <div className="toolbar">
-      <div
-        className={`undo-redo ${
-          showPenFeatures ? "move-undo-redo-with-pen" : ""
-        }${showEraserFeatures ? "move-undo-redo-with-eraser" : ""}`}
+      <button
+        className={`tool-button ${tool === "pointer" ? "selected" : ""}`}
+        onClick={() => handleToolChange("pointer")}
       >
-        <button
-          onClick={handleUndo}
-          disabled={undoStack.length === 0}
-          className="tool-button"
-        >
-          <FaUndo />
-        </button>
-        <button
-          onClick={handleRedo}
-          disabled={redoStack.length === 0}
-          className="tool-button"
-        >
-          <FaRedo />
-        </button>
-      </div>
-      <div
-        className={`pen-container ${
-          showPenFeatures ? "show-pen-features" : ""
-        } ${showEraserFeatures ? "move-pen-with-eraser" : ""}`}
+        <FaMousePointer />
+      </button>
+      <button
+        onClick={handleUndo}
+        disabled={undoStack.length === 0}
+        className="tool-button"
       >
-        <button
-          className={`tool-button ${tool === "pen" ? "selected" : ""}`}
-          onClick={handlePenClick}
-        >
-          <FaPen />
-        </button>
-        <div
-          className={`pen-features ${
-            showPenFeatures ? "show-pen-features" : ""
-          }`}
-        >
-          <button className="tool-button-feature" onClick={toggleColorPicker}>
-            <FaDroplet />
-          </button>
-          <button className="tool-button-feature" onClick={handleSizeClick}>
-            <FaSliders />
-          </button>
-        </div>
-      </div>
-      <div
-        className={`eraser-container ${
-          showEraserFeatures ? "show-eraser-features" : ""
-        }`}
+        <FaUndo />
+      </button>
+      <button
+        onClick={handleRedo}
+        disabled={redoStack.length === 0}
+        className="tool-button"
       >
-        <button
-          className={`tool-button ${tool === "eraser" ? "selected" : ""}`}
-          onClick={handleEraserClick}
-        >
-          <FaEraser />
-        </button>
-        <div
-          className={`eraser-features ${
-            showEraserFeatures ? "show-eraser-features" : ""
-          }`}
-        >
-          <button
-            className="tool-button-feature"
-            onClick={handleEraserSizeClick}
-          >
-            <FaSliders />
-          </button>
-        </div>
-      </div>
-
+        <FaRedo />
+      </button>
+      <button
+        className={`tool-button ${tool === "pen" ? "selected" : ""}`}
+        onClick={() => handleToolChange("pen")}
+      >
+        <FaPen />
+      </button>
+      <button
+        className={`tool-button ${tool === "eraser" ? "selected" : ""}`}
+        onClick={() => handleToolChange("eraser")}
+      >
+        <FaEraser />
+      </button>
       <button
         className={`tool-button ${tool === "text" ? "selected" : ""}`}
         onClick={() => handleToolChange("text")}
       >
         <FaTextHeight />
+      </button>
+      <button
+        className={`tool-button ${tool === "shape" ? "selected" : ""}`}
+        onClick={toggleShapeMenu}
+      >
+        <FaShapes />
+      </button>
+      <button className="tool-button" onClick={toggleColorPicker}>
+        <FaDroplet />
+      </button>
+      <button className="tool-button" onClick={handleSizeClick}>
+        <FaSliders />
       </button>
       <button className="tool-button" onClick={() => handleToolChange("clear")}>
         <FaTrash />
