@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Divider, Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavBar from "../components/Dashboard/Navbar";
-import Projects from "../components/Dashboard/projects";
+import Projects from "../components/Dashboard/Projects";
 import Profile from "../components/Dashboard/profile";
-import SideBar from "../components/Dashboard/sidebar";
+import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/trashAlt";
 
