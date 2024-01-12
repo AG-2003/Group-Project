@@ -1,5 +1,6 @@
 import { Flex, Text, Badge, Stack, Avatar, Button } from "@chakra-ui/react";
 import { auth } from "../../firebase-config";
+import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
 
 const Profile = () => {
   const teams = [
@@ -14,7 +15,8 @@ const Profile = () => {
     // ... more communities
   ];
 
-  const user = auth.currentUser;
+  const userProfile = UseUserProfilePic();
+
   return (
     <div>
       <Flex
@@ -25,9 +27,9 @@ const Profile = () => {
         rounded={15}
       >
         <Flex align="center" p={3}>
-          <Avatar ml={3} />
+          <Avatar ml={3} src={userProfile.photoURL || 'fallback_image_url'} name={userProfile.displayName} />
           <Text fontSize="25" ml={8}>
-            {user?.displayName}
+            {auth.currentUser?.displayName}
           </Text>
         </Flex>
 
