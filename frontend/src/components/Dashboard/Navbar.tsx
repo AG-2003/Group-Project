@@ -14,6 +14,7 @@ import { FiFileText, FiGrid, FiClipboard } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import Modal from "./sub-components/Modal";
+import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
 
 interface Props {
   isSidebarOpen: boolean;
@@ -37,6 +38,8 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
 
   // Function to handle the confirmation (submit) of the modal
   const handleConfirm = () => closeModal(); // Close the modal after submission
+
+  const userProfile = UseUserProfilePic();
 
   return (
     <Flex
@@ -93,7 +96,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
           </MenuList>
         </Menu>
         <Link to="/settings">
-          <Avatar size="sm" as="span" />
+          <Avatar size="sm" as="span" src={userProfile.photoURL || 'fallback_image_url'} name={userProfile.displayName} />
         </Link>
       </Flex>
     </Flex>

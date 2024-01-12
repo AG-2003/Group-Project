@@ -82,33 +82,33 @@ const Security = () => {
 
   const handleConfirm = async () => {
     //if((there is an email account logged in)||(If there is an external account logged in))
-    if ((user && password && user.email)||(user && user.email && isExternalAcc)) {
-     try {
-      //Chakra UI delete confirmation pop up functionality
-       setIsDeleting(true);
-       setError('');
+    if ((user && password && user.email) || (user && user.email && isExternalAcc)) {
+      try {
+        //Chakra UI delete confirmation pop up functionality
+        setIsDeleting(true);
+        setError('');
 
-       //If it is not an external account, reauthenticate the email
-       if(!isExternalAcc){
-         const credential = EmailAuthProvider.credential(user.email as string, password);
-         await reauthenticateWithCredential(curUser, credential);
-         deleteAccount();
-       }
-       //Else if it is an external account (G account), reauthenticate using googleAuthProvider
-       else {
-         onAuthStateChanged(auth, (user) => {
-           if (user) {
-             deleteAccount();
-           } else {
-            console.log('error in authentication state validation')
-           }
-         });
-       }
-     } catch (error: any) {
-       setError('Invalid password');
-       setIsDeleting(false);
-       console.error('Error deleting document:', (error as Error).message);
-     }
+        //If it is not an external account, reauthenticate the email
+        if (!isExternalAcc) {
+          const credential = EmailAuthProvider.credential(user.email as string, password);
+          await reauthenticateWithCredential(curUser, credential);
+          deleteAccount();
+        }
+        //Else if it is an external account (G account), reauthenticate using googleAuthProvider
+        else {
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+              deleteAccount();
+            } else {
+              console.log('error in authentication state validation')
+            }
+          });
+        }
+      } catch (error: any) {
+        setError('Invalid password');
+        setIsDeleting(false);
+        console.error('Error deleting document:', (error as Error).message);
+      }
     }
   };
 
@@ -135,17 +135,27 @@ const Security = () => {
     }
   };
 
+  useEffect(() => {
+    const updateUserVerificationStatus = async () => {
+      if (auth.currentUser && auth.currentUser.emailVerified) {
+        const userRef = doc(db, "users", auth.currentUser.email as string);
+        await updateDoc(userRef, {
+          emailVerified: auth.currentUser.emailVerified,
+        });
+      }
+    };
 
+    // Call this function right after the component mounts
+    updateUserVerificationStatus();
+  }, []);
 
 
   const handleEmailVerification = async () => {
     if (auth.currentUser) {
       try {
         await sendEmailVerification(auth.currentUser);
-        const userRef = doc(db, "users", auth.currentUser.email as string)
-        await updateDoc(userRef, {
-          emailVerified: auth.currentUser.emailVerified
-        })
+
+        alert(`verification mail sent to ${auth.currentUser.email}`)
         console.log(`email sent to ${auth.currentUser.email}`)
       } catch (err) {
         console.error(err);
@@ -228,38 +238,38 @@ const Security = () => {
           </Button>
           {/* Pop up for Account deletion confirmation */}
           <Modal isOpen={isOpen} onClose={closePopup} blockScrollOnMount={false} motionPreset="none" isCentered>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              <ModalCloseButton onClick={closePopup} />
-            </ModalHeader>
-            <ModalBody>
-              <p className="popup-text">Are you sure you would like to remove this account from the site? This action may not be undone.</p>
-              <br/>
-              <p style={{ fontSize: '0.9rem' }}>(You are required to re-authenticate your account details)</p>
-              {!isExternalAcc && (
-                <Input
-                  type="password"
-                  placeholder="Confirm your password to proceed"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  isInvalid={error !== ''}
-                />
-              )}
-              <FormErrorMessage>{error}</FormErrorMessage>
-            </ModalBody>
-            <ModalFooter>
-              <Flex justifyContent="space-between">
-                <Button colorScheme="red" flex="1" mr={2} onClick={handleConfirm} isLoading={isDeleting}>
-                  Confirm
-                </Button>
-                <Button flex="1" variant="outline" onClick={handleDeny}>
-                  Deny
-                </Button>
-              </Flex>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>
+                <ModalCloseButton onClick={closePopup} />
+              </ModalHeader>
+              <ModalBody>
+                <p className="popup-text">Are you sure you would like to remove this account from the site? This action may not be undone.</p>
+                <br />
+                <p style={{ fontSize: '0.9rem' }}>(You are required to re-authenticate your account details)</p>
+                {!isExternalAcc && (
+                  <Input
+                    type="password"
+                    placeholder="Confirm your password to proceed"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    isInvalid={error !== ''}
+                  />
+                )}
+                <FormErrorMessage>{error}</FormErrorMessage>
+              </ModalBody>
+              <ModalFooter>
+                <Flex justifyContent="space-between">
+                  <Button colorScheme="red" flex="1" mr={2} onClick={handleConfirm} isLoading={isDeleting}>
+                    Confirm
+                  </Button>
+                  <Button flex="1" variant="outline" onClick={handleDeny}>
+                    Deny
+                  </Button>
+                </Flex>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </Flex>
       </div>
     </>
