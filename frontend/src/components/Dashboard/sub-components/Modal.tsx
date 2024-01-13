@@ -68,10 +68,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, modalType }) => {
     // Depending on the modal type, navigate to different routes
     switch (modalType) {
       case "Doc":
-        navigate("/doc");
+        navigate("/doc", {state: {title}});
         break;
       case "Slide":
         navigate("/slides");
+        break;
         break;
       case "Spreadsheet":
         navigate("/spreadsheets");
