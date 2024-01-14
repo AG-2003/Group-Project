@@ -1,74 +1,144 @@
-import React, { useState } from "react";
-import { ReactGrid, Row, HeaderCell, TextCell } from "@silevis/reactgrid";
-import "@silevis/reactgrid/styles.scss";
-import "./Sheet.scss";
+// import React, { useState } from "react";
+// import Spreadsheet, { Matrix } from "react-spreadsheet";
+// import Toolbar from "./Toolbar"; // Assuming Toolbar is in the same directory
 
-// Helper function to create a header cell
-const getHeaderCell = (text: string): HeaderCell => ({
-  text,
-  type: "header",
-});
+// // ... (Other imports and code)
 
-// Helper function to create a text cell
-const getTextCell = (text: string): TextCell => ({
-  text,
-  type: "text",
-});
+// const Sheet = () => {
+//   // Create a matrix with 100 rows and 26 columns
+//   const createEmptyMatrix = (rows: number, columns: number): Matrix<any> => {
+//     return Array.from({ length: rows }, () =>
+//       Array.from({ length: columns }, () => ({ value: "" }))
+//     );
+//   };
+//   const [data, setData] = useState<Matrix<any>>(createEmptyMatrix(100, 26));
 
-const generateRows = (rowCount: number, columnCount: number): Row[] => {
-  // Create the header row with column labels (adjusting for the extra row number column)
-  const headerRow: Row = {
-    rowId: "header",
-    cells: [
-      getHeaderCell(""), // The top-left corner cell, could be left empty or labeled as needed
-      ...Array.from(
-        { length: columnCount },
-        (_, columnIndex) => getHeaderCell(String.fromCharCode(65 + columnIndex)) // A, B, C, etc.
-      ),
+//   // Implement the required functions for the Toolbar component
+//   // Here we just implement a dummy function for onFill
+//   const handleFill = () => {
+//     // Logic to fill selected cells with "Hello World"
+//     // This is a placeholder, as `react-spreadsheet` does not provide cell selection out of the box
+//     const newData = data.map((row) =>
+//       row.map((cell) => ({ ...cell, value: "Hello World" }))
+//     );
+//     setData(newData);
+//   };
+
+//   // Placeholder functions for other Toolbar actions
+//   const handleSearch = (searchTerm: string) => {
+//     /* ... */
+//   };
+//   const handleUndo = () => {
+//     /* ... */
+//   };
+//   // ... (Other handler functions)
+
+//   // You would replace the following with actual state logic
+//   const isSearchVisible = false;
+//   const toggleSearchVisibility = () => {
+//     /* ... */
+//   };
+//   const isSpellCheckEnabled = false;
+//   // ... (Other state/logic for toolbar visibility and features)
+
+//   return (
+//     <div>
+//       <Toolbar
+//         onSearch={handleSearch}
+//         isSearchVisible={isSearchVisible}
+//         toggleSearchVisibility={toggleSearchVisibility}
+//         onUndo={handleUndo}
+//         // ... (Pass all required props to Toolbar)
+//         // For now, we're assuming all buttons in the toolbar fill the cells with "Hello World"
+//         onRedo={handleFill}
+//         onToggleSpellCheck={handleFill}
+//         onTextTypeChange={(format, level) => handleFill()}
+//         onFontChange={handleFill}
+//         onFontSizeSelect={handleFill}
+//         onBoldClick={handleFill}
+//         onItalicClick={handleFill}
+//         onUnderlineClick={handleFill}
+//         onStrikeClick={handleFill}
+//         onColorSelect={handleFill}
+//         onHighlightSelect={handleFill}
+//         onLinkClick={handleFill}
+//         onImageUpload={handleFill}
+//         onTextAlignmentChange={handleFill}
+//         onChecklistClick={handleFill}
+//         onUnorderedListClick={handleFill}
+//         onOrderedListClick={handleFill}
+//         onIndentClick={handleFill}
+//         onOutdentClick={handleFill}
+//         isSpellCheckEnabled={false}
+//       />
+//       <div className="contentSheet">
+//         <Spreadsheet className="test" data={data} onChange={setData} />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Sheet;
+
+import React from "react";
+import { Workbook } from "@fortune-sheet/react";
+import "@fortune-sheet/react/dist/index.css";
+
+const Sheet = () => {
+  const settings = {
+    // Initial data for the workbook
+    data: [
+      {
+        name: "Sheet1",
+        celldata: [],
+      },
     ],
+
+    // onChange event handler (optional)
+    onChange: (data: any) => {
+      console.log("Data changed:", data);
+    },
+
+    // // Additional settings (optional)
+    // showToolbar: true,
+    // showSheetTabs: true,
+    // showFormulaBar: true,
+    // defaultFontSize: 11,
+
+    // // Customizing the toolbar (optional)
+    // toolbarItems: [
+    //   "undo",
+    //   "redo",
+    //   "|",
+    //   "bold",
+    //   "italic",
+    //   "underline",
+    //   "|",
+    //   // ... other toolbar items
+    // ],
+
+    // // Cell context menu customization (optional)
+    // cellContextMenu: [
+    //   "copy",
+    //   "paste",
+    //   "|",
+    //   "insert-row",
+    //   "insert-column",
+    //   // ... other context menu items
+    // ],
+
+    // // Sheet tab context menu customization (optional)
+    // sheetTabContextMenu: [
+    //   "delete",
+    //   "copy",
+    //   "rename",
+    //   // ... other tab context menu items
+    // ],
   };
 
-  // Generate the data rows, each starting with a row number header cell
-  const dataRows: Row[] = Array.from({ length: rowCount }, (_, rowIndex) => ({
-    rowId: rowIndex + 1, // Row numbers start at 1 for readability
-    cells: [
-      getHeaderCell((rowIndex + 1).toString()), // Add row number as the first cell of each row
-      ...Array.from({ length: columnCount }, () => getTextCell("")), // The rest are text cells
-    ],
-  }));
-
-  return [headerRow, ...dataRows];
-};
-
-const generateColumns = (columnCount: number) => {
-  // Add an extra column for the row numbers
-  return [
-    { columnId: "rowHeader", width: 50 }, // Width can be adjusted as needed for row number column
-    ...Array.from({ length: columnCount }, (_, columnIndex) => ({
-      columnId: String.fromCharCode(65 + columnIndex), // A, B, C, etc.
-      width: 100,
-    })),
-  ];
-};
-
-// Spreadsheet component
-const Sheet: React.FC = () => {
-  const rowCount = 100; // Adjust the number of rows as needed
-  const columnCount = 26; // Adjust the number of columns as needed (26 for A-Z)
-
-  // Initialize rows and columns using the helper functions
-  const [rows] = useState<Row[]>(generateRows(rowCount, columnCount));
-  const [columns] = useState(generateColumns(columnCount)); // Removed <GridColumn[]> type
-
   return (
-    <div style={{ height: "80vh" }}>
-      {" "}
-      {/* Adjust the height as needed */}
-      <ReactGrid
-        rows={rows}
-        columns={columns}
-        // Add other required props and event handlers
-      />
+    <div style={{ height: "100vh", width: "100vw" }}>
+      <Workbook {...settings} />
     </div>
   );
 };

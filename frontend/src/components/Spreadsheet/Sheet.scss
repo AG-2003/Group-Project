@@ -1,38 +1,6 @@
-.react-grid {
-  --cell-border-color: #d3d3d3;
-  --header-background: #f0f0f0;
-  --header-color: #333;
-  --cell-background: #ffffff;
-  --cell-color: #333;
-
-  .header-cell {
-    background-color: var(--header-background);
-    color: var(--header-color);
-    border-bottom: 1px solid var(--cell-border-color);
-    text-align: center;
-    font-weight: bold;
-  }
-
-  .text-cell {
-    background-color: var(--cell-background);
-    color: var(--cell-color);
-    border-right: 1px solid var(--cell-border-color);
-    border-bottom: 1px solid var(--cell-border-color);
-  }
-
-  // You might need to adjust the following depending on how ReactGrid applies its classes
-  .cell {
-    padding: 8px;
-
-    &.selected {
-      background-color: #e6e6e6;
-    }
-
-    &:focus {
-      outline: none;
-      border: 2px solid #5b9bd5;
-    }
-  }
-
-  // Rest of your styles...
+.toolbarSheet{
+  position: fixed;
+}
+.test {
+  padding-top: 500px;
 }
