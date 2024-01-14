@@ -16,12 +16,14 @@
     width: 101.2%;
 }// Customizing the main toolbar container
 .fortune-toolbar {
+  position: relative;
   background-color: #bcbcdc; // Example: Change the toolbar background color
   padding: 0.25rem; // Reduced padding for less space around buttons
   border-radius: 8px; // Rounded corners
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow effect
   margin: 1rem;
-  // width: 100%;
+  width: 95%;
+  left: 15px;
 }
 
 // Customizing individual toolbar buttons
@@ -39,4 +41,3 @@
 &:hover {
     background-color: #cdcdff; // Hover effect
   }}
-
