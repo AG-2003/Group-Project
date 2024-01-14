@@ -30,10 +30,10 @@ function App() {
       <Route element={<ProtectedRoutes />}>
         <Route path="/index" element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
+        <Route path="/Doc" element={<Doc />} />
+        <Route path="/Board" element={<Whiteboard />} />;
+        <Route path="/Sheet" element={<Spreadsheet />} />;
       </Route>
-      <Route path="/Doc" element={<Doc />} />
-      <Route path="/Board" element={<Whiteboard />} />;
-      <Route path="/Sheet" element={<Spreadsheet />} />;
     </Routes>
   );
 }

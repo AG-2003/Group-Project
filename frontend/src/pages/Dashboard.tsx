@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Divider, Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
-import NavBar from "../components/Dashboard/Navbar";
+import Navbar from "../components/Dashboard/Navbar";
 import Projects from "../components/Dashboard/Projects";
 import Profile from "../components/Dashboard/profile";
 import SideBar from "../components/Dashboard/Sidebar";
@@ -29,7 +29,7 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
-        <NavBar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+        <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       </div>
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
