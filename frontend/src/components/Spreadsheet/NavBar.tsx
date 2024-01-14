@@ -34,7 +34,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
   };
 
   return (
-    <div className="navbar">
+    <div className="navbarSheet">
       <IconButton
         className="menu-icon-button"
         aria-label="Menu"

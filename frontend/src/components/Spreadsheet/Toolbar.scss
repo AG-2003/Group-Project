@@ -1,11 +1,15 @@
 
-.container {
+.containerSheet {
+  // position: fixed;
   display: flex; // Use flexbox to align children
   justify-content: center; // Center children horizontally
   align-items: center; // Center children vertically
   padding: 1rem;
   background-color: #eeeeff;
-  margin-bottom: 1rem;
+  width: 100%;
+  // top: 200px;
+  z-index: 10;
+  // margin-bottom: 1rem;
 
 .toolbarSheet {
   padding: 0.25rem; // Reduced padding for less space around buttons.

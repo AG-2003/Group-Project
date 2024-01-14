@@ -222,7 +222,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
   ];
 
   return (
-    <div className="container">
+    <div className="containerSheet">
       <ButtonGroup className="toolbarSheet">
         <div className="search-container">
           <Tooltip label="Search" hasArrow>
