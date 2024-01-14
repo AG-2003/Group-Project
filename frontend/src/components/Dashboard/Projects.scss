@@ -1,0 +1,74 @@
+ .projects-container {
+  margin-top: 1rem;
+  
+    .projects-heading {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      // text-align: center;
+    }
+  
+    .projects-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      justify-content: center;
+    }
+  
+    .project-card {
+      padding: 1rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      .project-title {
+          font-size: 1.25rem;
+          margin-bottom: 0.5rem;
+        }
+      
+        .project-content {
+          margin-bottom: 1rem;
+        }
+      
+        .edit-button {
+          background-color: #805ad5;
+          color: white;
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 0.25rem;
+          font-size: 1rem;
+          cursor: pointer;
+      
+          &:hover {
+            background-color: #6b46c1;
+          }
+        }
+                }
+        
+                .no-projects {
+                  text-align: center;
+                  .no-projects-title {
+                      font-size: 1.25rem;
+                      margin-bottom: 0.5rem;
+                    }
+                  
+                    .no-projects-text {
+                      margin-bottom: 1rem;
+                    }
+                  
+                    .create-button {
+                      background-color: #805ad5;
+                      color: white;
+                      padding: 0.5rem 1rem;
+                      border: none;
+                      border-radius: 0.25rem;
+                      font-size: 1rem;
+                      cursor: pointer;
+                  
+                      &:hover {
+                        background-color: #6b46c1;
+                      }
+                    }
+                  }
+                }
