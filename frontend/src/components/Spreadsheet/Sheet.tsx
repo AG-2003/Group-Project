@@ -1,6 +1,6 @@
 import { Workbook } from "@fortune-sheet/react";
 import "@fortune-sheet/react/dist/index.css";
-import "./Toolbar.scss";
+import "./Sheet.scss";
 
 const Sheet = () => {
   const settings = {
