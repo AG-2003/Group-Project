@@ -1,5 +1,6 @@
 import { Workbook } from "@fortune-sheet/react";
 import "@fortune-sheet/react/dist/index.css";
+import "./Toolbar.scss";
 
 const Sheet = () => {
   const settings = {
@@ -10,10 +11,45 @@ const Sheet = () => {
         celldata: [],
       },
     ],
+    toolbarItems: [
+      "undo",
+      "redo",
+      "format-painter",
+      "clear-format",
+      "|",
+      "currency-format",
+      "percentage-format",
+      "number-decrease",
+      "number-increase",
+      "format",
+      "font-size",
+      "|",
+      "bold",
+      "italic",
+      "strike-through",
+      "underline",
+      "|",
+      "font-color",
+      "background",
+      "border",
+      "merge-cell",
+      "|",
+      "horizontal-align",
+      "vertical-align",
+      "text-wrap",
+      "text-rotation",
+      "|",
+      "freeze",
+      "sort",
+      "image",
+      "comment",
+      "quick-formula",
+    ],
+    // ... other settings
   };
 
   return (
-    <div style={{ height: "100vh", width: "100vw" }}>
+    <div className="containerSheet">
       <Workbook {...settings} />
     </div>
   );
