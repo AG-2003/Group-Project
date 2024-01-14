@@ -4,9 +4,17 @@ import NavBar from "../components/Doc_/NavBar";
 import Document from "../components/Doc_/Document";
 import Footer from "../components/Doc_/Footer";
 import "./Doc.scss"; // Make sure you import Doc.scss here
+import { useLocation } from "react-router-dom";
+
+import { v4 as uuidv4 } from 'uuid';
+
+const uniqueID = uuidv4()
 
 const Doc: React.FC = () => {
+  const location = useLocation();
+  const initialTitle = location.state?.title || 'Untitled';
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [documentTitle, setDocumentTitle] = useState(initialTitle);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -14,10 +22,19 @@ const Doc: React.FC = () => {
     // Logic to update document size
   };
 
+
   return (
     <div className="doc-container">
-      <NavBar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      <Document />
+      <NavBar
+        onToggle={toggleSidebar}
+        isSidebarOpen={isSidebarOpen}
+        documentTitle={documentTitle}
+        setDocumentTitle={setDocumentTitle}
+      />
+      <Document
+        documentTitle={documentTitle}
+        documentId={uniqueID}
+      />
       <Footer onZoomChange={handleZoomChange} />
     </div>
   );
