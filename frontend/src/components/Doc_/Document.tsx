@@ -60,51 +60,75 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   //---------------Function to save the document to the database----------------
   const [user] = useAuthState(auth);
 
-    // Use useEffect to call saveDocumentToFirestore whenever the value changes
-    useEffect(() => {
-      const username = user?.email; // Replace with the actual username
-      if (username) {
-        debouncedSaveDocumentToFirestore(username, documentId, documentTitle, value);
+  // Use useEffect to call saveDocumentToFirestore whenever the value changes
+  useEffect(() => {
+    const username = user?.email; // Replace with the actual username
+    if (username) {
+      debouncedSaveDocumentToFirestore(
+        username,
+        documentId,
+        documentTitle,
+        value
+      );
+    }
+  }, [value, documentTitle]); // Only re-run the effect if 'value' changes
+
+  const saveDocumentToFirestore = async (
+    username: string,
+    documentId: string,
+    documentTitle: string,
+    text: string
+  ) => {
+    try {
+      const userDocRef = doc(collection(db, "users"), username);
+      // Get the current document to see if there are existing documents
+      const docSnapshot = await getDoc(userDocRef);
+      let documentsArray: DocumentData[] = [];
+
+      if (docSnapshot.exists()) {
+        // Get the existing documents array or initialize it if it doesn't exist
+        documentsArray = docSnapshot.data().documents || [];
       }
-    }, [value, documentTitle]); // Only re-run the effect if 'value' changes
 
-    const saveDocumentToFirestore = async (username: string, documentId: string, documentTitle: string, text: string) => {
-      try {
-        const userDocRef = doc(collection(db, 'users'), username);
-        // Get the current document to see if there are existing documents
-        const docSnapshot = await getDoc(userDocRef);
-        let documentsArray: DocumentData[] = [];
+      // Check if the document with the given ID already exists
+      const existingDocIndex = documentsArray.findIndex(
+        (doc: DocumentData) => doc.id === documentId
+      );
 
-        if (docSnapshot.exists()) {
-          // Get the existing documents array or initialize it if it doesn't exist
-          documentsArray = docSnapshot.data().documents || [];
-        }
-
-        // Check if the document with the given ID already exists
-        const existingDocIndex = documentsArray.findIndex((doc: DocumentData) => doc.id === documentId);
-
-        if (existingDocIndex !== -1) {
-          // Update the existing document's title and content
-          documentsArray[existingDocIndex] = { id: documentId, title: documentTitle, content: text };
-        } else {
-          // Add a new document with a unique ID
-          documentsArray.push({ id: documentId, title: documentTitle, content: text });
-        }
-
-        // Update the user's document with the new or updated documents array
-        await setDoc(userDocRef, {
-          documents: documentsArray
-        }, { merge: true });
-        console.log('Document saved successfully');
-      } catch (error) {
-        console.error('Error saving document:', error);
+      if (existingDocIndex !== -1) {
+        // Update the existing document's title and content
+        documentsArray[existingDocIndex] = {
+          id: documentId,
+          title: documentTitle,
+          content: text,
+        };
+      } else {
+        // Add a new document with a unique ID
+        documentsArray.push({
+          id: documentId,
+          title: documentTitle,
+          content: text,
+        });
       }
-    };
 
-    const debouncedSaveDocumentToFirestore = debounce(
-      saveDocumentToFirestore,
-      5000 // Delay in milliseconds
-    );
+      // Update the user's document with the new or updated documents array
+      await setDoc(
+        userDocRef,
+        {
+          documents: documentsArray,
+        },
+        { merge: true }
+      );
+      console.log("Document saved successfully");
+    } catch (error) {
+      console.error("Error saving document:", error);
+    }
+  };
+
+  const debouncedSaveDocumentToFirestore = debounce(
+    saveDocumentToFirestore,
+    5000 // Delay in milliseconds
+  );
   //____________________________________________________________
 
   const toggleSearchVisibility = () => {
