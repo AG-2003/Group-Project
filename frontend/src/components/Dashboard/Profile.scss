@@ -1,0 +1,64 @@
+// Profile.scss
+.profile-container {
+  .profile-header {
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #dcdcf6;
+    border-radius: 15px;
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+
+      .profile-name {
+        font-size: 25px;
+        margin-left: 2rem;
+      }
+
+      .profile-description {
+        margin-left: 2rem;
+        font-size: 0.875rem; // example size, adjust as needed
+        color: #555; // example color, adjust as needed
+      }
+
+      // .profile-avatar {
+      //   margin-left: 1rem;
+      // }
+      .profile-avatar {
+        margin-left: 1rem;
+        width: 5rem; // Adjust width as needed
+        height: 5rem; // Adjust height as needed
+        object-fit: cover; // This ensures the image covers the area without stretching
+      }
+    }
+
+    .profile-stats {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+
+      .badge {
+        font-size: 1em;
+        padding: 0.5rem;
+        background-color: #8587bf;
+        color: white;
+        border-radius: var(--chakra-radii-md);
+      }
+    }
+
+    .leaderboard-button {
+      background-color: #845cd4;
+      color: white;
+      margin-right: 1rem;
+    }
+  }
+
+  .profile-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+  }
+}
