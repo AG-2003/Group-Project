@@ -12,6 +12,7 @@ import Landing from "./pages/Landing";
 import ProtectedRoutes from "./RoutingSecurity/ProtectedRoutes";
 import Doc from "./pages/Doc";
 import Whiteboard from "./pages/Whiteboard";
+import Spreadsheet from "./pages/Spreadsheet";
 
 import "draft-js/dist/Draft.css";
 
@@ -26,12 +27,13 @@ function App() {
       <Route path="/signUpEmail" element={<SignUpEmail />} />
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
-      <Route element={<ProtectedRoutes/>}>
-        <Route path='/index' element={<Dashboard />} />
+      <Route element={<ProtectedRoutes />}>
+        <Route path="/index" element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
+        <Route path="/Doc" element={<Doc />} />
+        <Route path="/Board" element={<Whiteboard />} />;
+        <Route path="/Sheet" element={<Spreadsheet />} />;
       </Route>
-      <Route path="/Doc" element={<Doc />} />
-      <Route path="/Board" element={<Whiteboard />} />;
     </Routes>
   );
 }

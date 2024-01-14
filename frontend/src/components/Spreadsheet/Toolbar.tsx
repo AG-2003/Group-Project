@@ -66,7 +66,6 @@ interface ToolBarProps {
   onColorSelect: ColorSelectFunction;
   onHighlightSelect: ColorSelectFunction;
   onLinkClick: SimpleFunction;
-  onAddComment: SimpleFunction;
   onImageUpload: SimpleFunction;
   onTextAlignmentChange: TextAlignmentChangeFunction;
   onChecklistClick: SimpleFunction;
@@ -94,7 +93,6 @@ const ToolBar: React.FC<ToolBarProps> = ({
   onColorSelect,
   onHighlightSelect,
   onLinkClick,
-  onAddComment,
   onImageUpload,
   onTextAlignmentChange,
   onChecklistClick,
@@ -225,7 +223,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
 
   return (
     <div className="container">
-      <ButtonGroup className="toolbarDoc">
+      <ButtonGroup className="toolbarSheet">
         <div className="search-container">
           <Tooltip label="Search" hasArrow>
             <IconButton
@@ -437,15 +435,6 @@ const ToolBar: React.FC<ToolBarProps> = ({
             aria-label="Insert Link"
             icon={<FaLink />}
             onClick={onLinkClick}
-          />
-        </Tooltip>
-
-        <Tooltip label="Add Comment" hasArrow>
-          <IconButton
-            className="tool"
-            aria-label="Add Comment"
-            icon={<FaComment />} // Make sure to import the correct icon
-            onClick={onAddComment}
           />
         </Tooltip>
 
