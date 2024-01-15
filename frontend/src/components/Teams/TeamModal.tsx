@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, getDoc, collection } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import {
   Flex,
   Heading,
@@ -20,11 +20,6 @@ import {
   Link,
 } from "@chakra-ui/react";
 
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
 interface TeamData {
   id: string;
   name: string;
@@ -33,12 +28,17 @@ interface TeamData {
   members: string[];
 }
 
-const CreateTeamModal = ({ isOpen, onClose }: Props) => {
-  const [page, setPage] = useState(1);
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const [teamName, setTeamName] = useState("");
   const [teamDescription, setTeamDescription] = useState("");
   const [teamRole, setTeamRole] = useState("");
   const [emailInputs, setEmailInputs] = useState([""]);
+  const [page, setPage] = useState(1); // Add page state
   const [user] = useAuthState(auth);
 
   const handleTeamNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,50 +66,6 @@ const CreateTeamModal = ({ isOpen, onClose }: Props) => {
     setEmailInputs(newEmailInputs);
   };
 
-  const saveTeamToFirestore = async () => {
-    if (!user || !user.uid) {
-      alert("You must be signed in to create a team");
-      return;
-    }
-
-    const newTeam: TeamData = {
-      id: teamName.toLowerCase().replace(/\s+/g, "-"),
-      name: teamName,
-      description: teamDescription,
-      role: teamRole,
-      members: emailInputs.filter((email) => email.trim() !== ""),
-    };
-
-    try {
-      // Reference to the user's document
-      const userDocRef = doc(db, "users", user.uid);
-
-      // Check if the user document exists
-      const userDocSnapshot = await getDoc(userDocRef);
-
-      if (userDocSnapshot.exists()) {
-        // If the user document exists, update the teams field
-        const userData = userDocSnapshot.data();
-        const updatedTeams = [...userData.teams, newTeam]; // Assuming "teams" is an array field in your user document
-        await setDoc(userDocRef, { teams: updatedTeams }, { merge: true });
-      } else {
-        // If the user document doesn't exist, create it with the "teams" field
-        await setDoc(userDocRef, { teams: [newTeam] });
-      }
-
-      console.log("Team saved successfully");
-      onClose();
-      setPage(1);
-      setTeamName("");
-      setTeamDescription("");
-      setTeamRole("");
-      setEmailInputs([""]);
-    } catch (error) {
-      console.error("Error saving team:", error);
-      alert("There was an error saving the team. Please try again.");
-    }
-  };
-
   const handleNextPage = () => {
     if (page === 1) {
       setPage(page + 1);
@@ -124,6 +80,50 @@ const CreateTeamModal = ({ isOpen, onClose }: Props) => {
 
   const handleAddInvitation = () => {
     setEmailInputs((prevEmails) => [...prevEmails, ""]);
+  };
+
+  const saveTeamToFirestore = async () => {
+    try {
+      const username = user?.email; // Replace with the actual username
+      if (username) {
+        const userDocRef = doc(db, "users", username);
+        const docSnapshot = await getDoc(userDocRef);
+        let teamsArray: TeamData[] = [];
+
+        if (docSnapshot.exists()) {
+          teamsArray = docSnapshot.data().teams || [];
+        }
+
+        const newTeam: TeamData = {
+          id: teamName.toLowerCase().replace(/\s+/g, "-"),
+          name: teamName,
+          description: teamDescription,
+          role: teamRole,
+          members: emailInputs.filter((email) => email.trim() !== ""),
+        };
+
+        const existingTeamIndex = teamsArray.findIndex(
+          (team: TeamData) => team.id === newTeam.id
+        );
+
+        if (existingTeamIndex !== -1) {
+          teamsArray[existingTeamIndex] = newTeam;
+        } else {
+          teamsArray.push(newTeam);
+        }
+
+        await setDoc(
+          userDocRef,
+          {
+            teams: teamsArray,
+          },
+          { merge: true }
+        );
+        console.log("Team saved successfully");
+      }
+    } catch (error) {
+      console.error("Error saving team:", error);
+    }
   };
 
   const renderModalContent = () => {
@@ -222,4 +222,4 @@ const CreateTeamModal = ({ isOpen, onClose }: Props) => {
   );
 };
 
-export default CreateTeamModal;
+export default TeamModal;
