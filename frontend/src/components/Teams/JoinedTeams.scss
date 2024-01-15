@@ -1,20 +1,125 @@
-.your-teams-container {
+// .teams-container {
+//   margin-top: 2rem;
+//   .heading-container {
+//     .heading {
+//       font-size: 2rem;
+//         margin-bottom: 1.5rem;
+//         font-weight: 600;
+//     }
+//   }
+
+//     .teams-list {
+//       display: flex;
+//       flex-wrap: wrap;
+//       gap: 20px;
+//     }
+  
+//     .team-card {
+//       background-color: #fff;
+//       border: 1px solid #e0e0e0;
+//       border-radius: 8px;
+//       padding: 16px;
+//       width: 300px;
+//       /* Adjust the width as needed */
+//       cursor: pointer;
+//       transition: transform 0.2s ease;
+  
+//       &:hover {
+//         transform: scale(1.05);
+//       }
+  
+//       h3.team-name {
+//         font-size: 20px;
+//         margin-bottom: 8px;
+//       }
+  
+//       p.team-description {
+//         font-size: 16px;
+//         color: #555;
+//         margin-bottom: 12px;
+//       }
+  
+//       p.team-role {
+//         font-size: 14px;
+//         color: #777;
+//       }
+//     }
+
+//   .no-team-message-container {
+//     margin-top: 16px; // Equivalent to Chakra's mt={4}
+
+//     .message {
+//       font-size: 24px; // The inline style fontSize: "24px"
+//       color: silver; // The inline style color: "silver"
+//       // Include other styles like padding, font-weight, etc.
+//     }
+//   }
+// }
+
+.teams-container {
+  // Define container layout, spacing, and alignment
+  display: flex;
+  flex-direction: column; // for a vertical layout
+  gap: 20px;
   margin-top: 2rem;
+
   .heading-container {
     .heading {
       font-size: 2rem;
-        margin-bottom: 1.5rem;
-        font-weight: 600;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
     }
   }
 
-  .message-container {
-    margin-top: 16px; // Equivalent to Chakra's mt={4}
+  .teams-list {
+    // Use either flexbox or grid depending on your layout needs
+    display: flex; // or display: grid;
+    flex-wrap: wrap;
+    gap: 20px; // consistent space between items
+
+    // Add responsive behavior if needed
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
+  }
+
+  .team-card {
+    // Define size, border, spacing, and interaction states
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    width: 300px; // Adjust the width as needed
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    h3.team-name {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    p.team-description {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    p.team-role {
+      font-size: 14px;
+      color: #777;
+    }
+  }
+
+  .no-team-message-container {
+    margin-top: 16px;
 
     .message {
-      font-size: 24px; // The inline style fontSize: "24px"
-      color: silver; // The inline style color: "silver"
-      // Include other styles like padding, font-weight, etc.
+      font-size: 24px;
+      color: silver;
     }
   }
 }
