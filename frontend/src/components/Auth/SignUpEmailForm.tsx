@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-import "./EmailForm.scss";
+import "./emailForm.scss";
 
 export function SignUpEmailForm() {
   const navigate = useNavigate();
