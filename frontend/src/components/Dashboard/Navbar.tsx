@@ -13,8 +13,14 @@ import { HamburgerIcon } from "@chakra-ui/icons";
 import { FiFileText, FiGrid, FiClipboard } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
 import { Link } from "react-router-dom";
+<<<<<<< HEAD
+import Modal from "./sub-components/Modal"; // Adjust the import path if needed
+import { useState } from "react";
+import { FaUserFriends } from "react-icons/fa";
+=======
 import Modal from "./sub-components/Modal";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
+>>>>>>> c6c38dc3783b3483be6b5cf4ae00504fa600d3b3
 
 interface Props {
   isSidebarOpen: boolean;
@@ -67,6 +73,19 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
           // onConfirm={handleConfirm}
           modalType={modalType}
         />
+
+        <Link to="/chat">
+          <IconButton
+            borderRadius="10%" // To make it a circular button
+            bg="white"
+            p={2}
+            mr={4}
+            icon={<FaUserFriends />}
+            cursor="pointer"
+            aria-label={""}
+          />
+        </Link>
+
         <Menu>
           <MenuButton as={Button} colorScheme="purple" mr={4} size="sm">
             Create a design

@@ -11,8 +11,11 @@ import {
 import { getRedirectResult, signInWithRedirect, AuthError } from "firebase/auth";
 import { setDoc, doc, DocumentData } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
-import "./LoginForm.scss";
+import "./loginForm.scss";
+<<<<<<< HEAD
+=======
 import { useAuthState } from 'react-firebase-hooks/auth'
+>>>>>>> c6c38dc3783b3483be6b5cf4ae00504fa600d3b3
 
 export function LoginForm() {
   const navigate = useNavigate(); // Initialize the navigate function
