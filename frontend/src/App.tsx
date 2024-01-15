@@ -12,6 +12,7 @@ import Landing from "./pages/Landing";
 import ProtectedRoutes from "./RoutingSecurity/ProtectedRoutes";
 import Doc from "./pages/Doc";
 import Whiteboard from "./pages/Whiteboard";
+import Spreadsheet from "./pages/Spreadsheet";
 
 import "draft-js/dist/Draft.css";
 import QuickChat from "./pages/QuickChat";
@@ -30,12 +31,18 @@ function App() {
       <Route element={<ProtectedRoutes />}>
         <Route path="/index" element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
+<<<<<<< HEAD
         <Route path="/chat" element={<QuickChat />} />;
+=======
+        <Route path="/Doc" element={<Doc />} />
+        <Route path="/Board" element={<Whiteboard />} />;
+        <Route path="/Sheet" element={<Spreadsheet />} />;
+>>>>>>> c6c38dc3783b3483be6b5cf4ae00504fa600d3b3
       </Route>
-      <Route path="/Doc" element={<Doc />} />
-      <Route path="/Board" element={<Whiteboard />} />;
     </Routes>
   );
 }
 
 export default App;
+
+

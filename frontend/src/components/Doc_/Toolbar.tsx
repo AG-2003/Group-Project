@@ -36,7 +36,47 @@ import {
   FaOutdent,
 } from "react-icons/fa";
 import { VscChecklist } from "react-icons/vsc";
-const ToolBar = ({
+
+// Define the types for the functions used as props
+type SearchFunction = (searchTerm: string) => void;
+type SimpleFunction = () => void;
+type TextTypeChangeFunction = (format: string, level?: number) => void;
+type FontChangeFunction = (font: string) => void;
+type FontSizeSelectFunction = (size: string) => void;
+type ColorSelectFunction = (color: string) => void;
+type TextAlignmentChangeFunction = (alignment: string) => void;
+type IndentClickFunction = (direction: string) => void;
+
+// Define the props interface
+interface ToolBarProps {
+  onSearch: SearchFunction;
+  isSearchVisible: boolean;
+  toggleSearchVisibility: SimpleFunction;
+  onUndo: SimpleFunction;
+  onRedo: SimpleFunction;
+  onToggleSpellCheck: SimpleFunction;
+  isSpellCheckEnabled: boolean;
+  onTextTypeChange: TextTypeChangeFunction;
+  onFontChange: FontChangeFunction;
+  onFontSizeSelect: FontSizeSelectFunction;
+  onBoldClick: SimpleFunction;
+  onItalicClick: SimpleFunction;
+  onUnderlineClick: SimpleFunction;
+  onStrikeClick: SimpleFunction;
+  onColorSelect: ColorSelectFunction;
+  onHighlightSelect: ColorSelectFunction;
+  onLinkClick: SimpleFunction;
+  onAddComment: SimpleFunction;
+  onImageUpload: SimpleFunction;
+  onTextAlignmentChange: TextAlignmentChangeFunction;
+  onChecklistClick: SimpleFunction;
+  onUnorderedListClick: SimpleFunction;
+  onOrderedListClick: SimpleFunction;
+  onIndentClick: IndentClickFunction;
+  onOutdentClick: IndentClickFunction;
+}
+
+const ToolBar: React.FC<ToolBarProps> = ({
   onSearch,
   isSearchVisible,
   toggleSearchVisibility,
@@ -73,13 +113,6 @@ const ToolBar = ({
     { label: "Heading 6", value: "header", level: 6 },
     { label: "Blockquote", value: "blockquote" },
     { label: "Code Block", value: "code-block" },
-
-    // { label: "List Bullet", value: "list", level: "bullet" },
-    // { label: "List Ordered", value: "list", level: "ordered" },
-    // { label: "Script Sub", value: "script", level: "sub" },
-    // { label: "Script Super", value: "script", level: "super" },
-    // { label: "Small", value: "small" },
-    // { label: "Indented", value: "indent" },
   ];
 
   const fonts = [
@@ -192,7 +225,7 @@ const ToolBar = ({
 
   return (
     <div className="container">
-      <ButtonGroup className="toolbar">
+      <ButtonGroup className="toolbarDoc">
         <div className="search-container">
           <Tooltip label="Search" hasArrow>
             <IconButton
@@ -213,6 +246,7 @@ const ToolBar = ({
             </div>
           )}
         </div>
+
         <Tooltip label="Undo" hasArrow>
           <IconButton
             className="tool"
@@ -230,15 +264,18 @@ const ToolBar = ({
             onClick={onRedo}
           />
         </Tooltip>
+
         <Tooltip label="Spell Check" hasArrow>
           <IconButton
-            className={`tool spellcheck-button ${isSpellCheckEnabled ? "active" : ""
-              }`}
+            className={`tool spellcheck-button ${
+              isSpellCheckEnabled ? "active" : ""
+            }`}
             aria-label="Toggle Spell Check"
             icon={<FaSpellCheck />} // Make sure to import the correct icon
             onClick={onToggleSpellCheck}
           />
         </Tooltip>
+
         <Tooltip label="Heading" hasArrow>
           <div>
             <Menu>
@@ -260,6 +297,7 @@ const ToolBar = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Font" hasArrow>
           <div>
             <Menu>
@@ -278,6 +316,7 @@ const ToolBar = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Font Size" hasArrow>
           <div>
             <Menu>
@@ -300,6 +339,7 @@ const ToolBar = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Bold" hasArrow>
           <IconButton
             className="tool"
@@ -308,6 +348,7 @@ const ToolBar = ({
             onClick={onBoldClick}
           />
         </Tooltip>
+
         <Tooltip label="Italic" hasArrow>
           <IconButton
             className="tool"
@@ -316,6 +357,7 @@ const ToolBar = ({
             onClick={onItalicClick}
           />
         </Tooltip>
+
         <Tooltip label="Underline" hasArrow>
           <IconButton
             className="tool"
@@ -324,6 +366,7 @@ const ToolBar = ({
             onClick={onUnderlineClick}
           />
         </Tooltip>
+
         <Tooltip label="Strike" hasArrow>
           <IconButton
             className="tool"
@@ -332,6 +375,7 @@ const ToolBar = ({
             onClick={onStrikeClick}
           />
         </Tooltip>
+
         <Tooltip label="Text Color" hasArrow>
           <div>
             <Menu>
@@ -359,6 +403,7 @@ const ToolBar = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Highlight Color" hasArrow>
           <div>
             <Menu>
@@ -394,6 +439,7 @@ const ToolBar = ({
             onClick={onLinkClick}
           />
         </Tooltip>
+
         <Tooltip label="Add Comment" hasArrow>
           <IconButton
             className="tool"
@@ -402,6 +448,7 @@ const ToolBar = ({
             onClick={onAddComment}
           />
         </Tooltip>
+
         <Tooltip label="Insert Image" hasArrow>
           <IconButton
             className="tool"
@@ -410,6 +457,7 @@ const ToolBar = ({
             onClick={onImageUpload}
           />
         </Tooltip>
+
         <Tooltip label="Text Alignment" hasArrow>
           <div className="alignment-container">
             <Menu>
@@ -432,6 +480,7 @@ const ToolBar = ({
             </Menu>
           </div>
         </Tooltip>
+
         <Tooltip label="Checklist" hasArrow>
           <IconButton
             className="tool-check"
@@ -440,6 +489,7 @@ const ToolBar = ({
             onClick={onChecklistClick}
           />
         </Tooltip>
+
         <Tooltip label="Bullet List" hasArrow>
           <IconButton
             className="tool"
@@ -448,6 +498,7 @@ const ToolBar = ({
             onClick={onUnorderedListClick}
           />
         </Tooltip>
+
         <Tooltip label="Numbered List" hasArrow>
           <IconButton
             className="tool"
@@ -456,6 +507,7 @@ const ToolBar = ({
             onClick={onOrderedListClick}
           />
         </Tooltip>
+
         <Tooltip label="Indent" hasArrow>
           <IconButton
             className="tool"
@@ -464,6 +516,7 @@ const ToolBar = ({
             onClick={() => onIndentClick("indent")}
           />
         </Tooltip>
+
         <Tooltip label="Outdent" hasArrow>
           <IconButton
             className="tool"

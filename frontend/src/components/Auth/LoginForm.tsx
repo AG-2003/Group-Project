@@ -8,23 +8,31 @@ import {
   db,
   microsoftProvider,
 } from "../../firebase-config";
-import { getRedirectResult, signInWithRedirect } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { getRedirectResult, signInWithRedirect, AuthError } from "firebase/auth";
+import { setDoc, doc, DocumentData } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
 import "./loginForm.scss";
+<<<<<<< HEAD
+=======
+import { useAuthState } from 'react-firebase-hooks/auth'
+>>>>>>> c6c38dc3783b3483be6b5cf4ae00504fa600d3b3
 
 export function LoginForm() {
   const navigate = useNavigate(); // Initialize the navigate function
+  const [user] = useAuthState(auth);
+
+  //Remove the line if you want to test out log In page
+  if (user != null) {
+    navigate('/index')
+  }
 
   const handleEmailLoginClick = () => {
     navigate("/loginEmail");
   };
 
-  let signInMethod = "";
   const signInWithGoogle = async () => {
     // Initiates the Google sign-in redirect when this function is called
     try {
-      signInMethod = "g";
       await signInWithRedirect(auth, googleProvider);
     } catch (err) {
       console.log(err);
@@ -34,46 +42,40 @@ export function LoginForm() {
   const signInWithMicrosoft = async () => {
     try {
       // Use signInWithRedirect for Microsoft
-      signInMethod = "m";
       await signInWithRedirect(auth, microsoftProvider);
-      navigate("/index");
     } catch (err) {
       console.error(err);
     }
   };
 
-  const saveGoogleUserToFirestore = async (user: User) => {
+  const saveUser = async (user: User) => {
     if (user != null) {
-      const userRef = doc(db, "users", user.uid);
+      const userRef = doc(db, "users", user.email as string);
       setDoc(userRef, {
         email: user?.email,
-      });
+        emailVerified: user?.emailVerified,
+        displayName: user.displayName,
+        desc: null,
+        userType: '',
+        userTheme: 'light',
+        photoURL: user.photoURL
+      } as DocumentData);
     }
   };
 
-  const saveMicrosoftUserToFirestore = (user: User | null) => {
-    if (user != null) {
-      const userRef = doc(db, "users", user.uid);
-      setDoc(userRef, {
-        email: user?.email,
-      });
-    }
-  };
 
   const handleRedirectSignIn = async () => {
     try {
       const result = await getRedirectResult(auth);
       const user = result?.user;
+      console.log(user);
       if (user) {
-        if (signInMethod == "g") {
-          await saveGoogleUserToFirestore(user);
-        } else {
-          await saveMicrosoftUserToFirestore(user);
-        }
+        await saveUser(user)
+
         navigate("/index"); // Navigate to /index here
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
+      alert(error)
     }
   };
 

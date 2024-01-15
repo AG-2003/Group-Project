@@ -10,33 +10,31 @@ import {
   IoShareOutline,
 } from "react-icons/io5";
 import "./NavBar.scss";
+import { useState } from "react";
 
 interface Props {
   isSidebarOpen: boolean;
   onToggle: () => void;
-  documentTitle: string;
-  setDocumentTitle: React.Dispatch<React.SetStateAction<string>>;
 }
 
-
-
-const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
+const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
+  const [title, setTitle] = useState("Untitled");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const iconStyle = {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
   };
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDocumentTitle(e.target.value);
+    setTitle(e.target.value);
   };
   const handleBlur = () => {
-    if (documentTitle.trim() === "") {
-      setDocumentTitle("Untitled");
+    if (title.trim() === "") {
+      setTitle("Untitled");
     }
   };
 
   return (
-    <div className="navbar">
+    <div className="navbarSheet">
       <IconButton
         className="menu-icon-button"
         aria-label="Menu"
@@ -58,7 +56,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       <div className="title-area">
         <input
           className="title-input"
-          value={documentTitle}
+          value={title}
           onChange={handleTitleChange}
           onBlur={handleBlur}
           placeholder="Untitled"

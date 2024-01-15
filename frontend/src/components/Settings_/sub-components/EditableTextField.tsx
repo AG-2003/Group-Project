@@ -1,13 +1,20 @@
-import { SetStateAction, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Button, Box } from "@chakra-ui/react";
 
 interface Props {
   b1: string;
-
+  initialValue: string;
+  onSave: (newValue: string) => void;
 }
-const EditableTextField = ({ b1 }: Props) => {
+
+const EditableTextField = ({ b1, initialValue, onSave }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [textValue, setTextValue] = useState("Default Text");
+  const [textValue, setTextValue] = useState(initialValue);
+
+  useEffect(() => {
+    // Update textValue whenever the initialValue prop changes
+    setTextValue(initialValue);
+  }, [initialValue]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -15,10 +22,10 @@ const EditableTextField = ({ b1 }: Props) => {
 
   const handleSaveClick = () => {
     setIsEditing(false);
-    // You can perform additional actions with the edited text, if needed.
+    onSave(textValue); // Call the onSave callback with the new value
   };
 
-  const handleInputChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTextValue(event.target.value);
   };
 

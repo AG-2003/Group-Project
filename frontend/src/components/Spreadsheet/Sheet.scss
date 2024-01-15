@@ -1,0 +1,43 @@
+.containerSheet{
+  width: 97.5vw;
+  height: 91vh;
+}
+
+.fortune-stat-area{
+  display: none;
+}
+
+.fortune-fx-editor{
+  background-color: white;
+}
+
+.fortune-workarea{
+    background-color: #eeeeff;
+    width: 101.2%;
+}// Customizing the main toolbar container
+.fortune-toolbar {
+  position: relative;
+  background-color: #bcbcdc; // Example: Change the toolbar background color
+  padding: 0.25rem; // Reduced padding for less space around buttons
+  border-radius: 8px; // Rounded corners
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow effect
+  margin: 1rem;
+  width: 95%;
+  left: 15px;
+}
+
+// Customizing individual toolbar buttons
+.fortune-toolbar .fortune-toolbar-button {
+  background-color: transparent; // Removing button background
+  color: #2c2c2c; // Changing icon color
+  border: none; // Removing borders
+
+  &:hover {
+    background-color: #cdcdff; // Hover effect
+  }
+}
+// Customizing the tooltips
+.fortune-toolbar .fortune-tooltip {
+&:hover {
+    background-color: #cdcdff; // Hover effect
+  }}

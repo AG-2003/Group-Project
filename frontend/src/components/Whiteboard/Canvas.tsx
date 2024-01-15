@@ -1,11 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Stage, Layer, Line, Text, StageProps } from "react-konva";
-import { FaPen, FaEraser, FaTextHeight, FaTrash } from "react-icons/fa"; // Import necessary icons
-import { FaDroplet, FaBrush } from "react-icons/fa6";
-
+import { Stage, Layer, Line, Text, StageProps, Rect } from "react-konva";
+import Toolbar from "./Toolbar";
 import "./Canvas.scss";
+import { FaRegSquare, FaRegCircle, FaSlash, FaRegStar } from "react-icons/fa";
+import { FiTriangle } from "react-icons/fi";
+import { BsArrowUpRight } from "react-icons/bs";
 
-type Tool = "pen" | "eraser" | "text" | "clear";
+type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
+type Shape =
+  | "rectangle"
+  | "circle"
+  | "line"
+  | "ellipse"
+  | "triangle"
+  | "star"
+  | "arrow";
 
 interface LineType {
   tool: Tool;
@@ -19,6 +28,14 @@ interface TextType {
   x: number;
   y: number;
   text: string;
+}
+
+interface RectangleType {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
 }
 
 const colors = [
@@ -111,30 +128,28 @@ const colors = [
   "#4c1130",
 ];
 
+function isShape(tool: string): tool is Shape {
+  return ["rectangle", "circle", "line"].includes(tool);
+}
+
 const Canvas: React.FC = () => {
-  const [tool, setTool] = useState<Tool>("pen");
+  const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
-  const [strokeSize, setStrokeSize] = useState<number>(5); // Default stroke size
+  const [size, setSize] = useState<number>(5); // Default stroke size
   const [lines, setLines] = useState<LineType[]>([]);
-  const [eraserSize, setEraserSize] = useState<number>(20); // Default eraser size
   const stageRef = useRef<any>(null); // Ref for the Konva Stage
   const [texts, setTexts] = useState<TextType[]>([]);
   const isDrawing = useRef(false);
-  const [showPenFeatures, setShowPenFeatures] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showSizeSlider, setShowSizeSlider] = useState(false);
   const [activeElement, setActiveElement] = useState<Element | null>(null);
-  const [showEraserFeatures, setShowEraserFeatures] = useState(false);
-
-  // const handlePenClick = () => {
-  //   setShowPenFeatures(!showPenFeatures);
-  // };
-
-  const handlePenClick = () => {
-    setTool("pen");
-    setShowPenFeatures(!showPenFeatures);
-    setShowEraserFeatures(false);
-  };
+  const [undoStack, setUndoStack] = useState<LineType[][]>([]);
+  const [redoStack, setRedoStack] = useState<LineType[][]>([]);
+  const [selectedShape, setSelectedShape] = useState<Shape | null>(null);
+  const [currentRectangle, setCurrentRectangle] =
+    useState<RectangleType | null>(null);
+  const [rectangles, setRectangles] = useState<RectangleType[]>([]);
+  const [showShapeMenu, setShowShapeMenu] = useState(false);
 
   const toggleColorPicker = () => {
     const newShowColorPicker = !showColorPicker;
@@ -158,35 +173,17 @@ const Canvas: React.FC = () => {
     if (showColorPicker) setShowColorPicker(false);
   };
 
-  // const handleEraserClick = () => {
-  //   // If the eraser tool is already selected, toggle its features visibility
-  //   if (tool === "eraser") {
-  //     setShowEraserFeatures(!showEraserFeatures);
-  //   } else {
-  //     // If the eraser tool is not selected, select it and show its features
-  //     handleToolChange("eraser");
-  //     setShowEraserFeatures(true);
-  //   }
-  //   // Hide pen features if any are visible
-  //   setShowPenFeatures(false);
-  //   setShowColorPicker(false);
-  //   setShowSizeSlider(false);
-  // };
-
-  const handleEraserClick = () => {
-    setTool("eraser");
-    setShowEraserFeatures(!showEraserFeatures);
-    setShowPenFeatures(false);
+  const toggleShapeMenu = () => {
+    console.log("Toggling shape menu");
+    setShowShapeMenu((prev) => {
+      console.log("Previous state: ", prev);
+      return !prev;
+    });
   };
 
-  const validateAndUpdateStrokeSize = (size: number) => {
-    const newSize = Math.max(1, Math.min(size, 20)); // Assuming max size is 20
-    setStrokeSize(newSize);
-  };
-
-  const validateAndUpdateEraserSize = (size: number) => {
-    const newSize = Math.max(1, Math.min(size, 40)); // Assuming max size is 40
-    setEraserSize(newSize);
+  const validateAndUpdateSize = (size: number) => {
+    const newSize = Math.max(1, Math.min(size, 40)); // Assuming max size is 20
+    setSize(newSize);
   };
 
   const handleMouseDown: StageProps["onMouseDown"] = (e) => {
@@ -199,76 +196,142 @@ const Canvas: React.FC = () => {
 
     if (pos) {
       if (tool === "pen") {
+        setUndoStack([...undoStack, [...lines]]);
+        setRedoStack([]);
         setLines([
           ...lines,
           {
             tool,
             points: [pos.x, pos.y],
             color: penColor,
-            strokeWidth: strokeSize,
+            strokeWidth: size,
           },
         ]);
-      } else if (tool === "eraser") {
-        // Include the eraser size in the line data
+      }
+      if (tool === "eraser") {
         setLines([
           ...lines,
           {
             tool,
             points: [pos.x, pos.y],
-            color: penColor,
-            strokeWidth: eraserSize,
+            color: "rgba(0,0,0,1)", // Eraser color, set alpha to 1 for full erasing
+            strokeWidth: size,
           },
         ]);
-      } else if (tool === "text") {
+      }
+
+      if (tool === "text") {
         const text = prompt("Enter the text:");
         if (text) {
           setTexts([...texts, { tool, x: pos.x, y: pos.y, text }]);
+        }
+      }
+
+      if (selectedShape === "rectangle") {
+        const stage = e.target.getStage();
+        const point = stage?.getPointerPosition();
+
+        if (point) {
+          setCurrentRectangle({
+            x: point.x,
+            y: point.y,
+            width: 0, // Keep these as zero initially
+            height: 0,
+            fill: penColor,
+          });
         }
       }
     }
   };
 
   const handleMouseMove: StageProps["onMouseMove"] = (e) => {
-    if (!isDrawing.current || tool === "text") {
+    if (!isDrawing.current) {
       return;
     }
+
     const stage = e.target.getStage();
     const point = stage?.getPointerPosition();
-    if (point) {
-      let lastLine = lines[lines.length - 1];
-      lastLine.points = lastLine.points.concat([point.x, point.y]);
-      lines.splice(lines.length - 1, 1, lastLine);
-      setLines(lines.concat());
+
+    if (!point) {
+      return;
     }
+
+    // Handle drawing for pen tool
+    if (tool === "pen" && lines.length > 0) {
+      let lastLine = lines[lines.length - 1];
+      if (lastLine) {
+        const newPoints = lastLine.points.concat([point.x, point.y]);
+        setLines(
+          lines.map((line, index) =>
+            index === lines.length - 1 ? { ...line, points: newPoints } : line
+          )
+        );
+      }
+    }
+
+    if (tool === "eraser" && lines.length > 0) {
+      const lastLine = lines[lines.length - 1];
+      const newPoints = lastLine.points.concat([point.x, point.y]);
+      setLines(
+        lines.map((line, index) =>
+          index === lines.length - 1 ? { ...line, points: newPoints } : line
+        )
+      );
+    }
+
+    // Handle drawing for shapes
+    if (selectedShape === "rectangle" && currentRectangle) {
+      const newWidth = Math.abs(point.x - currentRectangle.x);
+      const newHeight = Math.abs(point.y - currentRectangle.y);
+      const newX = point.x < currentRectangle.x ? point.x : currentRectangle.x;
+      const newY = point.y < currentRectangle.y ? point.y : currentRectangle.y;
+
+      setCurrentRectangle({
+        ...currentRectangle,
+        x: newX,
+        y: newY,
+        width: newWidth,
+        height: newHeight,
+      });
+    }
+    // Add similar conditions for other shapes if needed
+    // ...
   };
 
   const handleMouseUp: StageProps["onMouseUp"] = () => {
+    if (selectedShape === "rectangle" && currentRectangle) {
+      if (currentRectangle.width !== 0 && currentRectangle.height !== 0) {
+        setRectangles([...rectangles, currentRectangle]);
+        console.log("Rectangle drawing finished", currentRectangle);
+      }
+      setCurrentRectangle(null);
+    }
     isDrawing.current = false;
   };
 
-  // const handleToolChange = (selectedTool: Tool) => {
-  //   if (selectedTool === "clear") {
-  //     clearBoard();
-  //   }
-  //   if (selectedTool !== "pen") {
-  //     setShowPenFeatures(false);
-  //   }
-  //   if (selectedTool !== "eraser") {
-  //     setShowEraserFeatures(false);
-  //   } else {
-  //     setTool(selectedTool);
-  //   }
-  // };
-
-  const handleToolChange = (selectedTool: Tool) => {
-    if (selectedTool === "clear") {
-      // Clear the board logic
+  const handleToolChange = (selectedTool: Tool | Shape) => {
+    if (selectedTool === "pointer") {
+      setTool("pointer");
     }
-
-    setTool(selectedTool);
-    setShowPenFeatures(false);
-    setShowEraserFeatures(false);
-    // Close other feature panels if needed
+    if (selectedTool === "clear") {
+      setLines([]);
+      setTexts([]);
+      setRectangles([]);
+      setCurrentRectangle(null);
+    } else {
+      // If the selected tool is a shape, we update the selectedShape state.
+      if (selectedTool !== "shape") {
+        setShowShapeMenu(false);
+      }
+      if (isShape(selectedTool)) {
+        setSelectedShape(selectedTool);
+        setTool("pointer"); // 'none' indicates no drawing tool is selected.
+      } else {
+        // If the selected tool is not a shape, we update the tool state and clear the shape.
+        setTool(selectedTool as Tool);
+        setSelectedShape(null); // Clear any selected shape.
+      }
+    }
   };
 
   useEffect(() => {
@@ -295,20 +358,30 @@ const Canvas: React.FC = () => {
 
     // Remove the event listener on cleanup
     return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [showColorPicker, showSizeSlider]); // This effect should run when activeElement changes
+  }, [showColorPicker, showSizeSlider]);
 
-  const clearBoard = () => {
-    const confirmClear = window.confirm(
-      "Are you sure you want to clear the board?"
-    );
-    if (confirmClear) {
-      setLines([]);
-      setTexts([]);
+  const handleUndo = () => {
+    if (undoStack.length > 0) {
+      const newUndoStack = [...undoStack];
+      const previousLines = newUndoStack.pop();
+      setRedoStack([...redoStack, [...lines]]);
+      setLines(previousLines || []);
+      setUndoStack(newUndoStack);
+    }
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length > 0) {
+      const newRedoStack = [...redoStack];
+      const nextLines = newRedoStack.pop();
+      setUndoStack([...undoStack, [...lines]]);
+      setLines(nextLines || []);
+      setRedoStack(newRedoStack);
     }
   };
 
   return (
-    <div className="canvas-container" onDoubleClick={clearBoard}>
+    <div className="canvas-container">
       <Stage
         ref={stageRef}
         width={window.innerWidth}
@@ -330,6 +403,7 @@ const Canvas: React.FC = () => {
               globalCompositeOperation={
                 line.tool === "eraser" ? "destination-out" : "source-over"
               }
+              draggable={tool === "pointer"}
             />
           ))}
           {texts.map((textItem, i) => (
@@ -339,125 +413,43 @@ const Canvas: React.FC = () => {
               y={textItem.y}
               text={textItem.text}
               fontSize={20}
-              draggable
+              draggable={tool === "pointer"}
             />
           ))}
+          {rectangles.map((rect, i) => (
+            <Rect
+              key={i}
+              x={rect.x}
+              y={rect.y}
+              width={rect.width}
+              height={rect.height}
+              fill={rect.fill}
+              draggable={tool === "pointer"}
+            />
+          ))}
+          {currentRectangle && (
+            <Rect
+              x={currentRectangle.x}
+              y={currentRectangle.y}
+              width={currentRectangle.width}
+              height={currentRectangle.height}
+              fill={currentRectangle.fill}
+              draggable={tool === "pointer"}
+            />
+          )}
         </Layer>
       </Stage>
-      <div className="toolbar">
-        <div
-          className={`pen-container ${showPenFeatures ? "show-features" : ""} ${
-            showEraserFeatures ? "move-with-eraser" : ""
-          }`}
-        >
-          <button
-            className={`tool-button ${tool === "pen" ? "selected" : ""}`}
-            onClick={handlePenClick}
-          >
-            <FaPen />
-          </button>
-          <div
-            className={`pen-features ${showPenFeatures ? "show-features" : ""}`}
-          >
-            <button onClick={toggleColorPicker} className="drop-button">
-              <FaDroplet />
-            </button>
-            <button onClick={handleSizeClick}>
-              <FaBrush />
-            </button>
-          </div>
-        </div>
-
-        <div
-          className={`eraser-container ${
-            showEraserFeatures ? "show-features" : ""
-          }`}
-        >
-          <button
-            className={`tool-button ${tool === "eraser" ? "selected" : ""}`}
-            onClick={handleEraserClick}
-          >
-            <FaEraser />
-          </button>
-          {/* Placeholder for eraser features if any */}
-        </div>
-
-        <button
-          className={`tool-button ${tool === "text" ? "selected" : ""}`}
-          onClick={() => handleToolChange("text")}
-        >
-          <FaTextHeight />
-        </button>
-        <button
-          className="tool-button"
-          onClick={() => handleToolChange("clear")}
-        >
-          <FaTrash />
-        </button>
-      </div>
-
-      {/* {tool === "pen" && (
-        <>
-          <div className="color-grid">
-            {colors.map((color) => (
-              <div
-                key={color}
-                className={`color-block ${
-                  penColor === color ? "selected" : ""
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => setPenColor(color)}
-              />
-            ))}
-          </div>
-          <input
-            type="range"
-            min="1"
-            max="20"
-            value={strokeSize}
-            onChange={(e) =>
-              validateAndUpdateStrokeSize(parseInt(e.target.value))
-            }
-            className="stroke-size-slider"
-          />
-          <input
-            type="number"
-            value={strokeSize}
-            onChange={(e) =>
-              validateAndUpdateStrokeSize(parseInt(e.target.value))
-            }
-            className="stroke-size-input"
-          />
-        </>
-      )}
-      {tool === "eraser" && (
-        <>
-          <input
-            type="range"
-            min="1"
-            max="40"
-            value={eraserSize}
-            onChange={(e) =>
-              validateAndUpdateEraserSize(parseInt(e.target.value))
-            }
-            className="eraser-size-slider"
-          />
-          <input
-            type="number"
-            value={eraserSize}
-            onChange={(e) =>
-              validateAndUpdateEraserSize(parseInt(e.target.value))
-            }
-            className="eraser-size-input"
-          />
-        </>
-      )}
-    </div>
-  );
-};
-
-export default Canvas; */}
-
+      <Toolbar
+        tool={tool}
+        undoStack={undoStack}
+        redoStack={redoStack}
+        handleToolChange={handleToolChange}
+        handleUndo={handleUndo}
+        handleRedo={handleRedo}
+        toggleColorPicker={toggleColorPicker}
+        handleSizeClick={handleSizeClick}
+        toggleShapeMenu={toggleShapeMenu}
+      />
       {showColorPicker && (
         <div className={`color-grid ${showColorPicker ? "active" : ""}`}>
           {colors.map((color) => (
@@ -476,43 +468,57 @@ export default Canvas; */}
           <input
             type="range"
             min="1"
-            max="20"
-            value={strokeSize}
-            onChange={(e) =>
-              validateAndUpdateStrokeSize(parseInt(e.target.value))
-            }
+            max="40"
+            value={size}
+            onChange={(e) => validateAndUpdateSize(parseInt(e.target.value))}
             className="stroke-size-slider"
           />
           <input
             type="number"
-            value={strokeSize}
-            onChange={(e) =>
-              validateAndUpdateStrokeSize(parseInt(e.target.value))
-            }
+            value={size}
+            onChange={(e) => validateAndUpdateSize(parseInt(e.target.value))}
             className="stroke-size-input"
           />
         </div>
       )}
-      {showEraserFeatures && (
-        <div className="eraser-features">
-          <input
-            type="range"
-            min="1"
-            max="40"
-            value={eraserSize}
-            onChange={(e) =>
-              validateAndUpdateEraserSize(parseInt(e.target.value))
-            }
-            className="eraser-size-slider"
-          />
-          <input
-            type="number"
-            value={eraserSize}
-            onChange={(e) =>
-              validateAndUpdateEraserSize(parseInt(e.target.value))
-            }
-            className="eraser-size-input"
-          />
+      {showShapeMenu && (
+        <div className="shape-menu">
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("rectangle")}
+          >
+            <FaRegSquare />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("circle")}
+          >
+            <FaRegCircle />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("line")}
+          >
+            <FaSlash />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("triangle")}
+          >
+            <FiTriangle />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("star")}
+          >
+            <FaRegStar />
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => handleToolChange("arrow")}
+          >
+            <BsArrowUpRight />
+          </button>
         </div>
       )}
       {/* ... other components ... */}

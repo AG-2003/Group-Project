@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   IconButton,
   Flex,
@@ -12,9 +13,14 @@ import { HamburgerIcon } from "@chakra-ui/icons";
 import { FiFileText, FiGrid, FiClipboard } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
 import { Link } from "react-router-dom";
+<<<<<<< HEAD
 import Modal from "./sub-components/Modal"; // Adjust the import path if needed
 import { useState } from "react";
 import { FaUserFriends } from "react-icons/fa";
+=======
+import Modal from "./sub-components/Modal";
+import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
+>>>>>>> c6c38dc3783b3483be6b5cf4ae00504fa600d3b3
 
 interface Props {
   isSidebarOpen: boolean;
@@ -27,21 +33,19 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
     transition: "transform 0.3s ease",
   };
 
-  // State to control the visibility of the modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // State to control the visibility and type of the modal
+  const [modalType, setModalType] = useState("");
 
   // Function to open the modal
-  const openModal = () => setIsModalOpen(true);
+  const openModal = (type: string) => setModalType(type);
 
   // Function to close the modal
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => setModalType("");
 
   // Function to handle the confirmation (submit) of the modal
-  const handleConfirm = (title: string) => {
-    // Handle the title submission here, e.g., create a document
-    console.log(title); // Placeholder for your submit logic
-    closeModal(); // Close the modal after submission
-  };
+  const handleConfirm = () => closeModal(); // Close the modal after submission
+
+  const userProfile = UseUserProfilePic();
 
   return (
     <Flex
@@ -64,9 +68,10 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
 
       <Flex alignItems="center">
         <Modal
-          isOpen={isModalOpen}
+          isOpen={modalType !== ""}
           onClose={closeModal}
-          onConfirm={handleConfirm}
+          // onConfirm={handleConfirm}
+          modalType={modalType}
         />
 
         <Link to="/chat">
@@ -86,19 +91,31 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             Create a design
           </MenuButton>
           <MenuList>
-            {/* <MenuItem icon={<FiFileText />} onClick={openModal}>
-              Docs
-            </MenuItem> */}
-            <MenuItem icon={<FiFileText />}>Docs</MenuItem>
-            <MenuItem icon={<LuPresentation />}>Slides</MenuItem>
-            <MenuItem icon={<FiGrid />}>Spreadsheets</MenuItem>
-            <MenuItem icon={<FiClipboard />} onClick={openModal}>
+            <MenuItem icon={<FiFileText />} onClick={() => openModal("Doc")}>
+              Doc
+            </MenuItem>
+            <MenuItem
+              icon={<LuPresentation />}
+              onClick={() => openModal("Slide")}
+            >
+              Slide
+            </MenuItem>
+            <MenuItem
+              icon={<FiGrid />}
+              onClick={() => openModal("Spreadsheet")}
+            >
+              Spreadsheet
+            </MenuItem>
+            <MenuItem
+              icon={<FiClipboard />}
+              onClick={() => openModal("Whiteboard")}
+            >
               Whiteboard
             </MenuItem>
           </MenuList>
         </Menu>
         <Link to="/settings">
-          <Avatar size="sm" as="span" />
+          <Avatar size="sm" as="span" src={userProfile.photoURL || 'fallback_image_url'} name={userProfile.displayName} />
         </Link>
       </Flex>
     </Flex>
