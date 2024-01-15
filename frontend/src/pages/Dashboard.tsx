@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Divider, Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
-import Projects from "../components/Dashboard/projects";
-import Profile from "../components/Dashboard/profile";
-import SideBar from "../components/Dashboard/sidebar";
+import Projects from "../components/Dashboard/Projects";
+import Profile from "../components/Dashboard/Profile";
+import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
-import Trash from "../components/Trash/trashAlt";
-import TeamsAlt from "../components/Teams/TeamsAlt";
+import Trash from "../components/Trash/TrashAlt";
+// import TeamsAlt from "../components/Teams/TeamsAlt";
 import InsideTeam from "../components/Teams/insideTeam";
+import Teams from "./Teams";
 
 // meow
 const Dashboard: React.FC = () => {
@@ -61,7 +62,8 @@ const Dashboard: React.FC = () => {
           {currentComponent == "Projects" && <Projects />}
           {/* {currentComponent == "Templates" && <Templates />} */}
           {currentComponent == "Teams" && (
-            <TeamsAlt onButtonClick={handleButtonClick} />
+            // <TeamsAlt onButtonClick={handleButtonClick} />
+            <Teams />
           )}
           {currentComponent == "inTeam" && <InsideTeam />}
           {/* {currentComponent == "Calls" && <Calls />} */}
