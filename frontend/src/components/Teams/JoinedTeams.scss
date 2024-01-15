@@ -1,0 +1,20 @@
+.your-teams-container {
+  margin-top: 2rem;
+  .heading-container {
+    .heading {
+      font-size: 2rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+  }
+
+  .message-container {
+    margin-top: 16px; // Equivalent to Chakra's mt={4}
+
+    .message {
+      font-size: 24px; // The inline style fontSize: "24px"
+      color: silver; // The inline style color: "silver"
+      // Include other styles like padding, font-weight, etc.
+    }
+  }
+}

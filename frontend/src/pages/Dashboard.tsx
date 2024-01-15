@@ -8,7 +8,7 @@ import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/TrashAlt";
 // import TeamsAlt from "../components/Teams/TeamsAlt";
-import InsideTeam from "../components/Teams/insideTeam";
+import InsideTeam from "../components/Teams/InsideTeam";
 import Teams from "./Teams";
 
 // meow
