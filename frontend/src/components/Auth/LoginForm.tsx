@@ -8,14 +8,15 @@ import {
   db,
   microsoftProvider,
 } from "../../firebase-config";
-import { getRedirectResult, signInWithRedirect, AuthError } from "firebase/auth";
+import {
+  getRedirectResult,
+  signInWithRedirect,
+  AuthError,
+} from "firebase/auth";
 import { setDoc, doc, DocumentData } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
-import "./loginForm.scss";
-<<<<<<< HEAD
-=======
-import { useAuthState } from 'react-firebase-hooks/auth'
->>>>>>> c6c38dc3783b3483be6b5cf4ae00504fa600d3b3
+import "./LoginForm.scss";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export function LoginForm() {
   const navigate = useNavigate(); // Initialize the navigate function
@@ -23,7 +24,7 @@ export function LoginForm() {
 
   //Remove the line if you want to test out log In page
   if (user != null) {
-    navigate('/index')
+    navigate("/index");
   }
 
   const handleEmailLoginClick = () => {
@@ -56,13 +57,12 @@ export function LoginForm() {
         emailVerified: user?.emailVerified,
         displayName: user.displayName,
         desc: null,
-        userType: '',
-        userTheme: 'light',
-        photoURL: user.photoURL
+        userType: "",
+        userTheme: "light",
+        photoURL: user.photoURL,
       } as DocumentData);
     }
   };
-
 
   const handleRedirectSignIn = async () => {
     try {
@@ -70,12 +70,12 @@ export function LoginForm() {
       const user = result?.user;
       console.log(user);
       if (user) {
-        await saveUser(user)
+        await saveUser(user);
 
         navigate("/index"); // Navigate to /index here
       }
     } catch (error: any) {
-      alert(error)
+      alert(error);
     }
   };
 

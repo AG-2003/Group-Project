@@ -12,15 +12,10 @@ import {
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { FiFileText, FiGrid, FiClipboard } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
-import { Link } from "react-router-dom";
-<<<<<<< HEAD
-import Modal from "./sub-components/Modal"; // Adjust the import path if needed
-import { useState } from "react";
 import { FaUserFriends } from "react-icons/fa";
-=======
+import { Link } from "react-router-dom";
 import Modal from "./sub-components/Modal";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
->>>>>>> c6c38dc3783b3483be6b5cf4ae00504fa600d3b3
 
 interface Props {
   isSidebarOpen: boolean;
@@ -115,7 +110,12 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
           </MenuList>
         </Menu>
         <Link to="/settings">
-          <Avatar size="sm" as="span" src={userProfile.photoURL || 'fallback_image_url'} name={userProfile.displayName} />
+          <Avatar
+            size="sm"
+            as="span"
+            src={userProfile.photoURL || "fallback_image_url"}
+            name={userProfile.displayName}
+          />
         </Link>
       </Flex>
     </Flex>
