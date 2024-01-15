@@ -21,7 +21,7 @@ import {
 } from "firebase/auth";
 import { setDoc, doc, collection } from "firebase/firestore";
 import { db } from "../../firebase-config";
-import "./PasswordForm.scss";
+import "./passwordForm.scss";
 
 export function SignUpPasswordForm() {
   const navigate = useNavigate();

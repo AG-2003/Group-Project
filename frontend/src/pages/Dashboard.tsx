@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { Divider, Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
-import NavBar from "../components/Dashboard/NavBar";
-import Projects from "../components/Dashboard/Projects";
-import Profile from "../components/Dashboard/Profile";
-import SideBar from "../components/Dashboard/Sidebar";
+import NavBar from "../components/Dashboard/Navbar";
+import Projects from "../components/Dashboard/projects";
+import Profile from "../components/Dashboard/profile";
+import SideBar from "../components/Dashboard/sidebar";
 // import Trash from "./Trash";
-import Trash from "../components/Trash/TrashAlt";
+import Trash from "./Trash";
 import Teams from "./Teams";
+import InsideTeam from "../components/Teams/insideTeam";
+import TeamsAlt from "../components/Teams/TeamsAlt";
 
 // meow
 const Dashboard: React.FC = () => {
@@ -59,7 +61,10 @@ const Dashboard: React.FC = () => {
           {currentComponent == "Profile" && <Profile />}
           {currentComponent == "Projects" && <Projects />}
           {/* {currentComponent == "Templates" && <Templates />} */}
-          {currentComponent == "Teams" && <Teams />}
+          {currentComponent == "Teams" && (
+            <TeamsAlt onButtonClick={handleButtonClick} />
+          )}
+          {currentComponent == "inTeam" && <InsideTeam />}
           {/* {currentComponent == "Calls" && <Calls />} */}
           {/* {currentComponent == "Calendar" && <Calendar />} */}
           {/* {currentComponent == "Social" && <Social />} */}

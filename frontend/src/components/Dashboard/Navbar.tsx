@@ -14,6 +14,7 @@ import { LuPresentation } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import Modal from "./sub-components/Modal"; // Adjust the import path if needed
 import { useState } from "react";
+import { FaUserFriends } from "react-icons/fa";
 
 interface Props {
   isSidebarOpen: boolean;

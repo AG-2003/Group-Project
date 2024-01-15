@@ -14,6 +14,7 @@ import Doc from "./pages/Doc";
 import Whiteboard from "./pages/Whiteboard";
 
 import "draft-js/dist/Draft.css";
+import QuickChat from "./pages/QuickChat";
 
 function App() {
   return (
@@ -29,10 +30,10 @@ function App() {
       <Route element={<ProtectedRoutes />}>
         <Route path="/index" element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
+        <Route path="/chat" element={<QuickChat />} />;
       </Route>
       <Route path="/Doc" element={<Doc />} />
       <Route path="/Board" element={<Whiteboard />} />;
-      <Route path="/chat" element={<QuickChat />} />;
     </Routes>
   );
 }
