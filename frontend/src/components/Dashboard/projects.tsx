@@ -2,18 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 import { doc, getDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom"; // Import useHistory
 import "./Projects.scss";
 
 interface Document {
   id: string;
   title: string;
   content: string;
+
   // Add other fields as necessary, like lastEdited, if available
 }
 
 const Projects: React.FC = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [user] = useAuthState(auth);
+  const navigate = useNavigate(); // Use the useHistory hook for navigation
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -32,24 +35,26 @@ const Projects: React.FC = () => {
     fetchDocuments();
   }, [user]);
 
+  // Function to handle click on a project card
+  const handleCardClick = (documentId: string) => {
+    // Navigate to the editor page with the documentId
+    navigate(`/editor/${documentId}`);
+  };
+
   return (
     <div className="projects-container">
       <h2 className="projects-heading">Recent Designs</h2>
       <div className="projects-list">
         {documents.map((doc) => (
-          <div key={doc.id} className="project-card">
+          <div
+            key={doc.id}
+            className="project-card"
+            onClick={() => handleCardClick(doc.id)}
+          >
             <h3 className="project-title">{doc.title}</h3>
             <p className="project-content">
               {doc.content.substring(0, 100)}...
             </p>
-            {/* <button
-              className="edit-button"
-              onClick={() => {
-                // TODO: Implement navigation to the document editor
-              }}
-            >
-              Edit Design
-            </button> */}
           </div>
         ))}
         {documents.length === 0 && (
