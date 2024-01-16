@@ -7,7 +7,6 @@ import Profile from "../components/Dashboard/Profile";
 import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/TrashAlt";
-// import TeamsAlt from "../components/Teams/TeamsAlt";
 import TeamDetails from "../components/Teams/TeamDetails";
 import Teams from "../components/Dashboard/Teams";
 
@@ -56,15 +55,15 @@ const Dashboard: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          {currentComponent == "Profile" && <Profile />}
-          {currentComponent == "Projects" && <Projects />}
-          {/* {currentComponent == "Templates" && <Templates />} */}
-          {currentComponent == "Teams" && <Teams />}
-          {currentComponent == "Details" && <TeamDetails />}
-          {/* {currentComponent == "Calls" && <Calls />} */}
-          {/* {currentComponent == "Calendar" && <Calendar />} */}
-          {/* {currentComponent == "Social" && <Social />} */}
-          {currentComponent == "Trash" && <Trash />}
+          {currentComponent === "Profile" && <Profile />}
+          {currentComponent === "Projects" && <Projects />}
+          {/* {currentComponent === "Templates" && <Templates />} */}
+          {currentComponent === "Teams" && <Teams />}
+          {currentComponent === "Details" && <TeamDetails />}
+          {/* {currentComponent === "Calls" && <Calls />} */}
+          {/* {currentComponent === "Calendar" && <Calendar />} */}
+          {/* {currentComponent === "Social" && <Social />} */}
+          {currentComponent === "Trash" && <Trash />}
         </Box>
       </Box>
     </>
