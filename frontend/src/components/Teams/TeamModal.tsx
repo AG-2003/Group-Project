@@ -19,6 +19,12 @@ import {
   Select,
   Link,
 } from "@chakra-ui/react";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 
 interface TeamData {
   id: string;
@@ -26,6 +32,7 @@ interface TeamData {
   description: string;
   role: string;
   members: string[];
+  image: string | null; // Store image URL instead of File
 }
 
 interface Props {
@@ -38,7 +45,8 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const [teamDescription, setTeamDescription] = useState("");
   const [teamRole, setTeamRole] = useState("");
   const [emailInputs, setEmailInputs] = useState([""]);
-  const [page, setPage] = useState(1); // Add page state
+  const [image, setImage] = useState<File | null>(null); // State to store the selected image
+  const [page, setPage] = useState(1);
   const [user] = useAuthState(auth);
 
   const handleTeamNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,11 +74,18 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
     setEmailInputs(newEmailInputs);
   };
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setImage(event.target.files[0]);
+    }
+  };
+
   const handleNextPage = () => {
     if (page === 1) {
       setPage(page + 1);
     } else {
       saveTeamToFirestore();
+      onClose(); // Close the modal when saving is complete
     }
   };
 
@@ -84,7 +99,7 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
 
   const saveTeamToFirestore = async () => {
     try {
-      const username = user?.email; // Replace with the actual username
+      const username = user?.email;
       if (username) {
         const userDocRef = doc(db, "users", username);
         const docSnapshot = await getDoc(userDocRef);
@@ -100,7 +115,22 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
           description: teamDescription,
           role: teamRole,
           members: emailInputs.filter((email) => email.trim() !== ""),
+          image: null, // Initialize with null value
         };
+
+        if (image) {
+          // If an image is selected, upload it to Firebase Storage
+          const storage = getStorage();
+          const storagePath = `teamImages/${teamName
+            .toLowerCase()
+            .replace(/\s+/g, "-")}/${image.name}`;
+          const imageRef = storageRef(storage, storagePath);
+          const snapshot = await uploadBytes(imageRef, image);
+
+          // Get the download URL and update newTeam
+          const teamImageUrl = await getDownloadURL(snapshot.ref);
+          newTeam.image = teamImageUrl;
+        }
 
         const existingTeamIndex = teamsArray.findIndex(
           (team: TeamData) => team.id === newTeam.id
@@ -160,6 +190,13 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
               <option value="business">Business</option>
               <option value="creator">Creator</option>
             </Select>
+            <Text mb={4}>Team Image</Text>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              mb={4}
+            />
           </>
         );
       case 2:

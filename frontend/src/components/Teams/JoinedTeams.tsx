@@ -11,9 +11,10 @@ interface Team {
   description: string;
   role: string;
   members: string[];
+  image: string | null; // Add the image field
 }
 
-const Teams: React.FC = () => {
+const JoinedTeams: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
@@ -37,10 +38,10 @@ const Teams: React.FC = () => {
 
   // Function to handle click on a team card
   const handleCardClick = (teamId: string) => {
-    // Navigate to the team details page with the teamId
+    // Navigate to the TeamDetails route with the teamId as a route parameter
     navigate(`/team/${teamId}`);
   };
-
+  
   return (
     <div className="teams-container">
       <div className="heading-container">
@@ -53,9 +54,11 @@ const Teams: React.FC = () => {
             className="team-card"
             onClick={() => handleCardClick(team.id)}
           >
+            {team.image && (
+              <img src={team.image} alt={team.name} className="team-image" />
+            )}
             <h3 className="team-name">{team.name}</h3>
             <p className="team-description">{team.description}</p>
-            <p className="team-role">{team.role}</p>
           </div>
         ))}
         {teams.length === 0 && (
@@ -68,4 +71,4 @@ const Teams: React.FC = () => {
   );
 };
 
-export default Teams;
+export default JoinedTeams;

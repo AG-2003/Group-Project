@@ -8,13 +8,11 @@ import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/TrashAlt";
 // import TeamsAlt from "../components/Teams/TeamsAlt";
-import InsideTeam from "../components/Teams/InsideTeam";
-import Teams from "./Teams";
+import TeamDetails from "../components/Teams/TeamDetails";
+import Teams from "../components/Dashboard/Teams";
 
-// meow
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
   const [currentComponent, setCurrentComponent] = useState("Profile");
 
   const handleButtonClick = (component: string) => {
@@ -61,11 +59,8 @@ const Dashboard: React.FC = () => {
           {currentComponent == "Profile" && <Profile />}
           {currentComponent == "Projects" && <Projects />}
           {/* {currentComponent == "Templates" && <Templates />} */}
-          {currentComponent == "Teams" && (
-            // <TeamsAlt onButtonClick={handleButtonClick} />
-            <Teams />
-          )}
-          {currentComponent == "inTeam" && <InsideTeam />}
+          {currentComponent == "Teams" && <Teams />}
+          {currentComponent == "Details" && <TeamDetails />}
           {/* {currentComponent == "Calls" && <Calls />} */}
           {/* {currentComponent == "Calendar" && <Calendar />} */}
           {/* {currentComponent == "Social" && <Social />} */}
