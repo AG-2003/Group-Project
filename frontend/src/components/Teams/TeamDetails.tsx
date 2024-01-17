@@ -1,63 +1,93 @@
-// // TeamDetails.tsx
-// import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom"; // Import useParams
-// import { db } from "../../firebase-config";
-// import { doc, getDoc, DocumentData } from "firebase/firestore";
+// import {
+//   Avatar,
+//   Flex,
+//   Box,
+//   Text,
+//   Stack,
+//   Badge,
+//   Button,
+// } from "@chakra-ui/react";
 
-// interface Team {
-//   id: string;
-//   name: string;
-//   description: string;
-//   role: string;
-//   members: string[];
-//   image: string | null;
-// }
-
-// const TeamDetails: React.FC = () => {
-//   const { teamId } = useParams();
-//   const [team, setTeam] = useState<Team | null>(null);
-
-//   useEffect(() => {
-//     const fetchTeamDetails = async () => {
-//       try {
-//         const teamDocRef = doc(db, teams, teamId); // Replace "teams" with your collection name
-//         const teamDocSnapshot = await getDoc(teamDocRef);
-
-//         if (teamDocSnapshot.exists()) {
-//           const teamData = teamDocSnapshot.data() as Team;
-//           setTeam(teamData);
-//         } else {
-//           console.log("Team not found");
-//         }
-//       } catch (error) {
-//         console.error("Error fetching team details:", error);
-//       }
-//     };
-
-//     fetchTeamDetails();
-//   }, [teamId]);
-
-//   if (!team) {
-//     // Handle the case when team details are still loading or not found
-//     return <div>Loading team details...</div>;
-//   }
-
+// const TeamDetails = () => {
 //   return (
-//     <div>
-//       <h2>{team.name}</h2>
-//       <p>Description: {team.description}</p>
-//       <p>Role: {team.role}</p>
-//       {/* Render other details of the team as needed */}
+//     <div className="team-container">
+//       <Flex className="team-header">
+//         <Flex className="team-info">
+//           <Avatar
+//             className="team-avatar"
+//             // src={userProfile.photoURL || "fallback_image_url"}
+//             // name={userProfile.displayName}
+//             borderRadius="10%" // Adjust this value as needed
+//           />
+//           <Box className="team-text">
+//             <Text className="team-name">
+//               {/* {userProfile.displayName || auth.currentUser?.displayName} */}
+//               TeamName
+//             </Text>
+//             <Text className="team-description">
+//               {/* {userProfile.description || "Your Description"} */}
+//               <p>Description</p>
+//             </Text>
+//           </Box>
+//         </Flex>
+
+//         <Stack className="team-stats">
+//           <Badge className="badge">7 Projects</Badge>
+//           <Badge className="badge">11 Communities</Badge>
+//           <Badge className="badge">4 Awards</Badge>
+//         </Stack>
+
+//         <Button className="leaderboard-button">Leaderboard</Button>
+//       </Flex>
+//       <Flex className="team-body">
+//         {/* The commented out sections can be replaced with your components */}
+//         {/* <DashboardSection title="Your Teams" items={teams} />
+//         <DashboardSection title="Your Communities" items={communities} /> */}
+//       </Flex>
 //     </div>
 //   );
 // };
 
 // export default TeamDetails;
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { db } from "../../firebase-config";
+import { doc, getDoc } from "firebase/firestore";
+// ... other imports
 
-const TeamDetails = () => {
-  return <div>TeamDetails</div>;
+const TeamDetails: React.FC = () => {
+  const { teamId } = useParams<{ teamId: string }>(); // This gets the teamId from the URL
+  const [teamDetails, setTeamDetails] = useState<String | null>(null);
+
+  useEffect(() => {
+    const fetchTeamDetails = async () => {
+      if (teamId) {
+        const teamDocRef = doc(db, "teams", teamId);
+        const teamDocSnap = await getDoc(teamDocRef);
+
+        if (teamDocSnap.exists()) {
+          setTeamDetails(teamDocSnap.data() as String);
+        } else {
+          console.log("No such team!");
+        }
+      }
+    };
+
+    fetchTeamDetails();
+  }, [teamId]);
+
+  if (!teamDetails) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      {/* <h2>{teamDetails.name}</h2> */}
+      works?
+      {/* Render other details of the team */}
+    </div>
+  );
 };
 
 export default TeamDetails;

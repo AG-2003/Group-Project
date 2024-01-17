@@ -1,49 +1,67 @@
-import React, { useState } from "react";
-import { JitsiMeeting } from "@jitsi/react-sdk";
-import "./Call.scss";
+import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
+import { ZegoSuperBoardManager } from "zego-superboard-web";
 
-const Call = () => {
-  const [startCall, setStartCall] = useState(false);
+function randomID(len: number) {
+  let result = "";
+  if (result) return result;
+  var chars = "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
+    maxPos = chars.length,
+    i;
+  len = len || 5;
+  for (i = 0; i < len; i++) {
+    result += chars.charAt(Math.floor(Math.random() * maxPos));
+  }
+  return result;
+}
+
+export function getUrlParams(url = window.location.href) {
+  let urlStr = url.split("?")[1];
+  return new URLSearchParams(urlStr);
+}
+
+export default function App() {
+  const roomID = getUrlParams().get("roomID") || randomID(5);
+  let myMeeting = async (element: HTMLDivElement) => {
+    // generate Kit Token
+    const appID = 100726050;
+    const serverSecret = "be8ae9fa57aae635c0563451be5946cc";
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+      appID,
+      serverSecret,
+      roomID,
+      randomID(5),
+      randomID(5)
+    );
+
+    // Create instance object from Kit Token.
+    const zp = ZegoUIKitPrebuilt.create(kitToken);
+    // start the call
+    zp.addPlugins({ ZegoSuperBoardManager });
+    zp.joinRoom({
+      container: element,
+      sharedLinks: [
+        {
+          name: "Personal link",
+          url:
+            window.location.protocol +
+            "//" +
+            window.location.host +
+            window.location.pathname +
+            "?roomID=" +
+            roomID,
+        },
+      ],
+      scenario: {
+        mode: ZegoUIKitPrebuilt.GroupCall, // To implement 1-on-1 calls, modify the parameter here to [ZegoUIKitPrebuilt.OneONoneCall].
+      },
+    });
+  };
 
   return (
-    <div className="jitsi-container">
-      {!startCall && (
-        <button
-          className="start-call-button"
-          onClick={() => setStartCall(true)}
-        >
-          Start Call
-        </button>
-      )}
-
-      {startCall && (
-        <JitsiMeeting
-          domain="meet.jit.si"
-          roomName="PleaseUseAGoodRoomName"
-          configOverwrite={{
-            startWithAudioMuted: true,
-            disableModeratorIndicator: true,
-            startScreenSharing: true,
-            enableEmailInStats: false,
-          }}
-          interfaceConfigOverwrite={{
-            DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-          }}
-          userInfo={{
-            displayName: "YOUR_USERNAME",
-            email: "YOUR_EMAIL",
-          }}
-          onApiReady={(externalApi) => {
-            // You can use the externalApi here
-          }}
-          getIFrameRef={(iframeRef) => {
-            iframeRef.style.height = "400px";
-            iframeRef.style.width = "100%";
-          }}
-        />
-      )}
-    </div>
+    <div
+      className="myCallContainer"
+      ref={myMeeting}
+      style={{ width: "100vw", height: "100vh" }}
+    ></div>
   );
-};
-
-export default Call;
+}
