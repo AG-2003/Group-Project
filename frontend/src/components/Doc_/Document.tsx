@@ -129,6 +129,22 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
     saveDocumentToFirestore,
     5000 // Delay in milliseconds
   );
+
+  const fetchContent = async (
+    username: string,
+    documentId: string,
+    documentTitle: string,
+    text: string
+  ) => {
+    const userRef = doc(db, "users", username);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+
+    }
+  }
+
+
   //____________________________________________________________
 
   const toggleSearchVisibility = () => {
@@ -420,7 +436,7 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
         <ReactQuill
           className="editable-area"
           ref={quillRef}
-          value={value}
+          value={value} // TODO: fetchContent
           onChange={setValue}
           modules={modules}
         />
