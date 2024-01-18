@@ -5,6 +5,9 @@ import "./Canvas.scss";
 import { FaRegSquare, FaRegCircle, FaSlash, FaRegStar } from "react-icons/fa";
 import { FiTriangle } from "react-icons/fi";
 import { BsArrowUpRight } from "react-icons/bs";
+import { doc, setDoc, collection, getDoc } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, db } from "../../firebase-config";
 
 type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
 type Shape =
@@ -36,6 +39,16 @@ interface RectangleType {
   width: number;
   height: number;
   fill: string;
+}
+
+// Define an interface for the board objects
+interface BoardData {
+  id: string; // Unique identifier for each board
+  title: string;
+  lines: LineType[]; // Array of lines drawn on the board
+  texts: TextType[]; // Array of texts added to the board
+  rectangles: RectangleType[]; // Array of rectangles drawn on the board
+  // Add other shapes as needed
 }
 
 const colors = [
@@ -132,7 +145,36 @@ function isShape(tool: string): tool is Shape {
   return ["rectangle", "circle", "line"].includes(tool);
 }
 
-const Canvas: React.FC = () => {
+//Added because delaying is preferred
+function debounce(
+  func: (...args: any[]) => void,
+  wait: number
+): (...args: any[]) => void {
+  let timeout: NodeJS.Timeout | null;
+
+  return function executedFunction(...args: any[]): void {
+    const later = () => {
+      if (timeout !== null) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      func(...args);
+    };
+
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(later, wait);
+  };
+}
+
+//Define a Props interface
+interface Props {
+  documentId: string;
+  documentTitle: string;
+}
+
+const Canvas: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
   const [size, setSize] = useState<number>(5); // Default stroke size
@@ -150,6 +192,12 @@ const Canvas: React.FC = () => {
     useState<RectangleType | null>(null);
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
   const [showShapeMenu, setShowShapeMenu] = useState(false);
+
+
+  //---------------Function to save the document to the database----------------
+
+  //____________________________________________________________
+
 
   const toggleColorPicker = () => {
     const newShowColorPicker = !showColorPicker;
