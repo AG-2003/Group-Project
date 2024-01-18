@@ -8,11 +8,10 @@ import { useLocation } from "react-router-dom";
 
 import { v4 as uuidv4 } from 'uuid';
 
-const uniqueID = uuidv4()
-
 const Doc: React.FC = () => {
   const location = useLocation();
   const initialTitle = location.state?.title || 'Untitled';
+  const uniqueID = location.state?.uniqueID || uuidv4();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [documentTitle, setDocumentTitle] = useState(initialTitle);
 
