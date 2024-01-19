@@ -57,9 +57,35 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isSpellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(true);
 
-  //---------------Function to save the document to the database----------------
   const [user] = useAuthState(auth);
 
+//---------------Function to render the document in the database----------------
+  useEffect(() => {
+    const username = user?.email
+    if(username){
+      fetchDocumentFromFirestore(username);
+    }
+  }, []);
+
+  const fetchDocumentFromFirestore = async (username: string) => {
+    try {
+      if (username) {
+        const userDocRef = doc(collection(db, "users"), username);
+        const docSnapshot = await getDoc(userDocRef);
+        if (docSnapshot.exists()) {
+          const documentsArray: DocumentData[] = docSnapshot.data().documents || [];
+          const document = documentsArray.find(doc => doc.id === documentId);
+          if (document) {
+            setValue(document.content);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+  };
+//____________________________________________________________
+//---------------Function to save the document to the database----------------
   // Use useEffect to call saveDocumentToFirestore whenever the value changes
   useEffect(() => {
     const username = user?.email; // Replace with the actual username
@@ -129,35 +155,7 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
     saveDocumentToFirestore,
     5000 // Delay in milliseconds
   );
-
-  // Function to load the document from Firestore
-  const loadDocumentFromFirestore = async (username: string, documentId: string) => {
-    try {
-      const userDocRef = doc(db, "users", username);
-      const docSnapshot = await getDoc(userDocRef);
-
-      if (docSnapshot.exists()) {
-        const documentsArray: DocumentData[] = docSnapshot.data().documents || [];
-        const existingDoc = documentsArray.find(doc => doc.id === documentId);
-        if (existingDoc) {
-          setValue(existingDoc.content); // Set the loaded content
-        }
-      }
-    } catch (error) {
-      console.error("Error loading document:", error);
-    }
-  };
-
-  useEffect(() => {
-    const username = user?.email;
-    if (username && documentId) {
-      loadDocumentFromFirestore(username, documentId);
-    }
-  }, [documentId, user]); // Run this effect when component mounts
-
-
-
-  //____________________________________________________________
+//____________________________________________________________
 
   const toggleSearchVisibility = () => {
     setIsSearchVisible(!isSearchVisible);

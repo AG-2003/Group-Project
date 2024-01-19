@@ -67,11 +67,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, modalType }) => {
 
   const handleOkClick = () => {
     const uniqueID = uuidv4()
-    console.log(uniqueID)
     // Depending on the modal type, navigate to different routes
     switch (modalType) {
       case "Doc":
-        navigate("/doc", {state: {title, uniqueID}});
+        navigate(`/doc/?id=${encodeURIComponent(uniqueID)}&title=${encodeURIComponent(title)}`);
         break;
       case "Slide":
         navigate("/slides", {state: {title, uniqueID}});

@@ -41,14 +41,12 @@ interface RectangleType {
   fill: string;
 }
 
-// Define an interface for the board objects
-interface BoardData {
-  id: string; // Unique identifier for each board
+interface BoardData{
+  id: string;
   title: string;
-  lines: LineType[]; // Array of lines drawn on the board
-  texts: TextType[]; // Array of texts added to the board
-  rectangles: RectangleType[]; // Array of rectangles drawn on the board
-  // Add other shapes as needed
+  lines: string;
+  texts: string;
+  rectangles: string;
 }
 
 const colors = [
@@ -193,9 +191,104 @@ const Canvas: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
   const [showShapeMenu, setShowShapeMenu] = useState(false);
 
+  //---------------Store the serialized data-----------------
+  const [serializedLinesData, setSerializedLinesData] = useState('')
+  const [serializedTextsData, setSerializedTextsData] = useState('')
+  const [serializedRectanglesData, setSerializedRectanglesData] = useState('')
+
+  useEffect(() => {
+    /*
+      *lines-> to store what is written by the pen in the toolbar
+      *texts-> text from toolbar
+      *rectangles-> a part of the 'shapes' on the toolbar
+    */
+    setSerializedLinesData(JSON.stringify(lines))
+    setSerializedTextsData(JSON.stringify(texts))
+    setSerializedRectanglesData(JSON.stringify(rectangles))
+
+  }, [lines, texts, rectangles]); // This effect runs whenever user changes the board
+  //____________________________________________________________
+
+
 
   //---------------Function to save the document to the database----------------
+  const [user] = useAuthState(auth)
 
+  useEffect(() => {
+    const username = user?.email
+    if(username){
+      const dataArray = [serializedLinesData, serializedTextsData, serializedRectanglesData]
+
+      debouncedSaveBoardToFirestore(
+        username,
+        documentId,
+        documentTitle,
+        dataArray
+      )
+    }
+  }, [serializedLinesData, serializedTextsData, serializedRectanglesData, documentTitle])
+
+
+  const saveBoardToFirestore = async (
+    username: string,
+    boardId: string,
+    boardTitle: string,
+    data: [string, string, string]
+  ) => {
+    try {
+      const userDocRef = doc(collection(db, "users"), username);
+      // Get the current document to see if there are existing documents
+      const docSnapshot = await getDoc(userDocRef);
+      let boardsArray: BoardData[] = [];
+
+      if (docSnapshot.exists()) {
+        // Get the existing documents array or initialize it if it doesn't exist
+        boardsArray = docSnapshot.data().boards || [];
+      }
+
+      // Check if the document with the given ID already exists
+      const existingBoardIndex = boardsArray.findIndex(
+        (board: BoardData) => board.id === boardId
+      );
+
+      if (existingBoardIndex !== -1) {
+        // Update the existing document's title and content
+        boardsArray[existingBoardIndex] = {
+          id: boardId,
+          title: boardTitle,
+          lines: data[0],
+          texts: data[1],
+          rectangles: data[2]
+        };
+      } else {
+        // Add a new document with a unique ID
+        boardsArray.push({
+          id: boardId,
+          title: boardTitle,
+          lines: data[0],
+          texts: data[1],
+          rectangles: data[2]
+        });
+      }
+
+      // Update the user's document with the new or updated documents array
+      await setDoc(
+        userDocRef,
+        {
+          boards: boardsArray,
+        },
+        { merge: true }
+      );
+      console.log("Document saved successfully");
+    } catch (error) {
+      console.error("Error saving document:", error);
+    }
+  };
+
+  const debouncedSaveBoardToFirestore = debounce(
+    saveBoardToFirestore,
+    5000 // Delay in milliseconds
+  );
   //____________________________________________________________
 
 

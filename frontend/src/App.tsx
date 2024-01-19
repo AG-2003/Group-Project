@@ -32,7 +32,7 @@ function App() {
         <Route path="/index" element={<Dashboard />} />
         <Route path="/Settings" element={<Settings />} />
         <Route path="/chat" element={<QuickChat />} />;
-        <Route path="/Doc" element={<Doc />} />
+        <Route path="/doc/*" element={<Doc />} />
         <Route path="/Board" element={<Whiteboard />} />;
         <Route path="/Sheet" element={<Spreadsheet />} />;
       </Route>

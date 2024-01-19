@@ -36,9 +36,9 @@ const Projects: React.FC = () => {
   }, [user]);
 
   // Function to handle click on a project card
-  const handleCardClick = (documentId: string) => {
+  const handleCardClick = (documentId: string, documentTitle: string) => {
     // Navigate to the editor page with the documentId
-    navigate(`/editor/${documentId}`);
+    navigate(`/doc/?id=${encodeURIComponent(documentId)}&title=${encodeURIComponent(documentTitle)}`);
   };
 
   return (
@@ -49,7 +49,7 @@ const Projects: React.FC = () => {
           <div
             key={doc.id}
             className="project-card"
-            onClick={() => handleCardClick(doc.id)}
+            onClick={() => handleCardClick(doc.id, doc.title)}
           >
             <h3 className="project-title">{doc.title}</h3>
             <p className="project-content">
