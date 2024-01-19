@@ -78,7 +78,7 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
     documentId: string,
     documentTitle: string,
     text: string
-  ) => {
+  ): Promise<void> => {
     try {
       const userDocRef = doc(collection(db, "users"), username);
       // Get the current document to see if there are existing documents
@@ -130,19 +130,31 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
     5000 // Delay in milliseconds
   );
 
-  const fetchContent = async (
-    username: string,
-    documentId: string,
-    documentTitle: string,
-    text: string
-  ) => {
-    const userRef = doc(db, "users", username);
-    const docSnap = await getDoc(userRef);
+  // Function to load the document from Firestore
+  const loadDocumentFromFirestore = async (username: string, documentId: string) => {
+    try {
+      const userDocRef = doc(db, "users", username);
+      const docSnapshot = await getDoc(userDocRef);
 
-    if (docSnap.exists()) {
-
+      if (docSnapshot.exists()) {
+        const documentsArray: DocumentData[] = docSnapshot.data().documents || [];
+        const existingDoc = documentsArray.find(doc => doc.id === documentId);
+        if (existingDoc) {
+          setValue(existingDoc.content); // Set the loaded content
+        }
+      }
+    } catch (error) {
+      console.error("Error loading document:", error);
     }
-  }
+  };
+
+  useEffect(() => {
+    const username = user?.email;
+    if (username && documentId) {
+      loadDocumentFromFirestore(username, documentId);
+    }
+  }, [documentId, user]); // Run this effect when component mounts
+
 
 
   //____________________________________________________________
