@@ -8,6 +8,7 @@ import ToolBar from "./Toolbar";
 import "react-quill/dist/quill.snow.css";
 import "./Document.scss";
 
+// helper function for auto-save feature.
 function debounce(
   func: (...args: any[]) => void,
   wait: number
@@ -59,22 +60,22 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
 
   const [user] = useAuthState(auth);
 
-//---------------Function to render the document in the database----------------
+  //---------------Function to render the document in the database----------------
   useEffect(() => {
-    const username = user?.email
-    if(username){
-      fetchDocumentFromFirestore(username);
+    const userEmail = user?.email
+    if (userEmail) {
+      fetchDocumentFromFirestore(userEmail);
     }
   }, []);
 
-  const fetchDocumentFromFirestore = async (username: string) => {
+  const fetchDocumentFromFirestore = async (userEmail: string) => {
     try {
-      if (username) {
-        const userDocRef = doc(collection(db, "users"), username);
+      if (userEmail) {
+        const userDocRef = doc(db, "users", userEmail);
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
           const documentsArray: DocumentData[] = docSnapshot.data().documents || [];
-          const document = documentsArray.find(doc => doc.id === documentId);
+          const document = documentsArray.find((doc: DocumentData) => doc.id === documentId);
           if (document) {
             setValue(document.content);
           }
@@ -84,14 +85,14 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
       console.error("Error fetching document:", error);
     }
   };
-//____________________________________________________________
-//---------------Function to save the document to the database----------------
+  //____________________________________________________________
+  //---------------Function to save the document to the database----------------
   // Use useEffect to call saveDocumentToFirestore whenever the value changes
   useEffect(() => {
-    const username = user?.email; // Replace with the actual username
-    if (username) {
+    const userEmail = user?.email;
+    if (userEmail) {
       debouncedSaveDocumentToFirestore(
-        username,
+        userEmail,
         documentId,
         documentTitle,
         value
@@ -100,13 +101,13 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   }, [value, documentTitle]); // Only re-run the effect if 'value' changes
 
   const saveDocumentToFirestore = async (
-    username: string,
+    userEmail: string,
     documentId: string,
     documentTitle: string,
     text: string
   ): Promise<void> => {
     try {
-      const userDocRef = doc(collection(db, "users"), username);
+      const userDocRef = doc(db, "users", userEmail);
       // Get the current document to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
       let documentsArray: DocumentData[] = [];
@@ -155,7 +156,7 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
     saveDocumentToFirestore,
     5000 // Delay in milliseconds
   );
-//____________________________________________________________
+  //____________________________________________________________
 
   const toggleSearchVisibility = () => {
     setIsSearchVisible(!isSearchVisible);
@@ -446,7 +447,7 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
         <ReactQuill
           className="editable-area"
           ref={quillRef}
-          value={value} // TODO: fetchContent
+          value={value}
           onChange={setValue}
           modules={modules}
         />

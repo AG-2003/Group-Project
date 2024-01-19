@@ -17,13 +17,13 @@ interface SheetData {
   name: string;
   data: string; // Array of cell data for the sheet
   // Add other properties as needed
- }
+}
 
- interface Sheet {
+interface Sheet {
   id: string;
   title: string
   content: SheetData
- }
+}
 
 function debounce(
   func: (...args: any[]) => void,
@@ -47,10 +47,11 @@ function debounce(
   };
 }
 
+
 const Sheet: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   // State to hold workbook data
-  const [workbookData, setWorkbookData] = useState([{ id: '', title: '', data: [], name: '' }]);
-  const [serializedData, setSerializedData] = useState('');
+  const [workbookData, setWorkbookData] = useState([{ id: '', title: '', data: [], name: '' }]); // add type 
+  const [serializedData, setSerializedData] = useState<string>('');
 
   const settings = {
     // Initial data for the workbook
@@ -97,34 +98,64 @@ const Sheet: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   // Use useEffect to call saveDocumentToFirestore whenever the value changes
 
   useEffect(() => {
-   setSerializedData(JSON.stringify(workbookData[0]));
+    setSerializedData(JSON.stringify(workbookData[0]));
   }, [workbookData[0]]);
 
   useEffect(() => {
-   const username = user?.email;
-   if (username) {
-     const newWorkbookData = {
-       ...workbookData[0],
-       data: serializedData
-     };
+    const userEmail = user?.email;
+    if (userEmail) {
+      const newWorkbookData = {
+        ...workbookData[0],
+        data: serializedData
+      };
 
-     debouncedSaveSheetToFirestore(
-       username,
-       documentId,
-       documentTitle,
-       newWorkbookData
-     );
-   }
+      debouncedSaveSheetToFirestore(
+        userEmail,
+        documentId,
+        documentTitle,
+        newWorkbookData
+      );
+    }
   }, [serializedData, documentTitle]);
 
+
+  // //---------------Function to render the document in the database----------------
+  // useEffect(() => {
+  //   const userEmail = user?.email
+  //   if (userEmail) {
+  //     fetchDocumentFromFirestore(userEmail);
+  //   }
+  // }, []);
+
+  // const fetchDocumentFromFirestore = async (userEmail: string) => {
+  //   try {
+  //     if (userEmail) {
+  //       const userDocRef = doc(db, "users", userEmail);
+  //       const docSnapshot = await getDoc(userDocRef);
+  //       if (docSnapshot.exists()) {
+  //         const sheetArray: SheetData[] = docSnapshot.data().sheets || [];
+  //         const spreadsheet = documentsArray.find((sheet: SheetData) => sheet.id === documentId);
+  //         if (spreadsheet) {
+  //           // setValue(.content);
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching document:", error);
+  //   }
+  // };
+
+
+
+
   const saveSheetToFirestore = async (
-    username: string,
+    userEmail: string,
     sheetId: string,
     sheetTitle: string,
     data: SheetData
   ) => {
     try {
-      const userDocRef = doc(collection(db, "users"), username);
+      const userDocRef = doc(collection(db, "users"), userEmail);
       // Get the current sheet to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
       let sheetsArray: Sheet[] = [];
