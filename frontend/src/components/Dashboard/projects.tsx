@@ -2,62 +2,112 @@ import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 import { doc, getDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom"; // Import useHistory
+import { useNavigate } from "react-router-dom";
 import "./Projects.scss";
+import { SuiteData } from "../../interfaces/SuiteData";
 
-interface Document {
-  id: string;
-  title: string;
-  content: string;
 
-  // Add other fields as necessary, like lastEdited, if available
-}
 
 const Projects: React.FC = () => {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [projects, setProjects] = useState<SuiteData[]>([]);
   const [user] = useAuthState(auth);
-  const navigate = useNavigate(); // Use the useHistory hook for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchDocuments = async () => {
+    const fetchProjects = async () => {
       if (user?.email) {
         const userDocRef = doc(db, "users", user.email);
         const userDocSnapshot = await getDoc(userDocRef);
 
         if (userDocSnapshot.exists()) {
           const userData = userDocSnapshot.data();
-          const userDocuments = userData.documents || [];
-          setDocuments(userDocuments);
+          const userDocuments: SuiteData[] = userData.documents || [];
+          const userSheets: SuiteData[] = userData.sheets || [];
+          const userWhiteboards: SuiteData[] = userData.whiteboards || [];
+          const userPowerpoints: SuiteData[] = userData.powerpoints || [];
+
+          // Use the existing lastEdited field from Firestore data, don't generate a new one
+          const combinedProjects: SuiteData[] = [
+            ...userDocuments,
+            ...userSheets,
+            ...userWhiteboards,
+            ...userPowerpoints,
+          ];
+
+          setProjects(combinedProjects);
         }
       }
     };
 
-    fetchDocuments();
+    fetchProjects();
+
+
+    fetchProjects();
   }, [user]);
 
-  // Function to handle click on a project card
-  const handleCardClick = (documentId: string, documentTitle: string) => {
-    // Navigate to the editor page with the documentId
-    navigate(`/doc/?id=${encodeURIComponent(documentId)}&title=${encodeURIComponent(documentTitle)}`);
+  const handleCardClick = (projectId: string, projectTitle: string, type: string) => {
+    // Adjust the navigation path based on the project type
+    let path: string = '';
+    switch (type) {
+      case 'document':
+        path = `/doc/?id=${encodeURIComponent(projectId)}&title=${encodeURIComponent(projectTitle)}`;
+        break;
+      case 'sheet':
+        path = `/sheet/?id=${encodeURIComponent(projectId)}&title=${encodeURIComponent(projectTitle)}`;
+        break;
+      // Add cases for 'whiteboard' and 'powerpoint' as necessary
+    }
+    navigate(path);
   };
+
+  const stripHtml = (html: string): string => {
+    // Create a new div element and set its innerHTML to the HTML string
+    const temporalDivElement = document.createElement('div');
+    temporalDivElement.innerHTML = html;
+    // Retrieve the text content from the div, which will be the plain text without HTML tags
+    return temporalDivElement.textContent || temporalDivElement.innerText || '';
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date: Date = new Date(dateString);
+    const hours: number = date.getHours();
+    const minutes: number = date.getMinutes();
+    const day: number = date.getDate();
+    const month: number = date.getMonth() + 1; // Month is 0-indexed
+    const year: number = date.getFullYear();
+
+    // Convert 24hr time to 12hr time and set am/pm
+    const hours12: number = hours % 12 || 12; // Convert hour to 12-hour format
+    const amPm: string = hours < 12 ? 'AM' : 'PM';
+
+    // Format minutes to always be two digits
+    const formattedMinutes: string | number = minutes < 10 ? `0${minutes}` : minutes;
+
+    // Format the date string
+    return `${hours12}:${formattedMinutes} ${amPm}, ${day}/${month}/${year}`;
+  };
+
 
   return (
     <div className="projects-container">
       <h2 className="projects-heading">Recent Designs</h2>
       <div className="projects-list">
-        {documents.map((doc) => (
+        {projects.map((project: SuiteData) => (
           <div
-            key={doc.id}
+            key={project.id}
             className="project-card"
-            onClick={() => handleCardClick(doc.id, doc.title)}
+            onClick={() => handleCardClick(project.id, project.title, project.type)}
           >
-            <h3 className="project-title">{doc.title}</h3>
+            <h3 className="project-title">{project.title}</h3>
             <p className="project-content">
-              {doc.content.substring(0, 100)}...
+              {typeof project.content === 'string' ? stripHtml(project.content).substring(0, 20) : 'No content available'}...
+            </p>
+            <p className="last-edited">
+              Last edited: {formatDate(project.lastEdited)}
             </p>
           </div>
         ))}
-        {documents.length === 0 && (
+        {projects.length === 0 && (
           <div className="no-projects">
             <h3 className="no-projects-title">Don't have a design?</h3>
             <p className="no-projects-text">Create your first design now!</p>
@@ -67,6 +117,7 @@ const Projects: React.FC = () => {
       </div>
     </div>
   );
+
 };
 
 export default Projects;

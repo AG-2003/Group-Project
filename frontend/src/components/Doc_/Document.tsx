@@ -6,52 +6,22 @@ import { doc, setDoc, collection, getDoc } from "firebase/firestore";
 import ReactQuill from "react-quill";
 import ToolBar from "./Toolbar";
 import "react-quill/dist/quill.snow.css";
+import { SuiteData } from "../../interfaces/SuiteData";
 import "./Document.scss";
+import { debounce } from "../../utils/Time";
+import { CommentType } from "../../interfaces/CommentType";
+import { SuiteProps } from "../../interfaces/SuiteProps";
 
-// helper function for auto-save feature.
-function debounce(
-  func: (...args: any[]) => void,
-  wait: number
-): (...args: any[]) => void {
-  let timeout: NodeJS.Timeout | null;
 
-  return function executedFunction(...args: any[]): void {
-    const later = () => {
-      if (timeout !== null) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      func(...args);
-    };
 
-    if (timeout !== null) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(later, wait);
-  };
-}
-
-interface CommentType {
-  id: number;
-  text: string;
-  rangeIndex: number;
-  rangeLength: number;
-}
 
 // Define an interface for the document objects
-interface DocumentData {
-  id: string; // Unique identifier for each document
-  title: string;
-  content: string;
-}
+
 
 //Define a Props interface
-interface Props {
-  documentId: string;
-  documentTitle: string;
-}
 
-const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
+
+const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
   const [value, setValue] = useState<string>("");
   const quillRef = useRef<ReactQuill>(null);
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
@@ -74,8 +44,8 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
         const userDocRef = doc(db, "users", userEmail);
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
-          const documentsArray: DocumentData[] = docSnapshot.data().documents || [];
-          const document = documentsArray.find((doc: DocumentData) => doc.id === documentId);
+          const documentsArray: SuiteData[] = docSnapshot.data().documents || [];
+          const document = documentsArray.find((doc: SuiteData) => doc.id === suiteId);
           if (document) {
             setValue(document.content);
           }
@@ -91,66 +61,70 @@ const Document: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   useEffect(() => {
     const userEmail = user?.email;
     if (userEmail) {
+
       debouncedSaveDocumentToFirestore(
         userEmail,
-        documentId,
-        documentTitle,
+        suiteId,
+        suiteTitle,
         value
       );
     }
-  }, [value, documentTitle]); // Only re-run the effect if 'value' changes
+  }, [value, suiteTitle]); // Only re-run the effect if 'value' changes
 
   const saveDocumentToFirestore = async (
     userEmail: string,
-    documentId: string,
-    documentTitle: string,
+    suiteId: string,
+    suiteTitle: string,
     text: string
   ): Promise<void> => {
     try {
       const userDocRef = doc(db, "users", userEmail);
-      // Get the current document to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
-      let documentsArray: DocumentData[] = [];
+      let documentsArray: SuiteData[] = [];
 
       if (docSnapshot.exists()) {
-        // Get the existing documents array or initialize it if it doesn't exist
         documentsArray = docSnapshot.data().documents || [];
       }
 
+      const now = new Date().toISOString(); // Get current time as ISO string
+
       // Check if the document with the given ID already exists
-      const existingDocIndex = documentsArray.findIndex(
-        (doc: DocumentData) => doc.id === documentId
-      );
+      const existingDocIndex = documentsArray.findIndex(doc => doc.id === suiteId);
 
       if (existingDocIndex !== -1) {
-        // Update the existing document's title and content
+        // Update the existing document's title, content, and last edited time
         documentsArray[existingDocIndex] = {
-          id: documentId,
-          title: documentTitle,
+          ...documentsArray[existingDocIndex], // Spread existing properties
+          title: suiteTitle,
           content: text,
+          lastEdited: now, // Update last edited time
         };
       } else {
-        // Add a new document with a unique ID
+        // Add a new document with a unique ID and current last edited time
         documentsArray.push({
-          id: documentId,
-          title: documentTitle,
+          id: suiteId,
+          title: suiteTitle,
           content: text,
+          lastEdited: now, // Set last edited time for new document
+          type: 'document'
         });
       }
 
       // Update the user's document with the new or updated documents array
       await setDoc(
         userDocRef,
-        {
-          documents: documentsArray,
-        },
+        { documents: documentsArray },
         { merge: true }
+
       );
       console.log("Document saved successfully");
     } catch (error) {
       console.error("Error saving document:", error);
     }
   };
+
+  // If you are using debouncing, remember to apply it here as well
+
 
   const debouncedSaveDocumentToFirestore = debounce(
     saveDocumentToFirestore,

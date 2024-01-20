@@ -5,52 +5,19 @@ import { doc, setDoc, collection, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase-config";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-
-interface Props {
-  documentId: string;
-  documentTitle: string;
-}
-
-interface SheetData {
-  id: string; // Unique identifier for each sheet
-  title: string;
-  name: string;
-  data: string; // Array of cell data for the sheet
-  // Add other properties as needed
-}
-
-interface Sheet {
-  id: string;
-  title: string
-  content: SheetData
-}
-
-function debounce(
-  func: (...args: any[]) => void,
-  wait: number
-): (...args: any[]) => void {
-  let timeout: NodeJS.Timeout | null;
-
-  return function executedFunction(...args: any[]): void {
-    const later = () => {
-      if (timeout !== null) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      func(...args);
-    };
-
-    if (timeout !== null) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(later, wait);
-  };
-}
+import { SuiteData } from "../../interfaces/SuiteData";
+import { SuiteProps } from "../../interfaces/SuiteProps";
+// import { SheetData } from "../../interfaces/SheetData";
+import { debounce } from "../../utils/Time";
 
 
-const Sheet: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
+
+
+
+
+const Sheet: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
   // State to hold workbook data
-  const [workbookData, setWorkbookData] = useState([{ id: '', title: '', data: [], name: '' }]); // add type 
+  const [workbookData, setWorkbookData] = useState([{ data: [], name: '' }]); // add type 
   const [serializedData, setSerializedData] = useState<string>('');
 
   const settings = {
@@ -111,39 +78,41 @@ const Sheet: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
 
       debouncedSaveSheetToFirestore(
         userEmail,
-        documentId,
-        documentTitle,
+        suiteId,
+        suiteTitle,
         newWorkbookData
       );
     }
-  }, [serializedData, documentTitle]);
+  }, [serializedData, suiteTitle]);
 
 
-  // //---------------Function to render the document in the database----------------
-  // useEffect(() => {
-  //   const userEmail = user?.email
-  //   if (userEmail) {
-  //     fetchDocumentFromFirestore(userEmail);
-  //   }
-  // }, []);
+  //---------------Function to render the document in the database----------------
+  useEffect(() => {
+    const userEmail = user?.email
+    if (userEmail) {
+      fetchDocumentFromFirestore(userEmail);
+    }
+  }, []);
 
-  // const fetchDocumentFromFirestore = async (userEmail: string) => {
-  //   try {
-  //     if (userEmail) {
-  //       const userDocRef = doc(db, "users", userEmail);
-  //       const docSnapshot = await getDoc(userDocRef);
-  //       if (docSnapshot.exists()) {
-  //         const sheetArray: SheetData[] = docSnapshot.data().sheets || [];
-  //         const spreadsheet = documentsArray.find((sheet: SheetData) => sheet.id === documentId);
-  //         if (spreadsheet) {
-  //           // setValue(.content);
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching document:", error);
-  //   }
-  // };
+  const fetchDocumentFromFirestore = async (userEmail: string) => {
+    try {
+      if (userEmail && suiteId) {
+        const userDocRef = doc(db, "users", userEmail);
+        const docSnapshot = await getDoc(userDocRef);
+        if (docSnapshot.exists()) {
+          const sheetArray: SuiteData[] = docSnapshot.data().sheets || [];
+          const spreadsheet = sheetArray.find((sheet: SuiteData) => sheet.id === suiteId);
+          if (spreadsheet) {
+            const parsedData = JSON.parse(spreadsheet.content);
+            setWorkbookData([{ ...parsedData, name: spreadsheet.title }]);
+
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+  };
 
 
 
@@ -151,14 +120,13 @@ const Sheet: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   const saveSheetToFirestore = async (
     userEmail: string,
     sheetId: string,
-    sheetTitle: string,
-    data: SheetData
+    suiteTitle: string,
   ) => {
     try {
       const userDocRef = doc(collection(db, "users"), userEmail);
       // Get the current sheet to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
-      let sheetsArray: Sheet[] = [];
+      let sheetsArray: SuiteData[] = [];
 
       if (docSnapshot.exists()) {
         // Get the existing sheets array or initialize it if it doesn't exist
@@ -167,22 +135,27 @@ const Sheet: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
 
       // Check if the sheet with the given ID already exists
       const existingSheetIndex = sheetsArray.findIndex(
-        (sheet: Sheet) => sheet.id === sheetId
+        (sheet: SuiteData) => sheet.id === sheetId
       );
+
+      const now = new Date().toISOString();
 
       if (existingSheetIndex !== -1) {
         // Update the existing sheet's title and content
         sheetsArray[existingSheetIndex] = {
-          id: sheetId,
-          title: sheetTitle,
-          content: data,
+          ...sheetsArray[existingSheetIndex],
+          title: suiteTitle,
+          lastEdited: now,
+          content: serializedData,
         };
       } else {
         // Add a new sheet with a unique ID
         sheetsArray.push({
-          id: documentId,
-          title: documentTitle,
-          content: data,
+          id: suiteId,
+          title: suiteTitle,
+          type: 'sheet',
+          lastEdited: now,
+          content: serializedData
         });
       }
 
@@ -201,12 +174,12 @@ const Sheet: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
 
   const debouncedSaveSheetToFirestore = debounce(
     saveSheetToFirestore,
-    10000 // Delay in milliseconds
+    5000 // Delay in milliseconds
   );
   //___________________________________
   return (
     <div className="containerSheet">
-      {documentId && <Workbook {...settings} />}
+      {suiteId && <Workbook {...settings} />}
     </div>
   );
 };

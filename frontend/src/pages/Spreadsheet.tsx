@@ -6,8 +6,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 const Whiteboard: React.FC = () => {
   const location = useLocation();
-  const initialTitle = location.state?.title || 'Untitled';
-  const uniqueID = location.state?.uniqueID || uuidv4();
+  const params = new URLSearchParams(location.search);
+  const initialTitle = decodeURIComponent(params.get('title') || '');
+  const uniqueID = decodeURIComponent(params.get('id') || '');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [documentTitle, setDocumentTitle] = useState(initialTitle);
 
@@ -22,8 +23,8 @@ const Whiteboard: React.FC = () => {
         setDocumentTitle={setDocumentTitle}
       />
       <Sheet
-        documentTitle={documentTitle}
-        documentId={uniqueID}
+        suiteTitle={documentTitle}
+        suiteId={uniqueID}
       />
     </div>
   );

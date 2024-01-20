@@ -73,13 +73,13 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, modalType }) => {
         navigate(`/doc/?id=${encodeURIComponent(uniqueID)}&title=${encodeURIComponent(title)}`);
         break;
       case "Slide":
-        navigate("/slides", {state: {title, uniqueID}});
+        navigate("/slides", { state: { title, uniqueID } });
         break;
       case "Spreadsheet":
-        navigate("/sheet", {state: {title, uniqueID}});
+        navigate(`/sheet/?id=${encodeURIComponent(uniqueID)}&title=${encodeURIComponent(title)}`);
         break;
       case "Whiteboard":
-        navigate("/board", {state: {title, uniqueID}});
+        navigate("/board", { state: { title, uniqueID } });
         break;
       default:
         // Default action or error handling

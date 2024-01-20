@@ -32,8 +32,8 @@ const Doc: React.FC = () => {
         setDocumentTitle={setDocumentTitle}
       />
       <Document
-        documentTitle={documentTitle}
-        documentId={uniqueID}
+        suiteId={uniqueID}
+        suiteTitle={documentTitle}
       />
       <Footer onZoomChange={handleZoomChange} />
     </div>
