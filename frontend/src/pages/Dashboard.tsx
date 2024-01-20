@@ -8,7 +8,6 @@ import SideBar from "../components/Dashboard/sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/trashAlt";
 // import TeamsAlt from "../components/Teams/TeamsAlt";
-import InsideTeam from "../components/Teams/insideTeam";
 import Teams from "./Teams";
 
 // meow
@@ -61,11 +60,7 @@ const Dashboard: React.FC = () => {
           {currentComponent == "Profile" && <Profile />}
           {currentComponent == "Projects" && <Projects />}
           {/* {currentComponent == "Templates" && <Templates />} */}
-          {currentComponent == "Teams" && (
-            // <TeamsAlt onButtonClick={handleButtonClick} />
-            <Teams />
-          )}
-          {currentComponent == "inTeam" && <InsideTeam />}
+          {currentComponent == "Teams" && <Teams />}
           {/* {currentComponent == "Calls" && <Calls />} */}
           {/* {currentComponent == "Calendar" && <Calendar />} */}
           {/* {currentComponent == "Social" && <Social />} */}
