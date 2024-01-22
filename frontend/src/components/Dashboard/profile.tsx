@@ -107,7 +107,7 @@ const Profile: React.FC = () => {
               {userProfile.displayName || auth.currentUser?.displayName}
             </Text>
             <Text className="profile-description">
-              {/* {userProfile.description || "Your Description"} */}
+              {/* {userProfile.desc || "Description"} */}
               <p>Description</p>
             </Text>
           </Box>

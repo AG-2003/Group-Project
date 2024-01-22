@@ -16,6 +16,7 @@ import Spreadsheet from "./pages/Spreadsheet";
 
 import "draft-js/dist/Draft.css";
 import QuickChat from "./pages/QuickChat";
+import Projects from "./components/Dashboard/projects";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/doc/*" element={<Doc />} />
         <Route path="/Board" element={<Whiteboard />} />;
         <Route path="/Sheet" element={<Spreadsheet />} />;
+        <Route path="/Projects" element={<Projects />} />
       </Route>
     </Routes>
   );
