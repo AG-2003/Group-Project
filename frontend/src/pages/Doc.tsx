@@ -12,7 +12,7 @@ const Doc: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const uniqueID = decodeURIComponent(params.get('id') || '');
-  const initialTitle = decodeURIComponent(params.get('title') || '');
+  const initialTitle = location.state?.title||'Untitled';
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [documentTitle, setDocumentTitle] = useState(initialTitle);
 
@@ -34,6 +34,7 @@ const Doc: React.FC = () => {
       <Document
         suiteId={uniqueID}
         suiteTitle={documentTitle}
+        setSuiteTitle={setDocumentTitle}
       />
       <Footer onZoomChange={handleZoomChange} />
     </div>

@@ -23,7 +23,7 @@ const Projects: React.FC = () => {
           const userData = userDocSnapshot.data();
           const userDocuments: SuiteData[] = userData.documents || [];
           const userSheets: SuiteData[] = userData.sheets || [];
-          const userWhiteboards: SuiteData[] = userData.whiteboards || [];
+          const userWhiteboards: SuiteData[] = userData.boards || [];
           const userPowerpoints: SuiteData[] = userData.powerpoints || [];
 
           // Use the existing lastEdited field from Firestore data, don't generate a new one
@@ -50,14 +50,17 @@ const Projects: React.FC = () => {
     let path: string = '';
     switch (type) {
       case 'document':
-        path = `/doc/?id=${encodeURIComponent(projectId)}&title=${encodeURIComponent(projectTitle)}`;
+        path = `/doc/?id=${encodeURIComponent(projectId)}`;
         break;
       case 'sheet':
-        path = `/sheet/?id=${encodeURIComponent(projectId)}&title=${encodeURIComponent(projectTitle)}`;
+        path = `/sheet/?id=${encodeURIComponent(projectId)}`;
         break;
-      // Add cases for 'whiteboard' and 'powerpoint' as necessary
+      case 'whiteboard':
+        path = `/board/?id=${encodeURIComponent(projectId)}`;
+        break;
+      // Add case for 'slides' as necessary
     }
-    navigate(path);
+    navigate(path, { state: { projectTitle} });
   };
 
   const stripHtml = (html: string): string => {

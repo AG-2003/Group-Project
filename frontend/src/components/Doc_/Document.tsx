@@ -21,7 +21,7 @@ import { SuiteProps } from "../../interfaces/SuiteProps";
 //Define a Props interface
 
 
-const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
+const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
   const [value, setValue] = useState<string>("");
   const quillRef = useRef<ReactQuill>(null);
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
@@ -48,6 +48,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => 
           const document = documentsArray.find((doc: SuiteData) => doc.id === suiteId);
           if (document) {
             setValue(document.content);
+            setSuiteTitle(document.title)
           }
         }
       }

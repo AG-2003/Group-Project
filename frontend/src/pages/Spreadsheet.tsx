@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 const Spreadsheet: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const initialTitle = decodeURIComponent(params.get('title') || '');
   const uniqueID = decodeURIComponent(params.get('id') || '');
+  const initialTitle = location.state?.title||'Untitled';
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [documentTitle, setDocumentTitle] = useState(initialTitle);
 
@@ -25,6 +25,7 @@ const Spreadsheet: React.FC = () => {
       <Sheet
         suiteTitle={documentTitle}
         suiteId={uniqueID}
+        setSuiteTitle={setDocumentTitle}
       />
     </div>
   );

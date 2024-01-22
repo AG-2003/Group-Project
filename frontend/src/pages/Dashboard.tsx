@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
 import Projects from "../components/Dashboard/projects";
 import Profile from "../components/Dashboard/profile";
-import SideBar from "../components/Dashboard/Sidebar";
+import SideBar from "../components/Dashboard/sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/trashAlt";
 // import TeamsAlt from "../components/Teams/TeamsAlt";

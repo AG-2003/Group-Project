@@ -5,6 +5,11 @@ import "./Canvas.scss";
 import { FaRegSquare, FaRegCircle, FaSlash, FaRegStar } from "react-icons/fa";
 import { FiTriangle } from "react-icons/fi";
 import { BsArrowUpRight } from "react-icons/bs";
+
+import { debounce } from "../../utils/Time";
+import { SuiteProps } from "../../interfaces/SuiteProps";
+import { SuiteData } from "../../interfaces/SuiteData";
+
 import { doc, setDoc, collection, getDoc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
@@ -39,14 +44,6 @@ interface RectangleType {
   width: number;
   height: number;
   fill: string;
-}
-
-interface BoardData{
-  id: string;
-  title: string;
-  lines: string;
-  texts: string;
-  rectangles: string;
 }
 
 const colors = [
@@ -143,36 +140,7 @@ function isShape(tool: string): tool is Shape {
   return ["rectangle", "circle", "line"].includes(tool);
 }
 
-//Added because delaying is preferred
-function debounce(
-  func: (...args: any[]) => void,
-  wait: number
-): (...args: any[]) => void {
-  let timeout: NodeJS.Timeout | null;
-
-  return function executedFunction(...args: any[]): void {
-    const later = () => {
-      if (timeout !== null) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      func(...args);
-    };
-
-    if (timeout !== null) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(later, wait);
-  };
-}
-
-//Define a Props interface
-interface Props {
-  documentId: string;
-  documentTitle: string;
-}
-
-const Canvas: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
+const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
   const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
   const [size, setSize] = useState<number>(5); // Default stroke size
@@ -221,12 +189,12 @@ const Canvas: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
 
       debouncedSaveBoardToFirestore(
         username,
-        documentId,
-        documentTitle,
+        suiteId,
+        suiteTitle,
         dataArray
       )
     }
-  }, [serializedLinesData, serializedTextsData, serializedRectanglesData, documentTitle])
+  }, [serializedLinesData, serializedTextsData, serializedRectanglesData, suiteTitle])
 
 
   const saveBoardToFirestore = async (
@@ -239,35 +207,38 @@ const Canvas: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
       const userDocRef = doc(collection(db, "users"), username);
       // Get the current document to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
-      let boardsArray: BoardData[] = [];
+      let boardsArray: SuiteData[] = [];
 
       if (docSnapshot.exists()) {
         // Get the existing documents array or initialize it if it doesn't exist
         boardsArray = docSnapshot.data().boards || [];
       }
 
+      const now = new Date().toISOString(); // Get current time as ISO string
+
       // Check if the document with the given ID already exists
       const existingBoardIndex = boardsArray.findIndex(
-        (board: BoardData) => board.id === boardId
+        (board: SuiteData) => board.id === boardId
       );
+
+
 
       if (existingBoardIndex !== -1) {
         // Update the existing document's title and content
         boardsArray[existingBoardIndex] = {
-          id: boardId,
+          ...boardsArray[existingBoardIndex],
           title: boardTitle,
-          lines: data[0],
-          texts: data[1],
-          rectangles: data[2]
+          lastEdited: now,
+          content: JSON.stringify(data)
         };
       } else {
         // Add a new document with a unique ID
         boardsArray.push({
           id: boardId,
           title: boardTitle,
-          lines: data[0],
-          texts: data[1],
-          rectangles: data[2]
+          lastEdited: now,
+          content: JSON.stringify(data),
+          type: 'whiteboard'
         });
       }
 
@@ -290,6 +261,38 @@ const Canvas: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
     5000 // Delay in milliseconds
   );
   //____________________________________________________________
+
+//---------------------------Function to render the saved whiteboard--------------
+  useEffect(() => {
+    const username = user?.email
+    if(username){
+      fetchDocumentFromFirestore(username);
+    }
+  }, []);
+
+  const fetchDocumentFromFirestore = async (username: string) => {
+    try {
+      if (username) {
+        const userDocRef = doc(collection(db, "users"), username);
+        const docSnapshot = await getDoc(userDocRef);
+        if (docSnapshot.exists()) {
+          const boardsArray: SuiteData[] = docSnapshot.data().boards || [];
+          const board = boardsArray.find(board => board.id === suiteId);
+          if (board) {
+            const boardContent = JSON.parse(board.content)
+            setLines(JSON.parse(boardContent[0]))
+            setTexts(JSON.parse(boardContent[1]))
+            setRectangles(JSON.parse(boardContent[2]))
+            setSuiteTitle(board.title)
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+  };
+//____________________________________________________________
+
 
 
   const toggleColorPicker = () => {
