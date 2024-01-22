@@ -5,20 +5,34 @@ import { doc, setDoc, collection, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase-config";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { SuiteData } from "../../interfaces/SuiteData";
 import { SuiteProps } from "../../interfaces/SuiteProps";
-// import { SheetData } from "../../interfaces/SheetData";
 import { debounce } from "../../utils/Time";
+import { parse } from "path";
 
 
+interface SheetData {
+  // id: string; // Unique identifier for each sheet
+  title: string;
+  name: string;
+  data: string; // Array of cell data for the sheet
+  // Add other properties as needed
+}
+
+interface Sheet {
+  id: string;
+  title: string
+  content: SheetData
+  type: string
+  lastEdited: string
+}
 
 
-
-
-const Sheet: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
+const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId }: SuiteProps) => {
   // State to hold workbook data
-  const [workbookData, setWorkbookData] = useState([{ data: [], name: '' }]); // add type 
+  const [workbookData, setWorkbookData] = useState([{ data: [], id: '', name: '', status: 0 }]); // add type 
   const [serializedData, setSerializedData] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true); // New loading state
+
 
   const settings = {
     // Initial data for the workbook
@@ -90,43 +104,50 @@ const Sheet: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
   useEffect(() => {
     const userEmail = user?.email
     if (userEmail) {
-      fetchDocumentFromFirestore(userEmail);
+      fetchSheetFromFirestore(userEmail);
     }
-  }, []);
+  }, [user?.email, suiteId]);
 
-  const fetchDocumentFromFirestore = async (userEmail: string) => {
+  const fetchSheetFromFirestore = async (userEmail: string) => {
+    setIsLoading(true); // Start loading
     try {
-      if (userEmail && suiteId) {
+      if (userEmail) {
         const userDocRef = doc(db, "users", userEmail);
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
-          const sheetArray: SuiteData[] = docSnapshot.data().sheets || [];
-          const spreadsheet = sheetArray.find((sheet: SuiteData) => sheet.id === suiteId);
+          const sheetArray: Sheet[] = docSnapshot.data().sheets || [];
+          const spreadsheet = sheetArray.find((sheet: Sheet) => sheet.id === suiteId);
           if (spreadsheet) {
-            const parsedData = JSON.parse(spreadsheet.content);
-            setWorkbookData([{ ...parsedData, name: spreadsheet.title }]);
-
+            const parsedData = JSON.parse(spreadsheet.content.data);
+            console.log(`this is the parsed data: `);
+            console.log(parsedData);
+            console.log(`string is ${JSON.stringify(parsedData)}`);
+            setWorkbookData(parsedData);
           }
         }
       }
     } catch (error) {
       console.error("Error fetching document:", error);
+    } finally {
+      setIsLoading(false); // End loading
     }
   };
 
 
 
 
+
   const saveSheetToFirestore = async (
     userEmail: string,
-    sheetId: string,
-    suiteTitle: string,
+    suiteId: string,
+    sheetTitle: string,
+    data: SheetData
   ) => {
     try {
       const userDocRef = doc(collection(db, "users"), userEmail);
       // Get the current sheet to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
-      let sheetsArray: SuiteData[] = [];
+      let sheetsArray: Sheet[] = [];
 
       if (docSnapshot.exists()) {
         // Get the existing sheets array or initialize it if it doesn't exist
@@ -135,7 +156,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
 
       // Check if the sheet with the given ID already exists
       const existingSheetIndex = sheetsArray.findIndex(
-        (sheet: SuiteData) => sheet.id === sheetId
+        (sheet: Sheet) => sheet.id === suiteId
       );
 
       const now = new Date().toISOString();
@@ -144,18 +165,18 @@ const Sheet: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
         // Update the existing sheet's title and content
         sheetsArray[existingSheetIndex] = {
           ...sheetsArray[existingSheetIndex],
-          title: suiteTitle,
-          lastEdited: now,
-          content: serializedData,
+          id: suiteId,
+          title: sheetTitle,
+          content: data,
         };
       } else {
         // Add a new sheet with a unique ID
         sheetsArray.push({
           id: suiteId,
           title: suiteTitle,
+          content: data,
           type: 'sheet',
-          lastEdited: now,
-          content: serializedData
+          lastEdited: now
         });
       }
 
@@ -167,6 +188,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
         },
         { merge: true }
       );
+      console.log(sheetsArray);
     } catch (error) {
       console.error("Error saving document:", error);
     }
@@ -174,12 +196,16 @@ const Sheet: React.FC<SuiteProps> = ({ suiteId, suiteTitle }: SuiteProps) => {
 
   const debouncedSaveSheetToFirestore = debounce(
     saveSheetToFirestore,
-    5000 // Delay in milliseconds
+    10000 // Delay in milliseconds
   );
   //___________________________________
   return (
     <div className="containerSheet">
-      {suiteId && <Workbook {...settings} />}
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        suiteId && <Workbook {...settings} />
+      )}
     </div>
   );
 };

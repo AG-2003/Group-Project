@@ -4,7 +4,7 @@ import NavBar from "../components/Spreadsheet/NavBar";
 import { useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 
-const Whiteboard: React.FC = () => {
+const Spreadsheet: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const initialTitle = decodeURIComponent(params.get('title') || '');
@@ -30,4 +30,4 @@ const Whiteboard: React.FC = () => {
   );
 };
 
-export default Whiteboard;
+export default Spreadsheet;
