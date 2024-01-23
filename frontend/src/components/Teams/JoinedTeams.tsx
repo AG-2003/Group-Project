@@ -180,13 +180,7 @@ interface Team {
   image: string | null;
 }
 
-interface JoinedTeamsProps {
-  onTeamClick: (teamId: string) => void;
-}
-
-const JoinedTeams: React.FC<JoinedTeamsProps> = ({
-  onTeamClick,
-}: JoinedTeamsProps) => {
+const JoinedTeams: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
