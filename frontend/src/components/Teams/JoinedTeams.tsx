@@ -227,12 +227,9 @@ const JoinedTeams: React.FC<JoinedTeamsProps> = ({
   // Function to handle click on a team card
   const handleCardClick = (teamId: string) => {
     // Use the onTeamClick prop to notify the parent component
-    onTeamClick(teamId);
-    // navigate("/in_team/:param1", {
-    //   state: {
-    //     param1: teamId,
-    //   },
-    // });
+    // onTeamClick(teamId);
+
+    navigate(`/Teams/In_teams/${encodeURIComponent(teamId)}`);
   };
 
   return (

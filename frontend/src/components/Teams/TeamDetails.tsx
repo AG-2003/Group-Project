@@ -77,29 +77,44 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, Flex, Box, Text, Stack, Badge } from "@chakra-ui/react";
 import { db } from "../../firebase-config";
-import { doc, getDoc, DocumentData } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  DocumentData,
+  DocumentReference,
+} from "firebase/firestore";
 import "./TeamDetails.scss"; // Import the SCSS file
 import { IoChatbubblesSharp } from "react-icons/io5";
+import { useNavigate, useParams } from "react-router-dom";
 
-interface TeamDetailsProps {
-  teamId: string;
-  onChatsClick: () => void;
-}
-
-const TeamDetails: React.FC<TeamDetailsProps> = ({
-  teamId,
-  onChatsClick,
-}: TeamDetailsProps) => {
+const TeamDetails: React.FC = () => {
   const [teamDetails, setTeamDetails] = useState<DocumentData | null>(null);
+  let { team_id } = useParams();
+  const navigate = useNavigate();
+
+  if (team_id) {
+    team_id = decodeURIComponent(team_id);
+  }
+
+  const handleChatClick = (teamId: string) => {
+    navigate(`/In_teams/chat/${encodeURIComponent(teamId)}`);
+  };
 
   useEffect(() => {
     const fetchTeamDetails = async () => {
       try {
-        const teamDocRef = doc(db, "teams", teamId);
-        const teamDocSnapshot = await getDoc(teamDocRef);
+        if (team_id) {
+          // Ensure teamId is defined before creating the DocumentReference
+          const teamDocRef: DocumentReference<DocumentData> = doc(
+            db,
+            "teams",
+            team_id
+          );
+          const teamDocSnapshot = await getDoc(teamDocRef);
 
-        if (teamDocSnapshot.exists()) {
-          setTeamDetails(teamDocSnapshot.data());
+          if (teamDocSnapshot.exists()) {
+            setTeamDetails(teamDocSnapshot.data());
+          }
         }
       } catch (error) {
         console.error("Error fetching team details:", error);
@@ -107,7 +122,7 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({
     };
 
     fetchTeamDetails();
-  }, [teamId]);
+  }, [team_id]);
 
   return (
     <div className="team-details-container">
@@ -142,8 +157,16 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({
             </Flex>
             <p className="no-documents-message">There are no documents yet.</p>
           </Flex>
+          {/* chat onclick goes here */}
 
-          <div className="circular-button" onClick={onChatsClick}>
+          <div
+            className="circular-button"
+            onClick={() => {
+              if (team_id) {
+                handleChatClick(team_id);
+              }
+            }}
+          >
             <IoChatbubblesSharp />
           </div>
         </div>

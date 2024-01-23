@@ -25,16 +25,7 @@ const Teams = () => {
       {/* Conditionally render either JoinedTeams or TeamDetails based on currentTeamId */}
 
       {currentTeamId ? (
-        <>
-          {inChat ? (
-            <TeamsChat teamId={currentTeamId} />
-          ) : (
-            <TeamDetails
-              teamId={currentTeamId}
-              onChatsClick={handleChatClick}
-            />
-          )}
-        </>
+        <>{inChat ? <TeamsChat /> : <TeamDetails />}</>
       ) : (
         <>
           <CreateJoin />
