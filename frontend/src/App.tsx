@@ -20,6 +20,7 @@ import Projects from "./components/Dashboard/projects";
 import Profile from "./components/Dashboard/profile";
 import Teams from "./pages/Teams";
 import Trash from "./pages/Trash";
+import TeamDetails from "./components/Teams/TeamDetails";
 
 function App() {
   return (

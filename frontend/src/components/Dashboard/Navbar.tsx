@@ -69,7 +69,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
           modalType={modalType}
         />
 
-        <Link to="/chat">
+        {/* <Link to="/chat">
           <IconButton
             borderRadius="10%" // To make it a circular button
             bg="white"
@@ -79,7 +79,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             cursor="pointer"
             aria-label={""}
           />
-        </Link>
+        </Link> */}
 
         <Menu>
           <MenuButton as={Button} colorScheme="purple" mr={4} size="sm">
