@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Flex,
   Text,
@@ -16,7 +16,7 @@ import { doc, getDoc } from "firebase/firestore";
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
 
-  const [userDescription, setUserDescription] = useState<string>('');
+  const [userDescription, setUserDescription] = useState<string>("");
 
   useEffect(() => {
     const fetchDescription = async () => {
@@ -27,19 +27,17 @@ const Profile: React.FC = () => {
           if (docSnap.exists() && docSnap.data().desc) {
             setUserDescription(docSnap.data().desc);
           } else {
-            setUserDescription('No description set.');
+            setUserDescription("No description set.");
           }
         } catch (error) {
           console.error("Error fetching user description:", error);
-          setUserDescription('Failed to fetch description.');
+          setUserDescription("Failed to fetch description.");
         }
       }
     };
 
     fetchDescription();
   }, []);
-
-
 
   return (
     <div className="profile-container">
@@ -56,8 +54,7 @@ const Profile: React.FC = () => {
               {userProfile.displayName || auth.currentUser?.displayName}
             </Text>
             <Text className="profile-description">
-
-              <p style={{ color: 'black' }}>{userDescription}</p>
+              <p style={{ color: "black" }}>{userDescription}</p>
             </Text>
           </Box>
         </Flex>
@@ -75,7 +72,7 @@ const Profile: React.FC = () => {
         {/* <DashboardSection title="Your Teams" items={teams} />
         <DashboardSection title="Your Communities" items={communities} /> */}
       </Flex>
-    </div >
+    </div>
   );
 };
 

@@ -6,8 +6,6 @@ import { useNavigate } from "react-router-dom";
 import "./Projects.scss";
 import { SuiteData } from "../../interfaces/SuiteData";
 
-
-
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<SuiteData[]>([]);
   const [user] = useAuthState(auth);
@@ -41,34 +39,37 @@ const Projects: React.FC = () => {
 
     fetchProjects();
 
-
     fetchProjects();
   }, [user]);
 
-  const handleCardClick = (projectId: string, projectTitle: string, type: string) => {
+  const handleCardClick = (
+    projectId: string,
+    projectTitle: string,
+    type: string
+  ) => {
     // Adjust the navigation path based on the project type
-    let path: string = '';
+    let path: string = "";
     switch (type) {
-      case 'document':
+      case "document":
         path = `/doc/?id=${encodeURIComponent(projectId)}`;
         break;
-      case 'sheet':
+      case "sheet":
         path = `/sheet/?id=${encodeURIComponent(projectId)}`;
         break;
-      case 'whiteboard':
+      case "whiteboard":
         path = `/board/?id=${encodeURIComponent(projectId)}`;
         break;
       // Add case for 'slides' as necessary
     }
-    navigate(path, { state: { projectTitle} });
+    navigate(path, { state: { projectTitle } });
   };
 
   const stripHtml = (html: string): string => {
     // Create a new div element and set its innerHTML to the HTML string
-    const temporalDivElement = document.createElement('div');
+    const temporalDivElement = document.createElement("div");
     temporalDivElement.innerHTML = html;
     // Retrieve the text content from the div, which will be the plain text without HTML tags
-    return temporalDivElement.textContent || temporalDivElement.innerText || '';
+    return temporalDivElement.textContent || temporalDivElement.innerText || "";
   };
 
   const formatDate = (dateString: string): string => {
@@ -81,15 +82,15 @@ const Projects: React.FC = () => {
 
     // Convert 24hr time to 12hr time and set am/pm
     const hours12: number = hours % 12 || 12; // Convert hour to 12-hour format
-    const amPm: string = hours < 12 ? 'AM' : 'PM';
+    const amPm: string = hours < 12 ? "AM" : "PM";
 
     // Format minutes to always be two digits
-    const formattedMinutes: string | number = minutes < 10 ? `0${minutes}` : minutes;
+    const formattedMinutes: string | number =
+      minutes < 10 ? `0${minutes}` : minutes;
 
     // Format the date string
     return `${hours12}:${formattedMinutes} ${amPm}, ${day}/${month}/${year}`;
   };
-
 
   return (
     <div className="projects-container">
@@ -99,11 +100,16 @@ const Projects: React.FC = () => {
           <div
             key={project.id}
             className="project-card"
-            onClick={() => handleCardClick(project.id, project.title, project.type)}
+            onClick={() =>
+              handleCardClick(project.id, project.title, project.type)
+            }
           >
             <h3 className="project-title">{project.title}</h3>
             <p className="project-content">
-              {typeof project.content === 'string' ? stripHtml(project.content).substring(0, 20) : 'No content available'}...
+              {typeof project.content === "string"
+                ? stripHtml(project.content).substring(0, 20)
+                : "No content available"}
+              ...
             </p>
             <p className="last-edited">
               Last edited: {formatDate(project.lastEdited)}
@@ -120,7 +126,6 @@ const Projects: React.FC = () => {
       </div>
     </div>
   );
-
 };
 
 export default Projects;
