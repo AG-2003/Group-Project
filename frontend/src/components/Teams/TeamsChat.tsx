@@ -22,6 +22,7 @@ import {
 } from "firebase/firestore";
 import "./TeamsChat.scss";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useParams } from "react-router-dom";
 
 interface Message {
   id: string;
@@ -32,30 +33,40 @@ interface Message {
   timestamp: any;
 }
 
-interface Props {
-  teamId: string;
-}
-
-const ChattingPage: React.FC<Props> = ({ teamId }: Props) => {
+const ChattingPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState("");
   const [user] = useAuthState(auth);
 
+  let { team_id } = useParams();
+  console.log("Team ID:", team_id);
+
+  if (team_id) {
+    team_id = decodeURIComponent(team_id);
+  }
+
   // Get the messages stuff
   useEffect(() => {
-    const messagesCollection = collection(db, "teamsChat", teamId, "messages");
-    const messagesQuery = query(messagesCollection, orderBy("timestamp"));
+    if (team_id) {
+      const messagesCollection = collection(
+        db,
+        "teamsChat",
+        team_id,
+        "messages"
+      );
+      const messagesQuery = query(messagesCollection, orderBy("timestamp"));
 
-    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-      const updatedMessages: Message[] = [];
-      snapshot.forEach((doc) => {
-        updatedMessages.push(doc.data() as Message);
+      const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+        const updatedMessages: Message[] = [];
+        snapshot.forEach((doc) => {
+          updatedMessages.push(doc.data() as Message);
+        });
+        setMessages(updatedMessages);
       });
-      setMessages(updatedMessages);
-    });
 
-    return () => unsubscribe();
-  }, [teamId]);
+      return () => unsubscribe();
+    }
+  }, [team_id]);
 
   // Get the teams stuff
   const [teamDetails, setTeamDetails] = useState<DocumentData | null>(null);
@@ -63,11 +74,13 @@ const ChattingPage: React.FC<Props> = ({ teamId }: Props) => {
   useEffect(() => {
     const fetchTeamDetails = async () => {
       try {
-        const teamDocRef = doc(db, "teams", teamId);
-        const teamDocSnapshot = await getDoc(teamDocRef);
+        if (team_id) {
+          const teamDocRef = doc(db, "teams", team_id);
+          const teamDocSnapshot = await getDoc(teamDocRef);
 
-        if (teamDocSnapshot.exists()) {
-          setTeamDetails(teamDocSnapshot.data());
+          if (teamDocSnapshot.exists()) {
+            setTeamDetails(teamDocSnapshot.data());
+          }
         }
       } catch (error) {
         console.error("Error fetching team details:", error);
@@ -75,7 +88,7 @@ const ChattingPage: React.FC<Props> = ({ teamId }: Props) => {
     };
 
     fetchTeamDetails();
-  }, [teamId]);
+  }, [team_id]);
 
   const handleSendMessage = async (e: any) => {
     e.preventDefault();
@@ -90,14 +103,16 @@ const ChattingPage: React.FC<Props> = ({ teamId }: Props) => {
       };
 
       try {
-        const messagesCollection = collection(
-          db,
-          "teamsChat",
-          teamId,
-          "messages"
-        );
-        await addDoc(messagesCollection, newMessage);
-        setMessageInput("");
+        if (team_id) {
+          const messagesCollection = collection(
+            db,
+            "teamsChat",
+            team_id,
+            "messages"
+          );
+          await addDoc(messagesCollection, newMessage);
+          setMessageInput("");
+        }
       } catch (error) {
         console.error("Error sending message:", error);
       }

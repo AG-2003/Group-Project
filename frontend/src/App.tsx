@@ -22,7 +22,6 @@ import Teams from "./components/Dashboard/Teams";
 import Trash from "./pages/Trash";
 // import TeamDetails from "./components/Teams/TeamDetails";
 import QuickChat from "./pages/Chat";
-import Social from "./pages/Social";
 
 function App() {
   return (
@@ -45,10 +44,9 @@ function App() {
         <Route path="/Projects" element={<Projects />} />
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />
-        <Route path="/Teams" element={<Trash />} />
+        <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
         <Route path="/Sheet" element={<Spreadsheet />} />;
-        <Route path="/Social" element={<Social />} />
       </Route>
     </Routes>
   );

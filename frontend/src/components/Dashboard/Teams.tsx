@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Box, Divider, Flex } from "@chakra-ui/react";
 import JoinedTeams from "../Teams/JoinedTeams";
-import TeamDetails from "../Teams/TeamDetails"; // Import the TeamDetails component
-import TeamsChat from "../Teams/TeamsChat";
 import CreateJoin from "../Teams/CreateJoin";
 import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
@@ -81,25 +79,10 @@ const Teams = () => {
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
     <Flex direction="column" height="100vh" p={8}>
-      {/* Conditionally render either JoinedTeams or TeamDetails based on currentTeamId */}
-
-      {currentTeamId ? (
-        <>
-          {inChat ? (
-            <TeamsChat teamId={currentTeamId} />
-          ) : (
-            <TeamDetails
-              teamId={currentTeamId}
-              onChatsClick={handleChatClick}
-            />
-          )}
-        </>
-      ) : (
-        <>
-          <CreateJoin />
-          <JoinedTeams onTeamClick={handleTeamClick} />
-        </>
-      )}
+      <>
+        <CreateJoin />
+        <JoinedTeams />
+      </>
     </Flex>
         </Box>
       </Box>
