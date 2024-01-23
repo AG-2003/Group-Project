@@ -15,7 +15,7 @@ import Whiteboard from "./pages/Whiteboard";
 import Spreadsheet from "./pages/Spreadsheet";
 
 import "draft-js/dist/Draft.css";
-import QuickChat from "./pages/QuickChat";
+import QuickChat from "./pages/Chat";
 
 function App() {
   return (

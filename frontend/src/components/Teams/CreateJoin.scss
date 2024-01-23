@@ -17,7 +17,7 @@
   justify-content: center;
   text-align: center;
   width: 138px; // Adjust width as needed
-  height: 150px; // Adjust height as needed
+  height: 160px; // Adjust height as needed
   padding: 10px;
   border: 1px solid #E2E8F0; // Use the color from the image border
   border-radius: 8px;
@@ -40,10 +40,11 @@
 
   .team-info {
     h2 {
-      font-size: 16px; // Adjust font-size to match the image
+      font-size: 18px; // Adjust font-size to match the image
       color: inherit; // Use the color from the image text
+      font-weight: 500;
       margin-top: 8px;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
 
     p {

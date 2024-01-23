@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
-import CreateJoin from "../components/Teams/CreateJoin";
-import JoinedTeams from "../components/Teams/JoinedTeams";
+import CreateJoin from "../Teams/CreateJoin";
+import JoinedTeams from "../Teams/JoinedTeams";
 
 const Teams = () => {
   return (
