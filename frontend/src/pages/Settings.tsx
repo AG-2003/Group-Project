@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import SideBar from "../components/Settings_/SideBar";
+import SideBar from "../components/Settings_/sideBar";
 import Account from "../components/Settings_/account";
 import Security from "../components/Settings_/security";
 import Preference from "../components/Settings_/preference";
