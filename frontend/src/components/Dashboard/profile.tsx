@@ -181,7 +181,7 @@ const Profile: React.FC = () => {
             <Flex className="profile-body">
               {/* The commented out sections can be replaced with your components */}
               {/* <DashboardSection title="Your Teams" items={teams} />
-        <DashboardSection title="Your Communities" items={communities} /> */}
+              <DashboardSection title="Your Communities" items={communities} /> */}
             </Flex>
           </div>
         </Box>
