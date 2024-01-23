@@ -17,6 +17,9 @@ import Spreadsheet from "./pages/Spreadsheet";
 import "draft-js/dist/Draft.css";
 import QuickChat from "./pages/QuickChat";
 import Projects from "./components/Dashboard/projects";
+import Profile from "./components/Dashboard/profile";
+import Teams from "./pages/Teams";
+import Trash from "./pages/Trash";
 
 function App() {
   return (
@@ -35,8 +38,11 @@ function App() {
         <Route path="/chat" element={<QuickChat />} />;
         <Route path="/doc/*" element={<Doc />} />
         <Route path="/Board" element={<Whiteboard />} />;
-        <Route path="/Sheet" element={<Spreadsheet />} />;
+        <Route path="/Sheet" element={<Spreadsheet />} />;{/* ---- */}
         <Route path="/Projects" element={<Projects />} />
+        <Route path="/Home" element={<Profile />} />
+        <Route path="/Teams" element={<Teams />} />
+        <Route path="/Teams" element={<Trash />} />
       </Route>
     </Routes>
   );

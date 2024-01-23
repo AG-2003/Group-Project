@@ -15,11 +15,11 @@ import Social from "./Social";
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const [currentComponent, setCurrentComponent] = useState("Profile");
+  // const [currentComponent, setCurrentComponent] = useState("Profile");
 
-  const handleButtonClick = (component: string) => {
-    setCurrentComponent(component);
-  };
+  // const handleButtonClick = (component: string) => {
+  //   setCurrentComponent(component);
+  // };
 
   // Variants for Framer Motion animation
   const sidebarVariants = {
@@ -53,19 +53,19 @@ const Dashboard: React.FC = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar onButtonClick={handleButtonClick} />
+              <SideBar />
             </motion.div>
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          {currentComponent == "Profile" && <Profile />}
-          {currentComponent == "Projects" && <Projects />}
+          {/* {currentComponent == "Profile" && <Profile />}
+          {currentComponent == "Projects" && <Projects />} */}
           {/* {currentComponent == "Templates" && <Templates />} */}
-          {currentComponent == "Teams" && <Teams />}
+          {/* {currentComponent == "Teams" && <Teams />} */}
           {/* {currentComponent == "Calls" && <Calls />} */}
           {/* {currentComponent == "Calendar" && <Calendar />} */}
-          {currentComponent == "Social" && <Social />}
-          {currentComponent == "Trash" && <Trash />}
+          {/* {currentComponent == "Social" && <Social />} */}
+          {/* {currentComponent == "Trash" && <Trash />} */}
         </Box>
       </Box>
     </>
