@@ -1,4 +1,12 @@
-import { Avatar, Box, Button, Flex, Input, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  Input,
+  Text,
+} from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../../firebase-config";
 import {
@@ -69,7 +77,8 @@ const ChattingPage: React.FC<Props> = ({ teamId }: Props) => {
     fetchTeamDetails();
   }, [teamId]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (e: any) => {
+    e.preventDefault();
     if (messageInput.trim() !== "") {
       const newMessage: Message = {
         id: Date.now().toString(),
@@ -137,13 +146,15 @@ const ChattingPage: React.FC<Props> = ({ teamId }: Props) => {
 
       {/* Text Input Bar */}
       <Flex className="text-input-bar">
-        <Input
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-          placeholder="Type your message..."
-        />
-        <Button onClick={handleSendMessage}>Send</Button>
-        <Button>Send File</Button>
+        <FormControl as="form" onSubmit={handleSendMessage}>
+          <Input
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            placeholder="Type your message..."
+          />
+          <Button onClick={handleSendMessage}>Send</Button>
+          <Button>Send File</Button>
+        </FormControl>
       </Flex>
     </Box>
   );

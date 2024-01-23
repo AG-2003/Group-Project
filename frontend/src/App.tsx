@@ -33,7 +33,7 @@ function App() {
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
       <Route element={<ProtectedRoutes />}>
-        <Route path="/index" element={<Dashboard />} />
+        <Route path="/index" element={<Profile />} />
         <Route path="/Settings" element={<Settings />} />
         <Route path="/chat" element={<QuickChat />} />;
         <Route path="/doc/*" element={<Doc />} />
