@@ -28,8 +28,6 @@ export function LoginPasswordForm() {
   const [isPwdIncorrect, setIsPwdIncorrect] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
 
-
-
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -52,8 +50,8 @@ export function LoginPasswordForm() {
       .catch((err) => {
         console.log(err.message);
         setIsPwdIncorrect(true);
-        setFailedAttempts(prev => prev + 1); // Increment failed attempts
-        console.log(failedAttempts)
+        setFailedAttempts((prev) => prev + 1); // Increment failed attempts
+        console.log(failedAttempts);
         alert(err.code);
       });
   }
@@ -95,7 +93,7 @@ export function LoginPasswordForm() {
 
           <InputGroup>
             <Input
-              className={`pwd-input ${isPwdIncorrect ? 'input-incorrect' : ''}`}
+              className={`pwd-input ${isPwdIncorrect ? "input-incorrect" : ""}`}
               placeholder="Enter password"
               type={showPwd ? "text" : "password"}
               value={pwd}
@@ -125,8 +123,10 @@ export function LoginPasswordForm() {
             Continue
           </Button>
 
-          <Text className={`forgot ${failedAttempts > 3 ? 'incorrect-input' : ''}`}
-            onClick={handleRecoveryEmailSubmission}>
+          <Text
+            className={`forgot ${failedAttempts > 3 ? "incorrect-input" : ""}`}
+            onClick={handleRecoveryEmailSubmission}
+          >
             Forgot Password?
           </Text>
         </FormControl>

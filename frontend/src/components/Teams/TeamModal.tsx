@@ -303,6 +303,7 @@ interface TeamData {
   role: string;
   members: string[];
   image: string | null; // Store image URL instead of File
+  chatId: string;
 }
 
 interface Props {
@@ -456,10 +457,11 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const saveTeamToFirestore = async () => {
     try {
       // get the user
-      const username = user?.email;
+      const userMail = user?.email;
+      const chatID = teamName.toLowerCase().replace(/\s+/g, "-163146");
 
       // create the team
-      if (username) {
+      if (userMail) {
         const newTeam: TeamData = {
           id: teamName.toLowerCase().replace(/\s+/g, "-93217"),
           name: teamName,
@@ -467,13 +469,17 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
           role: teamRole,
           members: emailInputs.filter((email) => email.trim() !== ""),
           image: null, // Initialize with null value
+          chatId: chatID,
         };
 
         // go to the firestore and into the collection "teams" and into that specific team
         const teamDocRef = doc(db, "teams", newTeam.id);
 
         // go to the firstore and into the collection users and into that specific user
-        const DocRef = doc(db, "users", username);
+        const DocRef = doc(db, "users", userMail);
+
+        // go to the firestore and into collection "teamsChat" and into that specific chat
+        const chatDocRef = doc(db, "teamsChat", newTeam.chatId);
 
         // wait for response
         const docSnapshot = await getDoc(teamDocRef);
@@ -491,6 +497,21 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
         await updateDoc(DocRef, {
           teams: [...(userDocSnapshot.data()?.teams || []), newTeam.id],
         });
+
+        await setDoc(chatDocRef, { messages: [] });
+
+        // for invite
+        for (const email of newTeam.members) {
+          const memberDocRef = doc(db, "users", email);
+          const memberDocSnapshot = await getDoc(memberDocRef);
+
+          if (memberDocSnapshot.exists()) {
+            // Add the team to the user's teams array
+            await updateDoc(memberDocRef, {
+              teams: [...(memberDocSnapshot.data()?.teams || []), newTeam.id],
+            });
+          }
+        }
 
         if (image) {
           // If an image is selected, upload it to Firebase Storage

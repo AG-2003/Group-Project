@@ -4,20 +4,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
 import Projects from "../components/Dashboard/projects";
 import Profile from "../components/Dashboard/profile";
+<<<<<<< HEAD
 import SideBar from "../components/Dashboard/Sidebar";
+=======
+import SideBar from "../components/Dashboard/sidebar";
+>>>>>>> 59567ddce9f383dd0861cfcc100048f3398eb216
 // import Trash from "./Trash";
-import Trash from "../components/Trash/TrashAlt";
+import Trash from "../components/Trash/trashAlt";
 // import TeamsAlt from "../components/Teams/TeamsAlt";
-// import InsideTeam from "../components/Teams/InsideTeam";
 import Teams from "../components/Dashboard/Teams";
+import Social from "./Social";
+// import InsideTeam from "../components/Teams/InsideTeam";
+// import Teams from "../components/Dashboard/Teams";
 
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [currentComponent, setCurrentComponent] = useState("Profile");
 
-  const handleButtonClick = (component: string) => {
-    setCurrentComponent(component);
-  };
+  // const [currentComponent, setCurrentComponent] = useState("Profile");
+
+  // const handleButtonClick = (component: string) => {
+  //   setCurrentComponent(component);
+  // };
 
   // Variants for Framer Motion animation
   const sidebarVariants = {
@@ -51,20 +58,19 @@ const Dashboard: React.FC = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar onButtonClick={handleButtonClick} />
+              <SideBar />
             </motion.div>
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          {currentComponent === "Profile" && <Profile />}
-          {currentComponent === "Projects" && <Projects />}
-          {/* {currentComponent === "Templates" && <Templates />} */}
-          {currentComponent === "Teams" && <Teams />}
-          {/* {currentComponent === "Details" && <TeamDetails />} */}
-          {/* {currentComponent === "Calls" && <Calls />} */}
-          {/* {currentComponent === "Calendar" && <Calendar />} */}
-          {/* {currentComponent === "Social" && <Social />} */}
-          {currentComponent === "Trash" && <Trash />}
+          {/* {currentComponent == "Profile" && <Profile />}
+          {currentComponent == "Projects" && <Projects />} */}
+          {/* {currentComponent == "Templates" && <Templates />} */}
+          {/* {currentComponent == "Teams" && <Teams />} */}
+          {/* {currentComponent == "Calls" && <Calls />} */}
+          {/* {currentComponent == "Calendar" && <Calendar />} */}
+          {/* {currentComponent == "Social" && <Social />} */}
+          {/* {currentComponent == "Trash" && <Trash />} */}
         </Box>
       </Box>
     </>
