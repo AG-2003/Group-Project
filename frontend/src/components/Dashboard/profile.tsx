@@ -21,8 +21,6 @@ const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-<<<<<<< HEAD
-=======
   const sidebarVariants = {
     open: { width: "200px" },
     closed: { width: "0px" },
@@ -31,7 +29,6 @@ const Profile: React.FC = () => {
   // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
->>>>>>> 59567ddce9f383dd0861cfcc100048f3398eb216
   const [userDescription, setUserDescription] = useState<string>("");
 
   useEffect(() => {
@@ -56,26 +53,6 @@ const Profile: React.FC = () => {
   }, []);
 
   return (
-<<<<<<< HEAD
-    <div className="profile-container">
-      <Flex className="profile-header">
-        <Flex className="profile-info">
-          <Avatar
-            className="profile-avatar"
-            src={userProfile.photoURL || "fallback_image_url"}
-            name={userProfile.displayName}
-            borderRadius="10%" // Adjust this value as needed
-          />
-          <Box className="profile-text">
-            <Text className="profile-name">
-              {userProfile.displayName || auth.currentUser?.displayName}
-            </Text>
-            <Text className="profile-description">
-              <p style={{ color: "black" }}>{userDescription}</p>
-            </Text>
-          </Box>
-        </Flex>
-=======
     <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
         <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
@@ -144,7 +121,6 @@ const Profile: React.FC = () => {
                 <Badge className="badge">11 Communities</Badge>
                 <Badge className="badge">4 Awards</Badge>
               </Stack>
->>>>>>> 59567ddce9f383dd0861cfcc100048f3398eb216
 
               <Button className="leaderboard-button">Leaderboard</Button>
             </Flex>
@@ -152,16 +128,11 @@ const Profile: React.FC = () => {
               {/* The commented out sections can be replaced with your components */}
               {/* <DashboardSection title="Your Teams" items={teams} />
         <DashboardSection title="Your Communities" items={communities} /> */}
-<<<<<<< HEAD
-      </Flex>
-    </div>
-=======
             </Flex>
           </div>
         </Box>
       </Box>
     </>
->>>>>>> 59567ddce9f383dd0861cfcc100048f3398eb216
   );
 };
 
