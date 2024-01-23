@@ -5,6 +5,9 @@ import "./Canvas.scss";
 import { FaRegSquare, FaRegCircle, FaSlash, FaRegStar } from "react-icons/fa";
 import { FiTriangle } from "react-icons/fi";
 import { BsArrowUpRight } from "react-icons/bs";
+import { doc, setDoc, collection, getDoc } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, db } from "../../firebase-config";
 
 type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
 type Shape =
@@ -36,6 +39,14 @@ interface RectangleType {
   width: number;
   height: number;
   fill: string;
+}
+
+interface BoardData{
+  id: string;
+  title: string;
+  lines: string;
+  texts: string;
+  rectangles: string;
 }
 
 const colors = [
@@ -132,7 +143,36 @@ function isShape(tool: string): tool is Shape {
   return ["rectangle", "circle", "line"].includes(tool);
 }
 
-const Canvas: React.FC = () => {
+//Added because delaying is preferred
+function debounce(
+  func: (...args: any[]) => void,
+  wait: number
+): (...args: any[]) => void {
+  let timeout: NodeJS.Timeout | null;
+
+  return function executedFunction(...args: any[]): void {
+    const later = () => {
+      if (timeout !== null) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      func(...args);
+    };
+
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(later, wait);
+  };
+}
+
+//Define a Props interface
+interface Props {
+  documentId: string;
+  documentTitle: string;
+}
+
+const Canvas: React.FC<Props> = ({ documentTitle, documentId }: Props) => {
   const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
   const [size, setSize] = useState<number>(5); // Default stroke size
@@ -150,6 +190,107 @@ const Canvas: React.FC = () => {
     useState<RectangleType | null>(null);
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
   const [showShapeMenu, setShowShapeMenu] = useState(false);
+
+  //---------------Store the serialized data-----------------
+  const [serializedLinesData, setSerializedLinesData] = useState('')
+  const [serializedTextsData, setSerializedTextsData] = useState('')
+  const [serializedRectanglesData, setSerializedRectanglesData] = useState('')
+
+  useEffect(() => {
+    /*
+      *lines-> to store what is written by the pen in the toolbar
+      *texts-> text from toolbar
+      *rectangles-> a part of the 'shapes' on the toolbar
+    */
+    setSerializedLinesData(JSON.stringify(lines))
+    setSerializedTextsData(JSON.stringify(texts))
+    setSerializedRectanglesData(JSON.stringify(rectangles))
+
+  }, [lines, texts, rectangles]); // This effect runs whenever user changes the board
+  //____________________________________________________________
+
+
+
+  //---------------Function to save the document to the database----------------
+  const [user] = useAuthState(auth)
+
+  useEffect(() => {
+    const username = user?.email
+    if(username){
+      const dataArray = [serializedLinesData, serializedTextsData, serializedRectanglesData]
+
+      debouncedSaveBoardToFirestore(
+        username,
+        documentId,
+        documentTitle,
+        dataArray
+      )
+    }
+  }, [serializedLinesData, serializedTextsData, serializedRectanglesData, documentTitle])
+
+
+  const saveBoardToFirestore = async (
+    username: string,
+    boardId: string,
+    boardTitle: string,
+    data: [string, string, string]
+  ) => {
+    try {
+      const userDocRef = doc(collection(db, "users"), username);
+      // Get the current document to see if there are existing documents
+      const docSnapshot = await getDoc(userDocRef);
+      let boardsArray: BoardData[] = [];
+
+      if (docSnapshot.exists()) {
+        // Get the existing documents array or initialize it if it doesn't exist
+        boardsArray = docSnapshot.data().boards || [];
+      }
+
+      // Check if the document with the given ID already exists
+      const existingBoardIndex = boardsArray.findIndex(
+        (board: BoardData) => board.id === boardId
+      );
+
+      if (existingBoardIndex !== -1) {
+        // Update the existing document's title and content
+        boardsArray[existingBoardIndex] = {
+          id: boardId,
+          title: boardTitle,
+          lines: data[0],
+          texts: data[1],
+          rectangles: data[2]
+        };
+      } else {
+        // Add a new document with a unique ID
+        boardsArray.push({
+          id: boardId,
+          title: boardTitle,
+          lines: data[0],
+          texts: data[1],
+          rectangles: data[2]
+        });
+      }
+
+      // Update the user's document with the new or updated documents array
+      await setDoc(
+        userDocRef,
+        {
+          boards: boardsArray,
+        },
+        { merge: true }
+      );
+      console.log("Document saved successfully");
+    } catch (error) {
+      console.error("Error saving document:", error);
+    }
+  };
+
+  const debouncedSaveBoardToFirestore = debounce(
+    saveBoardToFirestore,
+    5000 // Delay in milliseconds
+  );
+  //____________________________________________________________
+
 
   const toggleColorPicker = () => {
     const newShowColorPicker = !showColorPicker;

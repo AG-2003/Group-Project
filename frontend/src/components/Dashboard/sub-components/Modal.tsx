@@ -51,6 +51,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Modal.css";
+import { v4 as uuidv4 } from 'uuid';
 
 interface ModalProps {
   isOpen: boolean;
@@ -65,20 +66,20 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, modalType }) => {
   if (!isOpen) return null;
 
   const handleOkClick = () => {
+    const uniqueID = uuidv4()
     // Depending on the modal type, navigate to different routes
     switch (modalType) {
       case "Doc":
-        navigate("/doc", {state: {title}});
+        navigate(`/doc/?id=${encodeURIComponent(uniqueID)}&title=${encodeURIComponent(title)}`);
         break;
       case "Slide":
-        navigate("/slides");
-        break;
+        navigate("/slides", {state: {title, uniqueID}});
         break;
       case "Spreadsheet":
-        navigate("/sheet");
+        navigate("/sheet", {state: {title, uniqueID}});
         break;
       case "Whiteboard":
-        navigate("/board");
+        navigate("/board", {state: {title, uniqueID}});
         break;
       default:
         // Default action or error handling

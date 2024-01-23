@@ -15,21 +15,22 @@ import { useState } from "react";
 interface Props {
   isSidebarOpen: boolean;
   onToggle: () => void;
+  documentTitle: string;
+  setDocumentTitle: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
-  const [title, setTitle] = useState("Untitled");
+const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const iconStyle = {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
   };
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
+    setDocumentTitle(e.target.value);
   };
   const handleBlur = () => {
-    if (title.trim() === "") {
-      setTitle("Untitled");
+    if (documentTitle.trim() === "") {
+      setDocumentTitle("Untitled");
     }
   };
 
@@ -56,7 +57,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
       <div className="title-area">
         <input
           className="title-input"
-          value={title}
+          value={documentTitle}
           onChange={handleTitleChange}
           onBlur={handleBlur}
           placeholder="Untitled"
