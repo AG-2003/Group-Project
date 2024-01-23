@@ -231,7 +231,6 @@
 // };
 
 // export default TeamsPage;
-
 import React from "react";
 
 const TeamsAlt = () => {

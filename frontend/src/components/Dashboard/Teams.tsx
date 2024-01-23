@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { Box, Divider, Flex } from "@chakra-ui/react";
-import JoinedTeams from "../components/Teams/JoinedTeams";
-import TeamDetails from "../components/Teams/TeamDetails"; // Import the TeamDetails component
-import TeamsChat from "../components/Teams/TeamsChat";
-import CreateJoin from "../components/Teams/CreateJoin";
-import Navbar from "../components/Dashboard/Navbar";
+import JoinedTeams from "../Teams/JoinedTeams";
+import TeamDetails from "../Teams/TeamDetails"; // Import the TeamDetails component
+import TeamsChat from "../Teams/TeamsChat";
+import CreateJoin from "../Teams/CreateJoin";
+import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
-import SideBar from "../components/Dashboard/sidebar";
+import SideBar from "../Dashboard/sidebar";
+
+// import CreateJoin from "../Teams/CreateJoin";
+// import JoinedTeams from "../Teams/JoinedTeams";
 
 const Teams = () => {
   const [currentTeamId, setCurrentTeamId] = useState<string | null>(null);

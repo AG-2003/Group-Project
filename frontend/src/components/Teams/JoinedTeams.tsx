@@ -169,6 +169,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 import { doc, getDoc, DocumentData } from "firebase/firestore";
 import "./JoinedTeams.scss"; // Update the import as per your CSS file
+import { useNavigate } from "react-router-dom";
 
 interface Team {
   id: string;
@@ -188,6 +189,7 @@ const JoinedTeams: React.FC<JoinedTeamsProps> = ({
 }: JoinedTeamsProps) => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [user] = useAuthState(auth);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -226,6 +228,11 @@ const JoinedTeams: React.FC<JoinedTeamsProps> = ({
   const handleCardClick = (teamId: string) => {
     // Use the onTeamClick prop to notify the parent component
     onTeamClick(teamId);
+    // navigate("/in_team/:param1", {
+    //   state: {
+    //     param1: teamId,
+    //   },
+    // });
   };
 
   return (

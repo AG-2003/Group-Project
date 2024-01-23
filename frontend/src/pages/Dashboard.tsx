@@ -8,10 +8,11 @@ import SideBar from "../components/Dashboard/sidebar";
 // import Trash from "./Trash";
 import Trash from "../components/Trash/trashAlt";
 // import TeamsAlt from "../components/Teams/TeamsAlt";
-import Teams from "./Teams";
+import Teams from "../components/Dashboard/Teams";
 import Social from "./Social";
+// import InsideTeam from "../components/Teams/InsideTeam";
+// import Teams from "../components/Dashboard/Teams";
 
-// meow
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 

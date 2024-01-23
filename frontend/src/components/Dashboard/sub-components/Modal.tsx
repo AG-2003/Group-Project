@@ -70,16 +70,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, modalType }) => {
     // Depending on the modal type, navigate to different routes
     switch (modalType) {
       case "Doc":
-        navigate(`/doc/?id=${encodeURIComponent(uniqueID)}&title=${encodeURIComponent(title)}`);
+        navigate(`/doc/?id=${encodeURIComponent(uniqueID)}`, { state: { title} });
         break;
       case "Slide":
-        navigate("/slides", {state: {title, uniqueID}});
+        navigate("/slides", { state: { title, uniqueID } });
         break;
       case "Spreadsheet":
-        navigate("/sheet", {state: {title, uniqueID}});
+        navigate(`/sheet/?id=${encodeURIComponent(uniqueID)}`, { state: { title} });
         break;
       case "Whiteboard":
-        navigate("/board", {state: {title, uniqueID}});
+        navigate(`/board/?id=${encodeURIComponent(uniqueID)}`, { state: { title} });
         break;
       default:
         // Default action or error handling

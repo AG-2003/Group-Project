@@ -1,81 +1,4 @@
-// import { Flex, Text, Badge, Stack, Avatar, Button } from "@chakra-ui/react";
-// import { auth } from "../../firebase-config";
-// import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
-
-// const Profile = () => {
-//   const teams = [
-//     { name: "Group Name", members: 3, description: "Description" },
-//     { name: "Group Name", members: 4, description: "Description" },
-//     // ... more teams
-//   ];
-
-//   const communities = [
-//     { name: "Group Name", members: 3, description: "Description" },
-//     { name: "Group Name", members: 4, description: "Description" },
-//     // ... more communities
-//   ];
-
-//   const userProfile = UseUserProfilePic();
-
-//   return (
-//     <div>
-//       <Flex
-//         justifyContent="space-between"
-//         alignItems="center"
-//         p={5}
-//         bg="#dcdcf6"
-//         rounded={15}
-//       >
-//         <Flex align="center" p={3}>
-//           <Avatar ml={3} src={userProfile.photoURL || 'fallback_image_url'} name={userProfile.displayName} />
-//           <Text fontSize="25" ml={8}>
-//             {auth.currentUser?.displayName}
-//           </Text>
-//         </Flex>
-
-//         <Stack direction="row" spacing={4}>
-//           <Badge
-//             fontSize="1em"
-//             p={2}
-//             bg="#8587bf"
-//             color="white"
-//             borderRadius="md"
-//           >
-//             7 Projects
-//           </Badge>
-//           <Badge
-//             fontSize="1em"
-//             p={2}
-//             bg="#8587bf"
-//             color="white"
-//             borderRadius="md"
-//           >
-//             11 Communities
-//           </Badge>
-//           <Badge
-//             fontSize="1em"
-//             p={2}
-//             bg="#8587bf"
-//             color="white"
-//             borderRadius="md"
-//           >
-//             4 Awards
-//           </Badge>
-//         </Stack>
-
-//         <Button colorScheme="purple">Leaderboard</Button>
-//       </Flex>
-//       <Flex direction="column" p={5}>
-//         {/* <DashboardSection title="Your Teams" items={teams} />
-//         <DashboardSection title="Your Communities" items={communities} /> */}
-//       </Flex>
-//     </div>
-//   );
-// };
-
-// export default Profile;
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Flex,
   Text,
@@ -86,12 +9,13 @@ import {
   Box,
   Divider,
 } from "@chakra-ui/react";
-import { auth } from "../../firebase-config";
+import { auth, db } from "../../firebase-config";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
 import "./Profile.scss"; // Make sure this path is correct
 import Navbar from "./Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "./sidebar";
+import { doc, getDoc } from "firebase/firestore";
 
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
@@ -104,6 +28,29 @@ const Profile: React.FC = () => {
 
   // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const [userDescription, setUserDescription] = useState<string>("");
+
+  useEffect(() => {
+    const fetchDescription = async () => {
+      if (auth.currentUser) {
+        const userRef = doc(db, "users", auth.currentUser.email as string);
+        try {
+          const docSnap = await getDoc(userRef);
+          if (docSnap.exists() && docSnap.data().desc) {
+            setUserDescription(docSnap.data().desc);
+          } else {
+            setUserDescription("No description set.");
+          }
+        } catch (error) {
+          console.error("Error fetching user description:", error);
+          setUserDescription("Failed to fetch description.");
+        }
+      }
+    };
+
+    fetchDescription();
+  }, []);
 
   return (
     <>
@@ -164,8 +111,7 @@ const Profile: React.FC = () => {
                     {userProfile.displayName || auth.currentUser?.displayName}
                   </Text>
                   <Text className="profile-description">
-                    {/* {userProfile.desc || "Description"} */}
-                    <p>Description</p>
+                    <p style={{ color: "black" }}>{userDescription}</p>
                   </Text>
                 </Box>
               </Flex>

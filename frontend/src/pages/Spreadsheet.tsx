@@ -4,10 +4,11 @@ import NavBar from "../components/Spreadsheet/NavBar";
 import { useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 
-const Whiteboard: React.FC = () => {
+const Spreadsheet: React.FC = () => {
   const location = useLocation();
-  const initialTitle = location.state?.title || 'Untitled';
-  const uniqueID = location.state?.uniqueID || uuidv4();
+  const params = new URLSearchParams(location.search);
+  const uniqueID = decodeURIComponent(params.get('id') || '');
+  const initialTitle = location.state?.title||'Untitled';
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [documentTitle, setDocumentTitle] = useState(initialTitle);
 
@@ -22,11 +23,12 @@ const Whiteboard: React.FC = () => {
         setDocumentTitle={setDocumentTitle}
       />
       <Sheet
-        documentTitle={documentTitle}
-        documentId={uniqueID}
+        suiteTitle={documentTitle}
+        suiteId={uniqueID}
+        setSuiteTitle={setDocumentTitle}
       />
     </div>
   );
 };
 
-export default Whiteboard;
+export default Spreadsheet;

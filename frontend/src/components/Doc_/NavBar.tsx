@@ -10,6 +10,7 @@ import {
   IoShareOutline,
 } from "react-icons/io5";
 import "./NavBar.scss";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   isSidebarOpen: boolean;
@@ -22,6 +23,7 @@ interface Props {
 
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
   const iconStyle = {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
@@ -45,7 +47,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
         colorScheme="purple.100"
       />
       <div className="nav-items">
-        <div className="nav-item">Home</div>
+        <button className="nav-item" onClick={() => { navigate(-1) }}>Home</button>
         <div className="nav-item">File</div>
         <div className="nav-item">Edit</div>
         <div className="nav-item">View</div>

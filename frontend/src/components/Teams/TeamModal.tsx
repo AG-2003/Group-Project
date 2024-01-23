@@ -264,7 +264,14 @@
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+} from "firebase/firestore";
 import {
   Flex,
   Heading,
@@ -450,11 +457,11 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const saveTeamToFirestore = async () => {
     try {
       // get the user
-      const username = user?.email;
+      const userMail = user?.email;
       const chatID = teamName.toLowerCase().replace(/\s+/g, "-163146");
 
       // create the team
-      if (username) {
+      if (userMail) {
         const newTeam: TeamData = {
           id: teamName.toLowerCase().replace(/\s+/g, "-93217"),
           name: teamName,
@@ -469,7 +476,7 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
         const teamDocRef = doc(db, "teams", newTeam.id);
 
         // go to the firstore and into the collection users and into that specific user
-        const DocRef = doc(db, "users", username);
+        const DocRef = doc(db, "users", userMail);
 
         // go to the firestore and into collection "teamsChat" and into that specific chat
         const chatDocRef = doc(db, "teamsChat", newTeam.chatId);
