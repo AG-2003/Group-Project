@@ -124,8 +124,6 @@ export function SignUpPasswordForm() {
           <Button isDisabled={checkPwd} className="auth-button" type="submit">
             Continue
           </Button>
-
-          <Text className="forgot">Haven't recieved email ? Resend.</Text>
         </FormControl>
       </VStack>
       <Box className="empty-stack"></Box>
