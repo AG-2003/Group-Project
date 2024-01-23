@@ -4005,6 +4005,11 @@
   dependencies:
     "@zag-js/dom-query" "0.16.0"
 
+"@zegocloud/zego-uikit-prebuilt@^1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@zegocloud/zego-uikit-prebuilt/-/zego-uikit-prebuilt-1.10.0.tgz#3607e572eb8be353721cdd267d7f7f49c17b986b"
+  integrity sha512-Gv4ao1JQXcrCOL8jg09VJd6/pFz2mmY444EjeN36jXXx7Plo73nXUZFcjJQpealM+tyEy5LJZeGTKOOmd03zwA==
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.6"
   resolved "https://registry.npmjs.org/abab/-/abab-2.0.6.tgz"
@@ -6916,6 +6921,11 @@ human-signals@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/human-signals/-/human-signals-2.1.0.tgz"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
+
+i@^0.3.7:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/i/-/i-0.3.7.tgz#2a7437a923d59c14b17243dc63a549af24d85799"
+  integrity sha512-FYz4wlXgkQwIPqhzC5TdNMLSE5+GS1IIDJZY/1ZiEPCT2S3COUVZeT5OW4BmW4r5LHLQuOosSwsvnroG9GR59Q==
 
 iconv-lite@0.4.24:
   version "0.4.24"
@@ -11937,3 +11947,8 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zego-superboard-web@2.14.1:
+  version "2.14.1"
+  resolved "https://registry.yarnpkg.com/zego-superboard-web/-/zego-superboard-web-2.14.1.tgz#214ffca8e605369161acc8a7be3e266780302914"
+  integrity sha512-598RBjjXeB8BToNXhKxQ3/07MOV818q2oD3f2w0EKceMZacAXfBuGeIGpYHBBCaRZruru2GSX1fYI0oK9EoMYg==

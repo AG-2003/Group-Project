@@ -3,18 +3,16 @@ import { Divider, Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
 import Projects from "../components/Dashboard/projects";
-import Profile from "../components/Dashboard/profile";
-import SideBar from "../components/Dashboard/sidebar";
+import Profile from "../components/Dashboard/Profile";
+import SideBar from "../components/Dashboard/Sidebar";
 // import Trash from "./Trash";
-import Trash from "../components/Trash/trashAlt";
+import Trash from "../components/Trash/TrashAlt";
 // import TeamsAlt from "../components/Teams/TeamsAlt";
-import InsideTeam from "../components/Teams/insideTeam";
-import Teams from "./Teams";
+// import InsideTeam from "../components/Teams/InsideTeam";
+import Teams from "../components/Dashboard/Teams";
 
-// meow
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
   const [currentComponent, setCurrentComponent] = useState("Profile");
 
   const handleButtonClick = (component: string) => {
@@ -58,18 +56,15 @@ const Dashboard: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          {currentComponent == "Profile" && <Profile />}
-          {currentComponent == "Projects" && <Projects />}
-          {/* {currentComponent == "Templates" && <Templates />} */}
-          {currentComponent == "Teams" && (
-            // <TeamsAlt onButtonClick={handleButtonClick} />
-            <Teams />
-          )}
-          {currentComponent == "inTeam" && <InsideTeam />}
-          {/* {currentComponent == "Calls" && <Calls />} */}
-          {/* {currentComponent == "Calendar" && <Calendar />} */}
-          {/* {currentComponent == "Social" && <Social />} */}
-          {currentComponent == "Trash" && <Trash />}
+          {currentComponent === "Profile" && <Profile />}
+          {currentComponent === "Projects" && <Projects />}
+          {/* {currentComponent === "Templates" && <Templates />} */}
+          {currentComponent === "Teams" && <Teams />}
+          {/* {currentComponent === "Details" && <TeamDetails />} */}
+          {/* {currentComponent === "Calls" && <Calls />} */}
+          {/* {currentComponent === "Calendar" && <Calendar />} */}
+          {/* {currentComponent === "Social" && <Social />} */}
+          {currentComponent === "Trash" && <Trash />}
         </Box>
       </Box>
     </>

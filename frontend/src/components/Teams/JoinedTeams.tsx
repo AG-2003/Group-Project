@@ -1,3 +1,78 @@
+// import React, { useEffect, useState } from "react";
+// import { useAuthState } from "react-firebase-hooks/auth";
+// import { auth, db } from "../../firebase-config";
+// import { doc, getDoc, DocumentData } from "firebase/firestore";
+// import { useNavigate } from "react-router-dom";
+// import "./JoinedTeams.scss"; // Update the import as per your CSS file
+
+// interface Team {
+//   id: string;
+//   name: string;
+//   description: string;
+//   role: string;
+//   members: string[];
+//   image: string | null; // Add the image field
+// }
+
+// const JoinedTeams: React.FC = () => {
+//   const [teams, setTeams] = useState<Team[]>([]);
+//   const [user] = useAuthState(auth);
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const fetchTeams = async () => {
+//       if (user?.email) {
+//         const userDocRef = doc(db, "users", user.email);
+//         const userDocSnapshot = await getDoc(userDocRef);
+
+//         if (userDocSnapshot.exists()) {
+//           const userData = userDocSnapshot.data() as DocumentData;
+//           const userTeams = userData.teams || [];
+//           setTeams(userTeams);
+//         }
+//       }
+//     };
+
+//     fetchTeams();
+//   }, [user]);
+
+//   // Function to handle click on a team card
+//   const handleCardClick = (teamId: string) => {
+//     // Navigate to the TeamDetails route with the teamId as a route parameter
+//     navigate(`/team/${teamId}`);
+//   };
+
+//   return (
+//     <div className="teams-container">
+//       <div className="heading-container">
+//         <h2 className="heading">Your Teams</h2>
+//       </div>
+//       <div className="teams-list">
+//         {teams.map((team) => (
+//           <div
+//             key={team.id}
+//             className="team-card"
+//             onClick={() => handleCardClick(team.id)}
+//           >
+//             {team.image && (
+//               <img src={team.image} alt={team.name} className="team-image" />
+//             )}
+//             <h3 className="team-name">{team.name}</h3>
+//             <p className="team-description">{team.description}</p>
+//           </div>
+//         ))}
+//         {teams.length === 0 && (
+//           <div className="no-team-message-container">
+//             <p className="message">You are not in any teams.</p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default JoinedTeams;
+
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
@@ -11,9 +86,10 @@ interface Team {
   description: string;
   role: string;
   members: string[];
+  image: string | null; // Add the image field
 }
 
-const Teams: React.FC = () => {
+const JoinedTeams: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
@@ -27,7 +103,23 @@ const Teams: React.FC = () => {
         if (userDocSnapshot.exists()) {
           const userData = userDocSnapshot.data() as DocumentData;
           const userTeams = userData.teams || [];
-          setTeams(userTeams);
+
+          // Fetch team details from "teams" collection based on team IDs
+          const teamsPromises = userTeams.map(async (teamId: string) => {
+            const teamDocRef = doc(db, "teams", teamId);
+            const teamDocSnapshot = await getDoc(teamDocRef);
+            return teamDocSnapshot.exists() ? teamDocSnapshot.data() : null;
+          });
+
+          // Wait for all promises to resolve
+          const teamsData = await Promise.all(teamsPromises);
+
+          // Filter out null values (teams that do not exist)
+          const validTeams = teamsData.filter(
+            (team) => team !== null
+          ) as Team[];
+
+          setTeams(validTeams);
         }
       }
     };
@@ -37,7 +129,7 @@ const Teams: React.FC = () => {
 
   // Function to handle click on a team card
   const handleCardClick = (teamId: string) => {
-    // Navigate to the team details page with the teamId
+    // Navigate to the TeamDetails route with the teamId as a route parameter
     navigate(`/team/${teamId}`);
   };
 
@@ -53,9 +145,11 @@ const Teams: React.FC = () => {
             className="team-card"
             onClick={() => handleCardClick(team.id)}
           >
+            {team.image && (
+              <img src={team.image} alt={team.name} className="team-image" />
+            )}
             <h3 className="team-name">{team.name}</h3>
             <p className="team-description">{team.description}</p>
-            <p className="team-role">{team.role}</p>
           </div>
         ))}
         {teams.length === 0 && (
@@ -68,4 +162,4 @@ const Teams: React.FC = () => {
   );
 };
 
-export default Teams;
+export default JoinedTeams;
