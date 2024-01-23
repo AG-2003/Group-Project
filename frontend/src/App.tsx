@@ -6,7 +6,7 @@ import { ForgotPassword } from "./pages/Auth/ForgotPassword";
 import { SignUpEmail } from "./pages/Auth/SignUpEmail";
 import { SignUpPassword } from "./pages/Auth/SignUpPassword";
 import { NewPassword } from "./pages/Auth/NewPassword";
-import Dashboard from "./pages/Dashboard";
+// import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import ProtectedRoutes from "./RoutingSecurity/ProtectedRoutes";
@@ -15,7 +15,13 @@ import Whiteboard from "./pages/Whiteboard";
 import Spreadsheet from "./pages/Spreadsheet";
 
 import "draft-js/dist/Draft.css";
-import QuickChat from "./pages/QuickChat";
+// import QuickChat from "./pages/QuickChat";
+import Projects from "./components/Dashboard/projects";
+import Profile from "./components/Dashboard/profile";
+import Teams from "./components/Dashboard/Teams";
+import Trash from "./pages/Trash";
+// import TeamDetails from "./components/Teams/TeamDetails";
+import QuickChat from "./pages/Chat";
 
 function App() {
   return (
@@ -29,11 +35,17 @@ function App() {
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
       <Route element={<ProtectedRoutes />}>
-        <Route path="/index" element={<Dashboard />} />
+        <Route path="/index" element={<Profile />} />
         <Route path="/Settings" element={<Settings />} />
         <Route path="/chat" element={<QuickChat />} />;
         <Route path="/doc/*" element={<Doc />} />
         <Route path="/Board" element={<Whiteboard />} />;
+        <Route path="/Sheet" element={<Spreadsheet />} />;{/* ---- */}
+        <Route path="/Projects" element={<Projects />} />
+        <Route path="/Home" element={<Profile />} />
+        <Route path="/Teams" element={<Teams />} />
+        <Route path="/Teams" element={<Trash />} />
+        <Route path="/board/*" element={<Whiteboard />} />;
         <Route path="/Sheet" element={<Spreadsheet />} />;
       </Route>
     </Routes>

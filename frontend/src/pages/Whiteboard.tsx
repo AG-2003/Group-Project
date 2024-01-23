@@ -5,11 +5,15 @@ import NavBar from "../components/Whiteboard/NavBar";
 
 import { useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
+import { documentId } from "firebase/firestore";
+
+
 
 const Whiteboard: React.FC = () => {
   const location = useLocation();
-  const initialTitle = location.state?.title || 'Untitled';
-  const uniqueID = location.state?.uniqueID || uuidv4();
+  const params = new URLSearchParams(location.search);
+  const uniqueID = decodeURIComponent(params.get('id') || '');
+  const initialTitle = location.state?.title||'Untitled';
   const [documentTitle, setDocumentTitle] = useState(initialTitle);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -23,8 +27,9 @@ const Whiteboard: React.FC = () => {
         setDocumentTitle={setDocumentTitle}
       />
       <Canvas
-        documentTitle={documentTitle}
-        documentId={uniqueID}
+        suiteId={uniqueID}
+        suiteTitle={documentTitle}
+        setSuiteTitle={setDocumentTitle}
       />
     </div>
   );
