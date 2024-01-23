@@ -9,7 +9,7 @@ export const UseUserProfilePic = () => {
         if (auth.currentUser && auth.currentUser.photoURL) {
             setUserProfile({
                 photoURL: auth.currentUser.photoURL, // This can be string or null
-                displayName: auth.currentUser.displayName || ''
+                displayName: auth.currentUser.displayName || '',
             });
         }
 
