@@ -8,12 +8,38 @@ import {
   Button,
   Box,
 } from "@chakra-ui/react";
-import { auth } from "../../firebase-config";
+import { auth, db } from "../../firebase-config";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
 import "./Profile.scss"; // Make sure this path is correct
+import { doc, getDoc } from "firebase/firestore";
 
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
+
+  const [userDescription, setUserDescription] = useState<string>('');
+
+  useEffect(() => {
+    const fetchDescription = async () => {
+      if (auth.currentUser) {
+        const userRef = doc(db, "users", auth.currentUser.email as string);
+        try {
+          const docSnap = await getDoc(userRef);
+          if (docSnap.exists() && docSnap.data().desc) {
+            setUserDescription(docSnap.data().desc);
+          } else {
+            setUserDescription('No description set.');
+          }
+        } catch (error) {
+          console.error("Error fetching user description:", error);
+          setUserDescription('Failed to fetch description.');
+        }
+      }
+    };
+
+    fetchDescription();
+  }, []);
+
+
 
   return (
     <div className="profile-container">
@@ -30,8 +56,8 @@ const Profile: React.FC = () => {
               {userProfile.displayName || auth.currentUser?.displayName}
             </Text>
             <Text className="profile-description">
-              {/* {userProfile.description || "Your Description"} */}
-              <p>Description</p>
+
+              <p style={{ color: 'black' }}>{userDescription}</p>
             </Text>
           </Box>
         </Flex>
@@ -49,7 +75,7 @@ const Profile: React.FC = () => {
         {/* <DashboardSection title="Your Teams" items={teams} />
         <DashboardSection title="Your Communities" items={communities} /> */}
       </Flex>
-    </div>
+    </div >
   );
 };
 
