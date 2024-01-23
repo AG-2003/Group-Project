@@ -7,37 +7,42 @@ import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 import { debounce } from "../../utils/Time";
-import { parse } from "path";
 
 
-interface SheetData {
-  // id: string; // Unique identifier for each sheet
-  title: string;
-  name: string;
-  data: string; // Array of cell data for the sheet
-  // Add other properties as needed
-}
+
+
 
 interface Sheet {
   id: string;
-  title: string
-  content: SheetData
-  type: string
-  lastEdited: string
+  title: string;
+  content: string
+  type: string;
+  lastEdited: string;
 }
+
 
 
 const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: SuiteProps) => {
   // State to hold workbook data
-  const [workbookData, setWorkbookData] = useState([{ data: [], id: '', name: '', status: 0 }]); // add type
+  const [workbookData, setWorkbookData] = useState([{
+    data: [], // assuming this represents cell data for one sheet
+    name: 'Sheet1', // default name for a new sheet
+    // include any other required properties according to the Fortune Sheet SDK
+  }]);
   const [serializedData, setSerializedData] = useState<string>('');
-  // const [isLoading, setIsLoading] = useState(true); // New loading state
+
 
 
   const settings = {
     // Initial data for the workbook
-    data: workbookData,
+
+    // Initial data for the workbook, ensure it matches the Sheet[] type
+    data: workbookData.map(sheet => ({
+      ...sheet, // spread the existing properties
+      name: sheet.name || 'Default Sheet Name', // ensure there's a name property
+    })),
     onChange: (data: any) => {
+      // Your onChange handler
       setWorkbookData(data);
     },
     toolbarItems: [
@@ -79,18 +84,17 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
   // Use useEffect to call saveDocumentToFirestore whenever the value changes
 
   useEffect(() => {
-    setSerializedData(JSON.stringify(workbookData[0]));
-    console.log(serializedData)
-  }, [workbookData[0]]);
+    setSerializedData(JSON.stringify(workbookData));
+    console.log('CHECK', serializedData);
+  }, [workbookData]);
 
   useEffect(() => {
     const userEmail = user?.email;
     if (userEmail) {
       const newWorkbookData = {
-        ...workbookData[0],
-        data: serializedData
+        serializedData
       };
-
+      console.log(`this is the workbook data being sent to firebase: ${newWorkbookData}`);
       debouncedSaveSheetToFirestore(
         userEmail,
         suiteId,
@@ -104,7 +108,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     userEmail: string,
     suiteId: string,
     sheetTitle: string,
-    data: SheetData
+    data: string
   ) => {
     try {
       const userDocRef = doc(collection(db, "users"), userEmail);
@@ -131,6 +135,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
           id: suiteId,
           title: sheetTitle,
           content: data,
+          lastEdited: now
         };
       } else {
         // Add a new sheet with a unique ID
@@ -164,54 +169,52 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
   //___________________________________
 
 
-//---------------Function to save the Sheet to firebase---------
-useEffect(() => {
-  const userEmail = user?.email;
-  if (userEmail) {
-    // fetchSheetFromFirestore(userEmail, suiteId);
-  }
-}, [user, suiteId]); // Dependencies array includes user and suiteId
+  //---------------Function to save the Sheet to firebase---------
+  useEffect(() => {
+    const userEmail = user?.email;
+    if (userEmail) {
+      fetchSheetFromFirestore(userEmail, suiteId);
+    }
+  }, [user, suiteId]); // Dependencies array includes user and suiteId
 
-// const fetchSheetFromFirestore = async (userEmail: string, sheetId: string) => {
-//   try {
-//     const userDocRef = doc(db, "users", userEmail);
-//     const docSnapshot = await getDoc(userDocRef);
-//     if (docSnapshot.exists()) {
-//       const userData = docSnapshot.data();
-//       if (userData && userData.sheets) {
-//         const sheetsArray: Sheet[] = userData.sheets;
-//         const sheet = sheetsArray.find(sheet => sheet.id === sheetId);
-//         if (sheet) {
-//           // Assuming the content property of the sheet is the serialized data
-//           const sheetContent = JSON.parse(sheet.content.data);
-//           setWorkbookData(sheetContent); // Update the state with the sheet content
-//           setSuiteTitle(sheet.title); // Update the state with the sheet title
-//           setIsLoading(false); // Set loading to false after data is loaded
-//         } else {
-//           console.error("No sheet found with the given ID:", sheetId);
-//           setIsLoading(false);
-//         }
-//       } else {
-//         console.error("User data does not contain 'sheets' property:", userData);
-//         setIsLoading(false);
-//       }
-//     } else {
-//       console.error("No document found for the user:", userEmail);
-//       setIsLoading(false);
-//     }
-//   } catch (error) {
-//     console.error("Error fetching sheet from Firestore:", error);
-//     setIsLoading(false);
-//   }
-// };
-//_______________________________________________
+  const fetchSheetFromFirestore = async (userEmail: string, suiteId: string) => {
+    try {
+      const userDocRef = doc(db, "users", userEmail);
+      const docSnapshot = await getDoc(userDocRef);
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        if (userData && userData.sheets) {
+          const sheetsArray: Sheet[] = userData.sheets;
+          const sheet = sheetsArray.find(sheet => sheet.id === suiteId);
+          if (sheet && sheet.content) {
+            setSuiteTitle(sheet.title); // Update the state with the sheet title
+            // Parse the serialized data to get the workbook data
+            const workbookObject = JSON.parse(sheet.content);
+            // const workbookDataArray = workbookObject.data;
+            console.log(`this is the workBook data array: ${workbookObject}`);
+            setWorkbookData(workbookObject);
+
+
+          } else {
+            console.error("No sheet found with the given ID or missing content:", suiteId);
+          }
+        } else {
+          console.error("User data does not contain 'sheets' property:", userData);
+        }
+      } else {
+        console.error("No document found for the user:", userEmail);
+      }
+    } catch (error) {
+      console.error("Error fetching sheet from Firestore:", error);
+    }
+  };
+
+
+
+  //_______________________________________________
   return (
     <div className="containerSheet">
-      {/* {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        suiteId && <Workbook {...settings} />
-      )} */}
+
       <Workbook {...settings} />
     </div>
   );
