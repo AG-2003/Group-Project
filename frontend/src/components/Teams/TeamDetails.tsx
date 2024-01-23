@@ -86,6 +86,7 @@ import {
 import "./TeamDetails.scss"; // Import the SCSS file
 import { IoChatbubblesSharp } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
+import InvModal from "./InvModal";
 
 const TeamDetails: React.FC = () => {
   const [teamDetails, setTeamDetails] = useState<DocumentData | null>(null);
@@ -124,6 +125,17 @@ const TeamDetails: React.FC = () => {
     fetchTeamDetails();
   }, [team_id]);
 
+  // inv stuff
+  const [isInvModalOpen, setInvModalOpen] = useState(false);
+
+  const handleInvClick = () => {
+    setInvModalOpen(true);
+  };
+
+  const handleInvModalClose = () => {
+    setInvModalOpen(false);
+  };
+
   return (
     <div className="team-details-container">
       {teamDetails ? (
@@ -153,7 +165,9 @@ const TeamDetails: React.FC = () => {
           <Flex className="profile-body">
             <Flex className="top-titles">
               <Text className="projects-title">Projects</Text>
-              <button className="invite-button">Invite Members</button>
+              <button className="invite-button" onClick={handleInvClick}>
+                Invite Members
+              </button>
             </Flex>
             <p className="no-documents-message">There are no documents yet.</p>
           </Flex>
@@ -169,6 +183,12 @@ const TeamDetails: React.FC = () => {
           >
             <IoChatbubblesSharp />
           </div>
+
+          <InvModal
+            teamId={team_id}
+            isOpen={isInvModalOpen}
+            onClose={handleInvModalClose}
+          />
         </div>
       ) : (
         <p>Loading team details...</p>
