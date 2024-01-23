@@ -264,7 +264,14 @@
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+} from "firebase/firestore";
 import {
   Flex,
   Heading,

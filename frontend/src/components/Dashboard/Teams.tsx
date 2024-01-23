@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Flex } from "@chakra-ui/react";
-import JoinedTeams from "../components/Teams/JoinedTeams";
-import TeamDetails from "../components/Teams/TeamDetails"; // Import the TeamDetails component
-import TeamsChat from "../components/Teams/TeamsChat";
-import CreateJoin from "../components/Teams/CreateJoin";
+import JoinedTeams from "../Teams/JoinedTeams";
+import TeamDetails from "../Teams/TeamDetails"; // Import the TeamDetails component
+import TeamsChat from "../Teams/TeamsChat";
+import CreateJoin from "../Teams/CreateJoin";
+// import CreateJoin from "../Teams/CreateJoin";
+// import JoinedTeams from "../Teams/JoinedTeams";
 
 const Teams = () => {
   const [currentTeamId, setCurrentTeamId] = useState<string | null>(null);

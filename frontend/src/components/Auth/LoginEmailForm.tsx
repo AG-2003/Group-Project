@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import "./emailForm.scss";
-
 export function LoginEmailForm() {
   const [email, setEmail] = useState<string>("");
 
