@@ -13,7 +13,7 @@ import {
   signInWithRedirect,
   AuthError,
 } from "firebase/auth";
-import { setDoc, doc, DocumentData } from "firebase/firestore";
+import { setDoc, doc, DocumentData, getDoc } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
 import "./loginForm.scss";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -52,15 +52,21 @@ export function LoginForm() {
   const saveUser = async (user: User) => {
     if (user != null) {
       const userRef = doc(db, "users", user.email as string);
-      setDoc(userRef, {
-        email: user?.email,
-        emailVerified: user?.emailVerified,
-        displayName: user.displayName,
-        desc: null,
-        userType: "",
-        userTheme: "light",
-        photoURL: user.photoURL,
-      } as DocumentData);
+      // Check if the user document already exists
+      const docSnapshot = await getDoc(userRef);
+      if (!docSnapshot.exists()) {
+        // User document does not exist, create a new one
+        await setDoc(userRef, {
+          email: user.email,
+          emailVerified: user.emailVerified,
+          displayName: user.displayName,
+          desc: null,
+          userType: "",
+          userTheme: "light",
+          photoURL: user.photoURL,
+        } as DocumentData);
+      }
+      // If the document exists, the user is already in the database, so you can proceed with the login
     }
   };
 
