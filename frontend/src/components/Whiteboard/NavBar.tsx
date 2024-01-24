@@ -65,7 +65,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
           placeholder="Untitled"
           aria-label="Document Title"
         />
-        <span className="doc-extension">.doc</span>
+        <span className="doc-extension">.board</span>
       </div>
       <div className="action-buttons">
         <Tooltip
