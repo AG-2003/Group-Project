@@ -52,7 +52,7 @@ function App() {
         <Route path="/Sheet" element={<Spreadsheet />} />;
         <Route path="/Teams/In_teams/:team_id" element={<TeamDetails />} />
         <Route path="/In_teams/chat/:team_id" element={<TeamsChat />} />
-        <Route path="/Calls" element={<Call />} />
+        <Route path="/meeting" element={<Call />} />
       </Route>
     </Routes>
   );

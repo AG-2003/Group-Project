@@ -7,7 +7,7 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { auth, db } from "../../firebase-config";
 import {
   collection,
@@ -22,7 +22,9 @@ import {
 } from "firebase/firestore";
 import "./TeamsChat.scss";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+// import { FaFilePdf } from "react-icons/fa";
 
 interface Message {
   id: string;
@@ -37,6 +39,9 @@ const ChattingPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState("");
   const [user] = useAuthState(auth);
+  const history = useNavigate();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   let { team_id } = useParams();
   console.log("Team ID:", team_id);
@@ -119,6 +124,103 @@ const ChattingPage: React.FC = () => {
     }
   };
 
+  const handleSendFile = async () => {
+    // Trigger the file input dialog
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      try {
+        if (team_id) {
+          const storage = getStorage();
+          const storagePath = `teamFiles/${team_id}/${file.name}`;
+          const fileRef = ref(storage, storagePath);
+          await uploadBytes(fileRef, file);
+
+          const downloadURL = await getDownloadURL(fileRef);
+
+          const newMessage: Message = {
+            id: Date.now().toString(),
+            text: downloadURL, // Use downloadURL as the message text for file sharing
+            userId: user?.email,
+            timestamp: serverTimestamp(),
+            userPic: user?.photoURL,
+            userName: user?.displayName,
+          };
+
+          const messagesCollection = collection(
+            db,
+            "teamsChat",
+            team_id,
+            "messages"
+          );
+
+          await addDoc(messagesCollection, newMessage);
+        }
+      } catch (error) {
+        console.error("Error sending file:", error);
+      }
+    }
+  };
+
+  function randomID(len: number) {
+    let result = "";
+    if (result) return result;
+    var chars =
+        "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
+      maxPos = chars.length,
+      i;
+    len = len || 5;
+    for (i = 0; i < len; i++) {
+      result += chars.charAt(Math.floor(Math.random() * maxPos));
+    }
+    return result;
+  }
+
+  // Function to start the call
+  const handleStartCall = () => {
+    // Generate the roomID and construct the meeting link
+    const roomID = randomID(5);
+    const meetingLink =
+      window.location.protocol +
+      "//" +
+      window.location.host +
+      "/meeting?roomID=" +
+      roomID;
+
+    // Navigate to the Zoom meeting page
+    history(`/meeting?roomID=${roomID}`);
+
+    // Now you can send the meeting link to the chat or use it as needed
+    // For example, you can add a new message to the chat
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      text: meetingLink,
+      userId: user?.email,
+      timestamp: serverTimestamp(),
+      userPic: user?.photoURL,
+      userName: user?.displayName,
+    };
+
+    // Add the new message to the chat
+    if (team_id) {
+      const messagesCollection = collection(
+        db,
+        "teamsChat",
+        team_id,
+        "messages"
+      );
+      addDoc(messagesCollection, newMessage);
+    }
+  };
+
   return (
     <Box className="chatting-page">
       {/* Team Header */}
@@ -132,7 +234,9 @@ const ChattingPage: React.FC = () => {
         <Text className="team-name">
           {teamDetails ? teamDetails.name : "fallback_image_url"}
         </Text>
-        <Button className="call-button">Start a call</Button>
+        <Button className="call-button" onClick={handleStartCall}>
+          Start a call
+        </Button>
       </Flex>
 
       {/* Chat Area */}
@@ -154,7 +258,41 @@ const ChattingPage: React.FC = () => {
                 borderRadius="50%"
               />
             )}
-            <Text className="message-text">{message.text}</Text>
+            {/* Rendering logic for different types of messages */}
+            {message.text.startsWith(
+              "https://firebasestorage.googleapis.com"
+            ) ? (
+              // It's a file message
+              <Box
+                bg={
+                  message.userId === user?.email
+                    ? "sent-message"
+                    : "recieved-message"
+                }
+                p={4}
+                borderRadius="lg"
+                maxW="300px" // Adjust the maximum width as needed
+              >
+                <a
+                  href={message.text}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src={message.text}
+                    alt="File Preview"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "150px",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </a>
+              </Box>
+            ) : (
+              // It's a text message
+              <Text className="message-text">{message.text}</Text>
+            )}
           </Flex>
         ))}
       </Box>
@@ -168,7 +306,13 @@ const ChattingPage: React.FC = () => {
             placeholder="Type your message..."
           />
           <Button onClick={handleSendMessage}>Send</Button>
-          <Button>Send File</Button>
+          <Button onClick={handleSendFile}>Send File</Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileInputChange}
+          />
         </FormControl>
       </Flex>
     </Box>
