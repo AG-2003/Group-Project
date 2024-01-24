@@ -157,9 +157,11 @@ const TeamDetails: React.FC = () => {
             </Flex>
 
             <Stack className="profile-stats">
-              <Badge className="badge">7 Projects</Badge>
-              <Badge className="badge">11 Communities</Badge>
-              <Badge className="badge">4 Awards</Badge>
+              <Badge className="badge">0 Projects</Badge>
+              <Badge className="badge">
+                {teamDetails.members.length + 1} Members
+              </Badge>
+              <Badge className="badge">0 Awards</Badge>
             </Stack>
           </Flex>
           <Flex className="profile-body">

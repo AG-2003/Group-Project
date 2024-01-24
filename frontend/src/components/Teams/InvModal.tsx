@@ -68,6 +68,10 @@ const InvModal: React.FC<Props> = ({ isOpen, onClose, teamId }: Props) => {
     }
   };
 
+  const quickClose = () => {
+    setEmailInputs([""]);
+  };
+
   const handleClose = () => {
     saveTeamToFirestore();
     onClose();
@@ -91,7 +95,7 @@ const InvModal: React.FC<Props> = ({ isOpen, onClose, teamId }: Props) => {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Invite your team</ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton onClick={quickClose} />
         <ModalBody>
           <Heading>Invite your team</Heading>
           <Text mb={4} marginTop={5} marginBottom={5}>

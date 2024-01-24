@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import JoinedTeams from "../Teams/JoinedTeams";
 import CreateJoin from "../Teams/CreateJoin";
