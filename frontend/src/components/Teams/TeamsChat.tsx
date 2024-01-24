@@ -24,6 +24,8 @@ import "./TeamsChat.scss";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams, useNavigate } from "react-router-dom";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import Linkify from "react-linkify";
+
 // import { FaFilePdf } from "react-icons/fa";
 
 interface Message {
@@ -291,7 +293,9 @@ const ChattingPage: React.FC = () => {
               </Box>
             ) : (
               // It's a text message
-              <Text className="message-text">{message.text}</Text>
+              <Text className="message-text">
+                <Linkify>{message.text}</Linkify>
+              </Text>
             )}
           </Flex>
         ))}
