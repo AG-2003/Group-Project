@@ -21,8 +21,8 @@ import {
 } from "react-icons/fa";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import SideBar from "../components/Settings_/sideBar";
 import Navbar from "../components/Dashboard/Navbar";
+import SideBar from "../components/Dashboard/sidebar";
 const DashboardSection = (title: string, items: any) => {
   return (
     <Box mt={10}>
@@ -91,9 +91,7 @@ const Social = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar onNavigate={function (arg: string): void {
-                throw new Error("Function not implemented.");
-              } } />
+              <SideBar />
             </motion.div>
           ) : (
             <motion.div
@@ -110,9 +108,7 @@ const Social = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar onNavigate={function (arg: string): void {
-                  throw new Error("Function not implemented.");
-                } } />
+              <SideBar />
             </motion.div>
           )}
         </AnimatePresence>
