@@ -364,6 +364,11 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
     }
   };
 
+  const quickClose = () => {
+    setEmailInputs([""]);
+    setPage(1);
+  };
+
   const handlePreviousPage = () => {
     setPage(page - 1);
   };
@@ -641,7 +646,7 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
         <ModalHeader>
           {page === 1 ? "Create your own team" : "Invite your team"}
         </ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton onClick={quickClose} />
         <ModalBody>{renderModalContent()}</ModalBody>
         <ModalFooter>
           {page !== 1 && (

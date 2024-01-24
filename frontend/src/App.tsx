@@ -23,6 +23,9 @@ import Trash from "./pages/Trash";
 import Social from "./pages/Social";
 // import TeamDetails from "./components/Teams/TeamDetails";
 import QuickChat from "./pages/Chat";
+import TeamDetails from "./components/Teams/TeamDetails";
+import TeamsChat from "./components/Teams/TeamsChat";
+import Call from "./pages/Call";
 
 function App() {
   return (
@@ -49,6 +52,9 @@ function App() {
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
         <Route path="/Sheet" element={<Spreadsheet />} />;
+        <Route path="/Teams/In_teams/:team_id" element={<TeamDetails />} />
+        <Route path="/In_teams/chat/:team_id" element={<TeamsChat />} />
+        <Route path="/Calls" element={<Call />} />
       </Route>
     </Routes>
   );
