@@ -3,7 +3,7 @@ import "@fortune-sheet/react/dist/index.css";
 import "./Sheet.scss";
 import { doc, setDoc, collection, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase-config";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 import { debounce } from "../../utils/Time";
@@ -26,14 +26,60 @@ interface Sheet {
 const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: SuiteProps) => {
   // State to hold workbook data
   const [workbookData, setWorkbookData] = useState([{
-    celldata: [],
     name: `${suiteTitle}`, // Default sheet name
+    id: '',
+    status: 0,
+    data: [],
+
   }]);
 
   console.log('this is the initial data \n')
   console.log(workbookData);
   const [serializedData, setSerializedData] = useState<string>('');
   const [user] = useAuthState(auth);
+
+
+  const settings = useMemo(() => ({
+    // Initial data for the workbook, ensure it matches the Sheet[] type
+    data: workbookData,
+    onChange: (data: any) => {
+      // Your onChange handler
+      // console.log('this is the data being saved to workbookData \n');
+      // console.log(data);
+      setWorkbookData(data);
+    },
+    toolbarItems: [
+      "undo",
+      "redo",
+      "format-painter",
+      "clear-format",
+      "currency-format",
+      "percentage-format",
+      "number-decrease",
+      "number-increase",
+      "format",
+      "font-size",
+      "bold",
+      "italic",
+      "strike-through",
+      "underline",
+      "font-color",
+      "background",
+      "border",
+      "merge-cell",
+      "horizontal-align",
+      "vertical-align",
+      "text-wrap",
+      "text-rotation",
+      "freeze",
+      "sort",
+      "image",
+      "comment",
+      "quick-formula",
+    ],
+  }), [setWorkbookData]
+  )
+
 
 
 
@@ -182,48 +228,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     }
   };
 
-  const settings = {
-    // Initial data for the workbook
 
-    // Initial data for the workbook, ensure it matches the Sheet[] type
-    data: workbookData,
-    onChange: (data: any) => {
-      // Your onChange handler
-      console.log('this is the data being saved to workbookData \n');
-      console.log(data);
-      setWorkbookData(data);
-    },
-    toolbarItems: [
-      "undo",
-      "redo",
-      "format-painter",
-      "clear-format",
-      "currency-format",
-      "percentage-format",
-      "number-decrease",
-      "number-increase",
-      "format",
-      "font-size",
-      "bold",
-      "italic",
-      "strike-through",
-      "underline",
-      "font-color",
-      "background",
-      "border",
-      "merge-cell",
-      "horizontal-align",
-      "vertical-align",
-      "text-wrap",
-      "text-rotation",
-      "freeze",
-      "sort",
-      "image",
-      "comment",
-      "quick-formula",
-    ],
-    // ... other settings
-  };
 
 
   //_______________________________________________
