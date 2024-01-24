@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 import { debounce } from "../../utils/Time";
+import { useInterval } from "@chakra-ui/react";
 
 
 
@@ -230,6 +231,10 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
       abortController.abort();
     };
   }, [user, fetchSheetFromFirestore]); // Dependencies array includes user and suiteId
+
+  useInterval(() => {
+    console.log('INTERVAL LOG', workbookData)
+  }, 1000);
 
 
   //_______________________________________________
