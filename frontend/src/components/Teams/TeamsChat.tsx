@@ -179,6 +179,7 @@ const ChattingPage: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
+          
     <Box className="chatting-page">
       {/* Team Header */}
       <Flex className="team-header">
