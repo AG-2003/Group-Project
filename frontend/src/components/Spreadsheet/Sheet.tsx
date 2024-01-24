@@ -143,6 +143,8 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     } catch (error) {
       console.error("Error saving document:", error);
     }
+
+    console.log('SAVED')
   }, []);
 
   const debouncedSaveSheetToFirestore = useMemo(() => debounce(
@@ -211,6 +213,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
 
           } else {
             console.error("No sheet found with the given ID or missing content:", suiteId);
+            setLoading(false);
           }
         } else {
           console.error("User data does not contain 'sheets' property:", userData);
