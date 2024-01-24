@@ -20,6 +20,7 @@ import Projects from "./components/Dashboard/projects";
 import Profile from "./components/Dashboard/profile";
 import Teams from "./components/Dashboard/Teams";
 import Trash from "./pages/Trash";
+import Social from "./pages/Social";
 // import TeamDetails from "./components/Teams/TeamDetails";
 import QuickChat from "./pages/Chat";
 
@@ -44,6 +45,7 @@ function App() {
         <Route path="/Projects" element={<Projects />} />
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />
+        <Route path="/Social" element={<Social />} />
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
         <Route path="/Sheet" element={<Spreadsheet />} />;
