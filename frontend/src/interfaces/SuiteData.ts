@@ -3,6 +3,6 @@ export interface SuiteData {
     content: string;
     title: string;
     lastEdited: string;
-    type: 'document' | 'sheet' | 'whiteboard' | 'powerpoint';
-
+    type: 'document' | 'sheet' | 'board' | 'powerpoint';
+    isTrash: boolean
 }

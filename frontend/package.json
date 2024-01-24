@@ -42,7 +42,7 @@
     "typescript": "^4.4.2",
     "uuid": "^9.0.1",
     "web-vitals": "^2.1.0",
-    "zego-superboard-web": "2.14.1"
+    "zego-superboard-web": "^2.15.1"
   },
   "scripts": {
     "start": "react-scripts start",
