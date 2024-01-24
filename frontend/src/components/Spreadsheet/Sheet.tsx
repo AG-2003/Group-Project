@@ -62,6 +62,8 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     status: 0,
   }]);
 
+  const [loading, setLoading] = useState(true);
+
   // // console.log('this is the initial data \n')
   // // console.log(workbookData);
   const [serializedData, setSerializedData] = useState<string>('');
@@ -90,6 +92,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     suiteTitle: string,
     data: string
   ) => {
+    console.log('SAVING')
     try {
       const userDocRef = doc(collection(db, "users"), userEmail);
       // Get the current sheet to see if there are existing documents
@@ -196,6 +199,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
                   celldata: item.data?.flatMap((d, i) => d.map((c, j) => c ? ({ r: i, c: j, v: c }) : null).filter(x => x != null)),
                 })) as SheetData[];
                 setWorkbookData(newWorkbookData);
+                setLoading(false);
                 console.log('THIS IS THE UPDATED WORKBOOK DATA AFTER FETCH');
               }
             } catch (error) {
@@ -232,10 +236,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     };
   }, [user, fetchSheetFromFirestore]); // Dependencies array includes user and suiteId
 
-  useInterval(() => {
-    console.log('INTERVAL LOG', workbookData)
-  }, 1000);
-
+  if (loading) return null;
 
   //_______________________________________________
   return (
