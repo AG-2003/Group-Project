@@ -138,7 +138,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     if (userEmail) {
       fetchSheetFromFirestore(userEmail);
     }
-  }, [user, suiteId]); // Dependencies array includes user and suiteId
+  }, [user]); // Dependencies array includes user and suiteId
 
   useEffect(() => {
     console.log('Updated workbookData:', workbookData);
