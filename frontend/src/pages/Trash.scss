@@ -1,0 +1,99 @@
+ .modal-content{
+  margin-bottom: 1rem;
+ }
+
+ .Image{
+  position: relative;
+  height: 70vh;
+ }
+ 
+ .tprojects-container {
+   margin-top: 1rem;
+
+   .tprojects-heading {
+     font-size: 2rem;
+     margin-bottom: 1.5rem;
+     font-weight: 600;
+     // text-align: center;
+   }
+
+   .tprojects-list {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+     gap: 1rem;
+     justify-content: center;
+   }
+
+   .tproject-card {
+     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+     color: white;
+     // border: 1px solid #ddd;
+     border-radius: 0.5rem;
+     width: 220px; // Set the card width to be smaller
+     margin: 1rem; // Adjust margin as needed for layout
+     overflow: hidden; // Ensure the border-radius is applied to child elements
+
+     .tcard-top {
+       background-size: cover;
+       background-position: center;
+      background-color: #8587bf;
+      //  color: white;
+       padding: 1rem;
+       position: relative;
+       // text-align: center;
+
+       .tproject-title {
+         font-size: 1.2rem;
+         margin: 0;
+        //  color: black;
+         // background-color: rgba(0, 0, 0, 0.5); // Optional: for better readability
+         // display: inline-block;
+        //  padding: 1rem 0.5rem;
+        margin-left: 10px;
+         border-radius: 0.25rem;
+         font-weight: 500;
+       }
+     }
+
+     .tcard-bottom {
+       padding: 1.5rem;
+       // background-color: #f8f8f8; // Lighter background for the bottom part
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       position: relative; // Relative positioning for the absolute trash icon
+
+       .icon-container{
+        display: "flex";
+        align-Items: "center";
+       }
+     }
+   }
+
+   .no-projects {
+     text-align: center;
+
+     .no-projects-title {
+       font-size: 1.25rem;
+       margin-bottom: 0.5rem;
+     }
+
+     .no-projects-text {
+       margin-bottom: 1rem;
+     }
+
+     .create-button {
+       background-color: #805ad5;
+       color: white;
+       padding: 0.5rem 1rem;
+       border: none;
+       border-radius: 0.25rem;
+       font-size: 1rem;
+       cursor: pointer;
+
+       &:hover {
+         background-color: #6b46c1;
+       }
+     }
+   }
+ }

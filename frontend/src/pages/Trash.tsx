@@ -1,29 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { Divider,
-             Box,
-             IconButton,
-             Icon,
-             Modal,
-             ModalOverlay,
-             ModalContent,
-             ModalHeader,
-             ModalBody,
-             ModalFooter,
-             ModalCloseButton,
-             Input,
-             Button,
-             Flex,
-             useDisclosure } from "@chakra-ui/react";
+import {
+  Divider,
+  Box,
+  IconButton,
+  Icon,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Button,
+  Flex,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
 import SideBar from "../components/Dashboard/sidebar";
 import { SuiteData } from "../interfaces/SuiteData";
-import { FaTrash, FaSync } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { auth, db } from "../firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { MdRestore } from "react-icons/md";
+import TrashBg from "../assets/TrashBg2.png";
+import "./Trash.scss";
 
-interface Project{
+interface Project {
   id: string;
   type: string;
 }
@@ -31,7 +35,9 @@ interface Project{
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [projects, setProjects] = useState<SuiteData[]>([]);
-  const [currentProjectToDelete, setCurrentProjectToDelete] = useState<Project>({id: "", type: ""});
+  const [currentProjectToDelete, setCurrentProjectToDelete] = useState<Project>(
+    { id: "", type: "" }
+  );
   const [user] = useAuthState(auth);
 
   // Variants for Framer Motion animation
@@ -63,12 +69,21 @@ const Dashboard: React.FC = () => {
           ...userPowerpoints,
         ];
 
-        combinedProjects = combinedProjects.filter((project: SuiteData) => project.isTrash)
+        combinedProjects = combinedProjects.filter(
+          (project: SuiteData) => project.isTrash
+        );
 
         setProjects(combinedProjects);
       }
     }
   };
+
+  // This will manage the disclosure of the warning modal
+  const {
+    isOpen: isWarningModalOpen,
+    onOpen: openWarningModal,
+    onClose: closeWarningModal,
+  } = useDisclosure({ defaultIsOpen: true }); // Automatically open the modal when the component mounts
 
   useEffect(() => {
     fetchProjects();
@@ -79,7 +94,7 @@ const Dashboard: React.FC = () => {
       const currentDate = new Date();
       const thirtyDaysInMilliseconds = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-      const projectsToDelete = projects.filter(project => {
+      const projectsToDelete = projects.filter((project) => {
         const projectDate = new Date(project.lastEdited);
         const timeDifference = currentDate.getTime() - projectDate.getTime();
         return timeDifference >= thirtyDaysInMilliseconds;
@@ -98,6 +113,11 @@ const Dashboard: React.FC = () => {
     deleteOldProjects();
     // Add dependencies to the useEffect if there are any other variables that should trigger this effect
   }, [projects]);
+
+  useEffect(() => {
+    // Open the warning modal when the page loads
+    openWarningModal();
+  }, [openWarningModal]);
 
   const stripHtml = (html: string): string => {
     // Create a new div element and set its innerHTML to the HTML string
@@ -127,7 +147,10 @@ const Dashboard: React.FC = () => {
     return `${hours12}:${formattedMinutes} ${amPm}, ${day}/${month}/${year}`;
   };
 
-  const handleTrashIconClick = async (id: string, type: string): Promise<void> => {
+  const handleTrashIconClick = async (
+    id: string,
+    type: string
+  ): Promise<void> => {
     const userEmail = user?.email;
     if (userEmail) {
       try {
@@ -137,7 +160,9 @@ const Dashboard: React.FC = () => {
           const userData = docSnapshot.data();
           const suiteTypePlural = `${type}s`; // Convert type to plural (e.g., 'document' to 'documents')
           let suitesArray: SuiteData[] = userData[suiteTypePlural] || [];
-          suitesArray = suitesArray.filter((suite: SuiteData) => suite.id !== id); // Remove the suite from the array
+          suitesArray = suitesArray.filter(
+            (suite: SuiteData) => suite.id !== id
+          ); // Remove the suite from the array
 
           // Update the user's document with the new suites array
           await setDoc(
@@ -145,7 +170,7 @@ const Dashboard: React.FC = () => {
             { [suiteTypePlural]: suitesArray },
             { merge: true }
           );
-          fetchProjects()
+          fetchProjects();
         }
       } catch (error) {
         console.error("Error deleting suite:", error);
@@ -153,7 +178,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleRecoveryIconClick = async (id: string, type: string): Promise<void> => {
+  const handleRecoveryIconClick = async (
+    id: string,
+    type: string
+  ): Promise<void> => {
     const userEmail = user?.email;
     if (userEmail) {
       try {
@@ -163,7 +191,9 @@ const Dashboard: React.FC = () => {
           const userData = docSnapshot.data();
           const suiteTypePlural = `${type}s`; // Convert type to plural (e.g., 'document' to 'documents')
           const suitesArray: SuiteData[] = userData[suiteTypePlural] || [];
-          const suiteIndex = suitesArray.findIndex((suite: SuiteData) => suite.id === id);
+          const suiteIndex = suitesArray.findIndex(
+            (suite: SuiteData) => suite.id === id
+          );
 
           if (suiteIndex !== -1) {
             suitesArray[suiteIndex].isTrash = false; // Set isTrash to false for the suite
@@ -174,8 +204,8 @@ const Dashboard: React.FC = () => {
               { [suiteTypePlural]: suitesArray },
               { merge: true }
             );
-            setCurrentProjectToDelete({id: "", type: ""})
-            fetchProjects()
+            setCurrentProjectToDelete({ id: "", type: "" });
+            fetchProjects();
           }
         }
       } catch (error) {
@@ -188,33 +218,48 @@ const Dashboard: React.FC = () => {
     isOpen: isModalOpen,
     onOpen: openModal,
     onClose: closeModal,
-   } = useDisclosure();
+  } = useDisclosure();
 
-   const setCurrentProjectState = (id: string, type: string) => {
-    setCurrentProjectToDelete({id: id, type: type})
-   }
+  const setCurrentProjectState = (id: string, type: string) => {
+    setCurrentProjectToDelete({ id: id, type: type });
+  };
 
   const handleConfirmClick = () => {
     // Perform your logic here
-    handleTrashIconClick(currentProjectToDelete["id"], currentProjectToDelete["type"])
+    handleTrashIconClick(
+      currentProjectToDelete["id"],
+      currentProjectToDelete["type"]
+    );
     // Access the current project using 'currentProjectToDelete'
-    console.log('Confirmed for project:', currentProjectToDelete);
+    console.log("Confirmed for project:", currentProjectToDelete);
 
-    fetchProjects()
+    fetchProjects();
 
-    closeModal()
+    closeModal();
   };
 
   useEffect(() => {
     // Code to run when the modal is opened
     if (!isModalOpen) {
       // Additional code to run when modal opens...
-      setCurrentProjectToDelete({id: "", type: ""})
+      setCurrentProjectToDelete({ id: "", type: "" });
     }
   }, [isModalOpen]);
 
   return (
     <>
+      <Modal isOpen={isWarningModalOpen} onClose={closeWarningModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Warning</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <p className="modal-content">
+              Projects stored here will automatically be deleted within 30 days.
+            </p>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <div style={{ padding: "10px", background: "#484c6c" }}>
         <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       </div>
@@ -241,82 +286,100 @@ const Dashboard: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          <div className="projects-container">
-            <h2 className="projects-heading">Recently Deleted</h2>
-            <h3 style={{marginBottom: "10px", color: "red"}}>Warning: Projects stored here will automatically be deleted within 30 days</h3>
-            <div className="projects-list">
-              {projects
-                .map((project: SuiteData) => (
+          <div className="tprojects-container">
+            <h2 className="tprojects-heading">Recently Deleted</h2>
+            {projects.length === 0 ? (
+              <Box textAlign="center" mt="20px">
+                <img className="Image" src={TrashBg} alt="No Projects" />
+              </Box>
+            ) : (
+              <div className="tprojects-list">
+                {projects.map((project: SuiteData) => (
                   <div
                     key={project.id}
-                    className="project-card"
-                    style={{ position: "relative", marginBottom: "20px" }} // Add this style
+                    className="tproject-card"
+                    style={{ position: "relative", marginBottom: "20px" }}
                   >
-                    <div>
-                    <IconButton
-                      icon={<Icon as={FaTrash} color='#484c6c'/>}
-                      size="sm"
-                      style={{ backgroundColor: 'transparent', borderColor: '#484c6c', borderWidth: '2px' }}
-                      position="absolute"
-                      top={2}
-                      right={2}
-                      transition="transform 0.3s ease-in-out"
-                      _hover={{ transform: "scale(1.1)" }}
-                      aria-label="Delete Project"
-                      onClick={() => {openModal(); setCurrentProjectState(project.id, project.type)}}
-                    />
-                    <IconButton
-                      icon={<Icon as={FaSync} color='#484c6c'/>}
-                      size="sm"
-                      style={{ backgroundColor: 'transparent', borderColor: '#484c6c', borderWidth: '2px' }}
-                      position="absolute"
-                      top={2}
-                      left={2}
-                      transition="transform 0.3s ease-in-out"
-                      _hover={{ transform: "scale(1.1)" }}
-                      aria-label="Delete Project"
-                      onClick={() => {handleRecoveryIconClick(project.id, project.type)}}
-                    />
+                    <div className="tcard-top">
+                      <h3 className="tproject-title">{project.title}</h3>
                     </div>
-                    <h3 className="project-title">{project.title}</h3>
-                    <p className="project-content">
-                      {typeof project.content === "string"
-                        ? stripHtml(project.content).substring(0, 20)
-                        : "No content available"}
-                      ...
-                    </p>
-                    <p className="last-edited">
-                      Last edited: {formatDate(project.lastEdited)}
-                    </p>
+                    <div className="tcard-bottom">
+                      <div
+                        className="icon-container"
+                        style={{
+                          position: "absolute",
+                          right: "2px",
+                        }}
+                      >
+                        <IconButton
+                          icon={<Icon as={MdRestore} color="#484c6c" />}
+                          size="sm"
+                          style={{
+                            backgroundColor: "transparent",
+                          }}
+                          transition="transform 0.3s ease-in-out"
+                          _hover={{ transform: "scale(1.1)" }}
+                          aria-label="Restore Project"
+                          onClick={() => {
+                            handleRecoveryIconClick(project.id, project.type);
+                          }}
+                        />
+                        <IconButton
+                          icon={<Icon as={FaTrash} color="#484c6c" />}
+                          size="sm"
+                          style={{
+                            backgroundColor: "transparent",
+                            marginRight: "8px", // Add margin to separate icons
+                          }}
+                          transition="transform 0.3s ease-in-out"
+                          _hover={{ transform: "scale(1.1)" }}
+                          aria-label="Delete Project"
+                          onClick={() => {
+                            openModal();
+                            setCurrentProjectState(project.id, project.type);
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
-                {projects.length === 0 && (
-                  <div className="no-projects">
-                    <h3 className="no-projects-title">There are no projects to be viewed here :)</h3>
-                  </div>
-              )}
-              <Modal isOpen={isModalOpen} onClose={closeModal} blockScrollOnMount={false} motionPreset="none" isCentered>
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalHeader>
-                    <ModalCloseButton onClick={closeModal} />
-                  </ModalHeader>
-                  <ModalBody>
-                    <p className="popup-text">Are you sure you would like to delete the project? This action may not be undone.</p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Flex justifyContent="space-between">
-                      <Button colorScheme="red" flex="1" mr={2} onClick={handleConfirmClick}>
-                        Confirm
-                      </Button>
-                      <Button flex="1" variant="outline" onClick={closeModal}>
-                        Deny
-                      </Button>
-                    </Flex>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-            </div>
+                <Modal
+                  isOpen={isModalOpen}
+                  onClose={closeModal}
+                  blockScrollOnMount={false}
+                  motionPreset="none"
+                  isCentered
+                >
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalHeader>
+                      <ModalCloseButton onClick={closeModal} />
+                    </ModalHeader>
+                    <ModalBody>
+                      <p className="popup-text">
+                        Are you sure you would like to delete the project? This
+                        action cannot be undone.
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Flex justifyContent="space-between">
+                        <Button
+                          colorScheme="red"
+                          flex="1"
+                          mr={2}
+                          onClick={handleConfirmClick}
+                        >
+                          Confirm
+                        </Button>
+                        <Button flex="1" variant="outline" onClick={closeModal}>
+                          Deny
+                        </Button>
+                      </Flex>
+                    </ModalFooter>
+                  </ModalContent>
+                </Modal>
+              </div>
+            )}
           </div>
         </Box>
       </Box>

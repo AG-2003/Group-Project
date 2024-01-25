@@ -41,7 +41,8 @@ function App() {
         <Route path="/chat" element={<QuickChat />} />
         <Route path="/doc/*" element={<Doc />} />
         <Route path="/Board" element={<Whiteboard />} />
-        <Route path="/Sheet" element={<Spreadsheet />} />{/* ---- */}
+        <Route path="/Sheet" element={<Spreadsheet />} />
+        {/* ---- */}
         <Route path="/Projects" element={<Projects />} />
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />

@@ -115,7 +115,7 @@ const Projects: React.FC = () => {
     switch (type) {
       case "document":
         return DocBg;
-      case "whiteboard":
+      case "board":
         return BoardBg;
       case "sheet":
         return SheetBg;
@@ -240,45 +240,6 @@ const Projects: React.FC = () => {
             <h2 className="projects-heading">Recent Designs</h2>
             <div className="projects-list">
               {projects.map((project: SuiteData) => (
-                // <div
-                //   key={project.id}
-                //   className="project-card"
-                //   onClick={() =>
-                //     handleCardClick(project.id, project.title, project.type)
-                //   }
-                //   style={{ position: "relative", marginBottom: "20px" }} // Add this style
-                // >
-                //   <div>
-                //     <IconButton
-                //       icon={<Icon as={FaTrash} color="#484c6c" />}
-                //       size="sm"
-                //       style={{
-                //         backgroundColor: "transparent",
-                //         borderColor: "#484c6c",
-                //         borderWidth: "2px",
-                //       }}
-                //       position="absolute"
-                //       top={2}
-                //       right={2}
-                //       transition="transform 0.3s ease-in-out"
-                //       _hover={{ transform: "scale(1.1)" }}
-                //       onClick={(event) =>
-                //         handleTrashIconClick(project.id, project.type, event)
-                //       }
-                //       aria-label="Delete Project"
-                //     />
-                //   </div>
-                //   <h3 className="project-title">{project.title}</h3>
-                //   <p className="project-content">
-                //       {typeof project.content === "string"
-                //         ? stripHtml(project.content).substring(0, 20)
-                //         : "No content available"}
-                //       ...
-                //     </p>
-                //   <p className="last-edited">
-                //     Last edited: {formatDate(project.lastEdited)}
-                //   </p>
-                // </div>
                 <div
                   key={project.id}
                   className="project-card"
@@ -299,7 +260,8 @@ const Projects: React.FC = () => {
                       Last edited: {formatDate(project.lastEdited)}
                     </p>
                     <IconButton
-                      icon={<Icon as={FaTrash} />}
+                      icon={<Icon as={FaTrash} color="#484c6c" />}
+                      size="sm"
                       aria-label="Delete Project"
                       className="delete-icon"
                       onClick={(event) => {
