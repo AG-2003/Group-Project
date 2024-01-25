@@ -17,30 +17,41 @@
 
       .project-card {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        // border: 1px solid #ddd;
         border-radius: 0.5rem;
         width: 250px; // Set the card width to be smaller
         margin: 1rem; // Adjust margin as needed for layout
         overflow: hidden; // Ensure the border-radius is applied to child elements
 
-        .card-top {
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 1rem;
-            position: relative;
-            // text-align: center;
-        
-            .project-title {
-              font-size: 1.5rem;
-              margin: 0;
-              // background-color: rgba(0, 0, 0, 0.5); // Optional: for better readability
-              // display: inline-block;
-              padding: 1rem 0.5rem;
-              border-radius: 0.25rem;
-              font-weight: 500;
-            }
+      .card-top {
+          background-size: cover;
+          background-position: center;
+          color: white;
+          position: relative;
+      
+          &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+            pointer-events: none;
+            z-index: 1;
           }
+      
+          .project-title {
+            font-size: 1.5rem;
+            margin-left: 5px;
+            padding: 0.5rem;
+            padding-top: 2.5rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 2; // Make sure this is higher than the ::after pseudo-element
+          }
+        }
 
         .card-bottom {
           padding: .75rem;
@@ -70,29 +81,44 @@
         }
       }
         
-                .no-projects {
-                  text-align: center;
-                  .no-projects-title {
-                      font-size: 1.25rem;
-                      margin-bottom: 0.5rem;
-                    }
-                  
-                    .no-projects-text {
-                      margin-bottom: 1rem;
-                    }
-                  
-                    .create-button {
-                      background-color: #805ad5;
-                      color: white;
-                      padding: 0.5rem 1rem;
-                      border: none;
-                      border-radius: 0.25rem;
-                      font-size: 1rem;
-                      cursor: pointer;
-                  
-                      &:hover {
-                        background-color: #6b46c1;
-                      }
-                    }
-                  }
-                }
+    .no-projects {
+      text-align: center;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.1); // Example shadow
+      border-radius: 1rem;
+      padding: 1rem;
+      height: 45%;
+
+      .no-projects-title {
+          font-size: 1.25rem;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+          // margin-top: 1rem;
+          
+        }
+      
+        .no-projects-text {
+          margin-bottom: 1rem;
+        }
+      
+        .create-button {
+          background-color: #805ad5;
+          color: white;
+          // padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 0.25rem;
+          font-size: 1rem;
+          cursor: pointer;
+          // margin-bottom: 1rem;
+      
+          &:hover {
+            background-color: #6b46c1;
+          }
+        }
+      }
+    }
+
+            .ProjImage {
+              height: 50vh;
+              position: relative;
+              top: 100px;
+            }

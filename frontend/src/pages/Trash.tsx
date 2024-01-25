@@ -25,6 +25,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { MdRestore } from "react-icons/md";
 import TrashBg from "../assets/TrashBg2.png";
+import ArchiveBg from "../assets/Archive.png";
 import "./Trash.scss";
 
 interface Project {
@@ -300,7 +301,10 @@ const Dashboard: React.FC = () => {
                     className="tproject-card"
                     style={{ position: "relative", marginBottom: "20px" }}
                   >
-                    <div className="tcard-top">
+                    <div
+                      className="tcard-top"
+                      style={{ backgroundImage: `url(${ArchiveBg})` }}
+                    >
                       <h3 className="tproject-title">{project.title}</h3>
                     </div>
                     <div className="tcard-bottom">

@@ -25,7 +25,7 @@ import Modal from "./sub-components/Modal";
 import DocBg from "../../assets/DocBg.png";
 import BoardBg from "../../assets/BoardBg.png";
 import SheetBg from "../../assets/SheetBg.png";
-
+import NoProj from "../../assets/ProjectsEmpty.png";
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<SuiteData[]>([]);
   const [user] = useAuthState(auth);
@@ -273,48 +273,53 @@ const Projects: React.FC = () => {
                 </div>
               ))}
               {projects.length === 0 && (
-                <div className="no-projects">
-                  <h3 className="no-projects-title">Don't have a design?</h3>
-                  <p className="no-projects-text">
-                    Create your first design now!
-                  </p>
-                  <Modal
-                    isOpen={modalType !== ""}
-                    onClose={closeModal}
-                    // onConfirm={handleConfirm}
-                    modalType={modalType}
-                  />
-                  <Menu>
-                    <MenuButton
-                      as={Button}
-                      colorScheme="purple"
-                      mr={4}
-                      size="sm"
-                    >
-                      Create a design
-                    </MenuButton>
-                    <MenuList>
-                      <MenuItem
-                        icon={<FiFileText />}
-                        onClick={() => openModal("Doc")}
+                <>
+                  <div className="no-projects">
+                    <h3 className="no-projects-title">Don't have a design?</h3>
+                    <p className="no-projects-text">
+                      Create your first design now!
+                    </p>
+                    <Modal
+                      isOpen={modalType !== ""}
+                      onClose={closeModal}
+                      // onConfirm={handleConfirm}
+                      modalType={modalType}
+                    />
+                    <Menu>
+                      <MenuButton
+                        as={Button}
+                        colorScheme="purple"
+                        mr={4}
+                        size="sm"
                       >
-                        Doc
-                      </MenuItem>
-                      <MenuItem
-                        icon={<FiGrid />}
-                        onClick={() => openModal("Spreadsheet")}
-                      >
-                        Spreadsheet
-                      </MenuItem>
-                      <MenuItem
-                        icon={<FiClipboard />}
-                        onClick={() => openModal("Whiteboard")}
-                      >
-                        Whiteboard
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                </div>
+                        Create a design
+                      </MenuButton>
+                      <MenuList>
+                        <MenuItem
+                          icon={<FiFileText />}
+                          onClick={() => openModal("Doc")}
+                        >
+                          Doc
+                        </MenuItem>
+                        <MenuItem
+                          icon={<FiGrid />}
+                          onClick={() => openModal("Spreadsheet")}
+                        >
+                          Spreadsheet
+                        </MenuItem>
+                        <MenuItem
+                          icon={<FiClipboard />}
+                          onClick={() => openModal("Whiteboard")}
+                        >
+                          Whiteboard
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </div>
+                  <Box textAlign="center" mt="20px">
+                    <img className="ProjImage" src={NoProj} alt="No Projects" />
+                  </Box>
+                </>
               )}
             </div>
           </div>
