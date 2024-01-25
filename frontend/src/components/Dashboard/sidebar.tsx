@@ -12,10 +12,6 @@ import { FaHouse } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  // const handleClick = (component: string) => {
-  //   onButtonClick(component);
-  // };
-
   const nav = useNavigate();
 
   return (
