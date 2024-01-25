@@ -191,9 +191,42 @@ const Projects: React.FC = () => {
   };
 
   return (
+<<<<<<< HEAD
+    <div className="projects-container">
+      <h2 className="projects-heading">Recent Designs</h2>
+      <div className="projects-list">
+        {projects.map((project: SuiteData) => (
+          <div
+            key={project.id}
+            className="project-card"
+            onClick={() =>
+              handleCardClick(project.id, project.title, project.type)
+            }
+          >
+            <h3 className="project-title">{project.title}</h3>
+            <p className="project-content">
+              {typeof project.content === "string"
+                ? stripHtml(project.content).substring(0, 20)
+                : "No content available"}
+              ...
+            </p>
+            <p className="last-edited">
+              Last edited: {formatDate(project.lastEdited)}
+            </p>
+          </div>
+        ))}
+        {projects.length === 0 && (
+          <div className="no-projects">
+            <h3 className="no-projects-title">Don't have a design?</h3>
+            <p className="no-projects-text">Create your first design now!</p>
+            <button className="create-button">Create a design</button>
+          </div>
+        )}
+=======
     <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
         <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+>>>>>>> 59567ddce9f383dd0861cfcc100048f3398eb216
       </div>
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
