@@ -2,27 +2,10 @@ import React, { useState } from "react";
 import { Divider, Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
-import Projects from "../components/Dashboard/projects";
-import Profile from "../components/Dashboard/profile";
 import SideBar from "../components/Dashboard/sidebar";
-// import Trash from "./Trash";
-import Trash from "../components/Trash/trashAlt";
-// import TeamsAlt from "../components/Teams/TeamsAlt";
-import Teams from "../components/Dashboard/Teams";
-import Social from "./Social";
-// import InsideTeam from "../components/Teams/InsideTeam";
-// import Teams from "../components/Dashboard/Teams";
 
 const Dashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  // const [currentComponent, setCurrentComponent] = useState("Profile");
-
-  // const handleButtonClick = (component: string) => {
-  //   setCurrentComponent(component);
-  // };
-
-  // Variants for Framer Motion animation
   const sidebarVariants = {
     open: { width: "200px" },
     closed: { width: "0px" },
@@ -58,16 +41,6 @@ const Dashboard: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
-          {/* {currentComponent == "Profile" && <Profile />}
-          {currentComponent == "Projects" && <Projects />} */}
-          {/* {currentComponent == "Templates" && <Templates />} */}
-          {/* {currentComponent == "Teams" && <Teams />} */}
-          {/* {currentComponent == "Calls" && <Calls />} */}
-          {/* {currentComponent == "Calendar" && <Calendar />} */}
-          {/* {currentComponent == "Social" && <Social />} */}
-          {/* {currentComponent == "Trash" && <Trash />} */}
-        </Box>
       </Box>
     </>
   );
