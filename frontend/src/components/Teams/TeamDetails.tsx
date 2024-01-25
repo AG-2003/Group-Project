@@ -75,7 +75,15 @@
 // TeamDetails.tsx
 
 import React, { useEffect, useState } from "react";
-import { Avatar, Flex, Box, Text, Stack, Badge, Divider } from "@chakra-ui/react";
+import {
+  Avatar,
+  Flex,
+  Box,
+  Text,
+  Stack,
+  Badge,
+  Divider,
+} from "@chakra-ui/react";
 import { db } from "../../firebase-config";
 import {
   doc,
@@ -96,16 +104,16 @@ const TeamDetails: React.FC = () => {
   let { team_id } = useParams();
   const navigate = useNavigate();
 
-    // Dashboard routing
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Dashboard routing
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-    const sidebarVariants = {
-      open: { width: "200px" },
-      closed: { width: "0px" },
-    };
-  
-    // Function to toggle the sidebar
-    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const sidebarVariants = {
+    open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  // Function to toggle the sidebar
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   if (team_id) {
     team_id = decodeURIComponent(team_id);
@@ -195,66 +203,67 @@ const TeamDetails: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
+          <div className="team-details-container">
+            {teamDetails ? (
+              <div className="profile-container">
+                <Flex className="profile-header">
+                  <Flex className="profile-info">
+                    <Avatar
+                      className="profile-avatar"
+                      src={teamDetails.image || "fallback_image_url"}
+                      name={teamDetails.name}
+                      borderRadius="10%" // Adjust this value as needed
+                    />
+                    <Box className="profile-text">
+                      <Text className="profile-name">{teamDetails.name}</Text>
+                      <Text className="profile-description">
+                        {teamDetails.description || "Your Description"}
+                      </Text>
+                    </Box>
+                  </Flex>
 
-    <div className="team-details-container">
-      {teamDetails ? (
-        <div className="profile-container">
-          <Flex className="profile-header">
-            <Flex className="profile-info">
-              <Avatar
-                className="profile-avatar"
-                src={teamDetails.image || "fallback_image_url"}
-                name={teamDetails.name}
-                borderRadius="10%" // Adjust this value as needed
-              />
-              <Box className="profile-text">
-                <Text className="profile-name">{teamDetails.name}</Text>
-                <Text className="profile-description">
-                  {teamDetails.description || "Your Description"}
-                </Text>
-              </Box>
-            </Flex>
+                  <Stack className="profile-stats">
+                    <Badge className="badge">0 Projects</Badge>
+                    <Badge className="badge">
+                      {teamDetails.members.length + 1} Members
+                    </Badge>
+                    <Badge className="badge">0 Awards</Badge>
+                  </Stack>
+                </Flex>
+                <Flex className="profile-body">
+                  <Flex className="top-titles">
+                    <Text className="projects-title">Projects</Text>
+                    <button className="invite-button" onClick={handleInvClick}>
+                      Invite Members
+                    </button>
+                  </Flex>
+                  <p className="no-documents-message">
+                    There are no documents yet.
+                  </p>
+                </Flex>
+                {/* chat onclick goes here */}
 
-            <Stack className="profile-stats">
-              <Badge className="badge">0 Projects</Badge>
-              <Badge className="badge">
-                {teamDetails.members.length + 1} Members
-              </Badge>
-              <Badge className="badge">0 Awards</Badge>
-            </Stack>
-          </Flex>
-          <Flex className="profile-body">
-            <Flex className="top-titles">
-              <Text className="projects-title">Projects</Text>
-              <button className="invite-button" onClick={handleInvClick}>
-                Invite Members
-              </button>
-            </Flex>
-            <p className="no-documents-message">There are no documents yet.</p>
-          </Flex>
-          {/* chat onclick goes here */}
+                <div
+                  className="circular-button"
+                  onClick={() => {
+                    if (team_id) {
+                      handleChatClick(team_id);
+                    }
+                  }}
+                >
+                  <IoChatbubblesSharp />
+                </div>
 
-          <div
-            className="circular-button"
-            onClick={() => {
-              if (team_id) {
-                handleChatClick(team_id);
-              }
-            }}
-          >
-            <IoChatbubblesSharp />
+                <InvModal
+                  teamId={team_id}
+                  isOpen={isInvModalOpen}
+                  onClose={handleInvModalClose}
+                />
+              </div>
+            ) : (
+              <p>Loading team details...</p>
+            )}
           </div>
-
-          <InvModal
-            teamId={team_id}
-            isOpen={isInvModalOpen}
-            onClose={handleInvModalClose}
-          />
-        </div>
-      ) : (
-        <p>Loading team details...</p>
-      )}
-    </div>
         </Box>
       </Box>
     </>

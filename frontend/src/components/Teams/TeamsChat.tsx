@@ -179,59 +179,58 @@ const ChattingPage: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          
-    <Box className="chatting-page">
-      {/* Team Header */}
-      <Flex className="team-header">
-        <Avatar
-          className="team-avatar"
-          src={teamDetails ? teamDetails.image : "fallback_image_url"}
-          name={teamDetails ? teamDetails.name : "fallback_image_url"}
-          borderRadius="10%"
-        />
-        <Text className="team-name">
-          {teamDetails ? teamDetails.name : "fallback_image_url"}
-        </Text>
-        <Button className="call-button">Start a call</Button>
-      </Flex>
-
-      {/* Chat Area */}
-      <Box className="chat-area">
-        {messages.map((message) => (
-          <Flex
-            key={message.id}
-            className={
-              message.userId === user?.email
-                ? "sent-message"
-                : "received-message"
-            }
-          >
-            {message.userId !== user?.email && (
+          <Box className="chatting-page">
+            {/* Team Header */}
+            <Flex className="team-header">
               <Avatar
-                className="message-avatar"
-                src={message.userPic}
-                name={message.userName}
-                borderRadius="50%"
+                className="team-avatar"
+                src={teamDetails ? teamDetails.image : "fallback_image_url"}
+                name={teamDetails ? teamDetails.name : "fallback_image_url"}
+                borderRadius="10%"
               />
-            )}
-            <Text className="message-text">{message.text}</Text>
-          </Flex>
-        ))}
-      </Box>
+              <Text className="team-name">
+                {teamDetails ? teamDetails.name : "fallback_image_url"}
+              </Text>
+              <Button className="call-button">Start a call</Button>
+            </Flex>
 
-      {/* Text Input Bar */}
-      <Flex className="text-input-bar">
-        <FormControl as="form" onSubmit={handleSendMessage}>
-          <Input
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            placeholder="Type your message..."
-          />
-          <Button onClick={handleSendMessage}>Send</Button>
-          <Button>Send File</Button>
-        </FormControl>
-      </Flex>
-    </Box>
+            {/* Chat Area */}
+            <Box className="chat-area">
+              {messages.map((message) => (
+                <Flex
+                  key={message.id}
+                  className={
+                    message.userId === user?.email
+                      ? "sent-message"
+                      : "received-message"
+                  }
+                >
+                  {message.userId !== user?.email && (
+                    <Avatar
+                      className="message-avatar"
+                      src={message.userPic}
+                      name={message.userName}
+                      borderRadius="50%"
+                    />
+                  )}
+                  <Text className="message-text">{message.text}</Text>
+                </Flex>
+              ))}
+            </Box>
+
+            {/* Text Input Bar */}
+            <Flex className="text-input-bar">
+              <FormControl as="form" onSubmit={handleSendMessage}>
+                <Input
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  placeholder="Type your message..."
+                />
+                <Button onClick={handleSendMessage}>Send</Button>
+                <Button>Send File</Button>
+              </FormControl>
+            </Flex>
+          </Box>
         </Box>
       </Box>
     </>
