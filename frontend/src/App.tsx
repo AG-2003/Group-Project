@@ -47,8 +47,6 @@ function App() {
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />
         <Route path="/Trash" element={<Trash />} />
-        <Route path="/board/*" element={<Whiteboard />} />;
-        <Route path="/Sheet" element={<Spreadsheet />} />;
         <Route path="/Social" element={<Social />} />
       </Route>
     </Routes>
