@@ -264,14 +264,8 @@
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import {
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  addDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { RxCross2 } from "react-icons/rx";
 import {
   Flex,
   Heading,
@@ -288,6 +282,7 @@ import {
   Textarea,
   Select,
   Link,
+  Box,
 } from "@chakra-ui/react";
 import {
   getStorage,
@@ -319,6 +314,15 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const [image, setImage] = useState<File | null>(null); // State to store the selected image
   const [page, setPage] = useState(1);
   const [user] = useAuthState(auth);
+
+  const removeField = (RemoveIndex: Number) => {
+    setEmailInputs((prevEmails) => {
+      const updatedEmails = prevEmails.filter(
+        (_, index) => index !== RemoveIndex
+      );
+      return updatedEmails;
+    });
+  };
 
   const handleTeamNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTeamName(event.target.value);
@@ -358,6 +362,11 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
       saveTeamToFirestore();
       onClose(); // Close the modal when saving is complete
     }
+  };
+
+  const quickClose = () => {
+    setEmailInputs([""]);
+    setPage(1);
   };
 
   const handlePreviousPage = () => {
@@ -533,6 +542,8 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
         }
 
         console.log("Team saved successfully");
+
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error saving team:", error);
@@ -595,13 +606,25 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
               </Flex>
             </Link>
             {emailInputs.map((email, index) => (
-              <Input
-                key={index}
-                mb={4}
-                placeholder="Enter email address"
-                value={email}
-                onChange={(e) => handleEmailInputChange(index, e)}
-              />
+              <Flex align="center">
+                <Input
+                  key={index}
+                  mb={4}
+                  placeholder="Enter email address"
+                  value={email}
+                  onChange={(e) => handleEmailInputChange(index, e)}
+                />
+                <Box marginTop={-4} marginRight={-5} padding={3}>
+                  {index !== 0 && (
+                    <RxCross2
+                      color="red"
+                      onClick={() => {
+                        removeField(index);
+                      }}
+                    />
+                  )}
+                </Box>
+              </Flex>
             ))}
             <Text
               color="blue.500"
@@ -625,7 +648,7 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
         <ModalHeader>
           {page === 1 ? "Create your own team" : "Invite your team"}
         </ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton onClick={quickClose} />
         <ModalBody>{renderModalContent()}</ModalBody>
         <ModalFooter>
           {page !== 1 && (

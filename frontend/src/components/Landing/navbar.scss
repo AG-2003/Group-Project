@@ -26,6 +26,8 @@ $color-dropdown-arrow: #ffffff; // Adjust based on design
   padding: 1rem 2rem;
   background-color: $color-dark-purple;
   color: $color-white;
+  position:relative;
+  z-index: 1;
 
   .logo-and-name {
     display: flex;
