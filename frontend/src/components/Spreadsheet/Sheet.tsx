@@ -140,6 +140,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
       console.error("Error saving document:", error);
     }
     console.log('SAVED');
+
   }, []);
 
   const debouncedSaveSheetToFirestore = useMemo(() => debounce(

@@ -53,6 +53,7 @@ export function SignUpPasswordForm() {
           userType: "",
           userTheme: "light",
           photoURL: user.photoURL,
+          sheets: []
         } as DocumentData);
         showToast('success', `you have successfully created an account`)
         setTimeout(() => { navigate("/index") }, 1000)
