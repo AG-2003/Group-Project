@@ -1,13 +1,11 @@
-import React, { useState } from "react";
-import { Box, Divider, Flex } from "@chakra-ui/react";
-import JoinedTeams from "../Teams/JoinedTeams";
-import CreateJoin from "../Teams/CreateJoin";
-import Navbar from "../Dashboard/Navbar";
+import { useState } from "react";
+import Navbar from "../components/Dashboard/Navbar";
+import { Box, Divider } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
-import SideBar from "../Dashboard/sidebar";
+import SideBar from "../components/Dashboard/sidebar";
 
-const Teams = () => {
-  // Dashboard routing
+const Templates = () => {
+    // Dashboard routing
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const sidebarVariants = {
@@ -18,8 +16,8 @@ const Teams = () => {
   // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  return (
-    <>
+    return(
+        <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
         <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       </div>
@@ -63,16 +61,11 @@ const Teams = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          <Flex direction="column" height="100vh" p={8}>
-            <>
-              <CreateJoin />
-              <JoinedTeams />
-            </>
-          </Flex>
+            
         </Box>
       </Box>
     </>
-  );
+    );
 };
 
-export default Teams;
+export default Templates;
