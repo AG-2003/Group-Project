@@ -26,20 +26,14 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams, useNavigate } from "react-router-dom";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import Linkify from "react-linkify";
+import { Message } from "../../interfaces/Message";
 
 // import { FaFilePdf } from "react-icons/fa";
 import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Dashboard/sidebar";
 
-interface Message {
-  id: string;
-  text: any;
-  userId: string | null | undefined;
-  userPic: any;
-  userName: any;
-  timestamp: any;
-}
+
 
 const ChattingPage: React.FC = () => {
   // Dashboard routing
@@ -191,7 +185,7 @@ const ChattingPage: React.FC = () => {
     let result = "";
     if (result) return result;
     var chars =
-        "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
+      "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
       maxPos = chars.length,
       i;
     len = len || 5;

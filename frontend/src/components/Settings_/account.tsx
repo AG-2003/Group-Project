@@ -7,8 +7,10 @@ import {
   Flex,
   Heading,
   Input,
+  Progress,
   Select,
   Skeleton,
+  SkeletonCircle,
   Spinner,
   VStack,
 } from "@chakra-ui/react";
@@ -103,6 +105,7 @@ const Account = () => {
 
   const [userDescription, setUserDescription] = useState<string>('Write about yourself !');
   const [loadingDescription, setLoadingDescription] = useState<boolean>(true);
+  const [loadingUserType, setLoadingUserType] = useState<boolean>(true);
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -168,14 +171,14 @@ const Account = () => {
             const docSnap = await getDoc(userRef);
             if (docSnap.exists()) {
               const userData = docSnap.data();
-              if (userData.userType) {
-                setUserType(userData.userType); // Set the fetched user type
-              }
+              setUserType(userData.userType || ''); // Use an empty string if userType is not set
             } else {
               console.log("No such document!");
             }
           } catch (error) {
             console.error("Error fetching user data:", error);
+          } finally {
+            setLoadingUserType(false); // This ensures we stop the spinner regardless
           }
         } else {
           console.log("User email is null or undefined.");
@@ -185,6 +188,7 @@ const Account = () => {
 
     fetchUserData();
   }, []);
+
 
 
   const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -264,7 +268,7 @@ const Account = () => {
             Description
           </Heading>
           {loadingDescription ? (
-            <Skeleton />
+            <Spinner />
           ) : (
             <EditableTextField
               b1="Edit"
@@ -279,18 +283,20 @@ const Account = () => {
         <VStack spacing={4} align="stretch" my={4}>
           <Heading size="sm">What are you using the app for?</Heading>
           <Flex>
-            <Select
-              placeholder="Select option"
-              maxW="435px"
-              value={selectedRole || userType}
-              onChange={handleRoleChange}
-            >
-              <option value="teacher">Teacher</option>
-              <option value="student">Student</option>
-              <option value="creator">Creator</option>
-              <option value="business">Small Business</option>
-              <option value="personal">Personal</option>
-            </Select>
+            {loadingUserType ? <Spinner /> :
+              <Select
+                placeholder="Select option"
+                maxW="435px"
+                value={selectedRole || userType}
+                onChange={handleRoleChange}
+              >
+                <option value="teacher">Teacher</option>
+                <option value="student">Student</option>
+                <option value="creator">Creator</option>
+                <option value="business">Small Business</option>
+                <option value="personal">Personal</option>
+              </Select>}
+
             <Button size="sm" fontWeight='500' onClick={handleUserTypeSave} ml='2rem'>
               Save Role
             </Button>

@@ -11,7 +11,6 @@ import {
 import {
   getRedirectResult,
   signInWithRedirect,
-  AuthError,
 } from "firebase/auth";
 import { setDoc, doc, DocumentData, getDoc } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
@@ -64,6 +63,7 @@ export function LoginForm() {
           userType: "",
           userTheme: "light",
           photoURL: user.photoURL,
+          sheets: []
         } as DocumentData);
       }
       // If the document exists, the user is already in the database, so you can proceed with the login

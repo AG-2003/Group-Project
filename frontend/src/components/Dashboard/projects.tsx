@@ -9,12 +9,14 @@ import {
   Box,
   Button,
   Divider,
+  Flex,
   Icon,
   IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
+  Spinner,
 } from "@chakra-ui/react";
 import { FaTrash } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,6 +32,8 @@ const Projects: React.FC = () => {
   const [projects, setProjects] = useState<SuiteData[]>([]);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
+
+  const [isLoadingProjects, setIsLoadingProjects] = useState<boolean>(true);
 
   // basic UI
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -85,7 +89,9 @@ const Projects: React.FC = () => {
         );
 
         setProjects(combinedProjects);
+        setIsLoadingProjects(false);
       }
+      setIsLoadingProjects(false);
     }
   };
 
@@ -236,7 +242,19 @@ const Projects: React.FC = () => {
         </AnimatePresence>
         {/* Code is contained in this box */}
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          <div className="projects-container">
+          {isLoadingProjects ? (<Flex
+            height="100vh" // Adjust this to the desired height or use "100%" for full container height
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
+          </Flex>) : <div className="projects-container">
             <h2 className="projects-heading">Recent Designs</h2>
             <div className="projects-list">
               {projects.map((project: SuiteData) => (
@@ -322,7 +340,8 @@ const Projects: React.FC = () => {
                 </>
               )}
             </div>
-          </div>
+          </div>}
+
         </Box>
       </Box>
     </>

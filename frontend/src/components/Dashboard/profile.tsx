@@ -8,6 +8,9 @@ import {
   Button,
   Box,
   Divider,
+  SkeletonCircle,
+  Skeleton,
+  Spinner,
 } from "@chakra-ui/react";
 import { auth, db } from "../../firebase-config";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
@@ -22,6 +25,7 @@ import { Link as ChakraLink, LinkProps } from '@chakra-ui/react'
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(true);
 
   const sidebarVariants = {
     open: { width: "200px" },
@@ -41,12 +45,15 @@ const Profile: React.FC = () => {
           const docSnap = await getDoc(userRef);
           if (docSnap.exists() && docSnap.data().desc) {
             setUserDescription(docSnap.data().desc);
+            setIsLoadingDesc(false);
           } else {
             setUserDescription("No description set.");
+            setIsLoadingDesc(false);
           }
         } catch (error) {
           console.error("Error fetching user description:", error);
           setUserDescription("Failed to fetch description.");
+          setIsLoadingDesc(false);
         }
       }
     };
@@ -108,15 +115,16 @@ const Profile: React.FC = () => {
                   name={userProfile.displayName}
                   borderRadius="10%" // Adjust this value as needed
                 />
-                <Box className="profile-text">
-                  <ChakraLink as={ReactRouterLink} to='/settings' className="profile-name">
-                    {(userProfile.displayName || auth.currentUser?.displayName) || 'Set username by clicking on me.'}
-                  </ChakraLink>
-                  <ChakraLink as={ReactRouterLink} to='/settings' className="profile-description">
-                    {userDescription}
-                  </ChakraLink>
+                {isLoadingDesc ? (<Spinner ml='2rem' />) :
+                  <Box className="profile-text">
+                    <ChakraLink as={ReactRouterLink} to='/settings' className="profile-name">
+                      {(userProfile.displayName || auth.currentUser?.displayName) || 'Set username by clicking on me.'}
+                    </ChakraLink>
+                    <ChakraLink as={ReactRouterLink} to='/settings' className="profile-description">
+                      {userDescription}
+                    </ChakraLink>
+                  </Box>}
 
-                </Box>
               </Flex>
 
               <Stack className="profile-stats">
