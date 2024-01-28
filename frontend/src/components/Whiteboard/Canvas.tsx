@@ -238,7 +238,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           title: boardTitle,
           lastEdited: now,
           content: JSON.stringify(data),
-          type: 'whiteboard'
+          type: 'board',
+          isTrash: false
         });
       }
 
@@ -250,7 +251,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         },
         { merge: true }
       );
-      console.log("Document saved successfully");
     } catch (error) {
       console.error("Error saving document:", error);
     }

@@ -107,7 +107,8 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           title: suiteTitle,
           content: text,
           lastEdited: now, // Set last edited time for new document
-          type: 'document'
+          type: 'document',
+          isTrash: false
         });
       }
 

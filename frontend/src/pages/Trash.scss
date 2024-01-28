@@ -1,0 +1,106 @@
+ .modal-content{
+  margin-bottom: 1rem;
+ }
+
+ .Image{
+  position: relative;
+  height: 70vh;
+ }
+ 
+ .tprojects-container {
+   margin-top: 1rem;
+
+   .tprojects-heading {
+     font-size: 2rem;
+     margin-bottom: 1.5rem;
+     font-weight: 600;
+     // text-align: center;
+   }
+
+   .tprojects-list {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+     gap: 1rem;
+     justify-content: center;
+   }
+
+     .tproject-card {
+       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+       border-radius: 0.5rem;
+       width: 230px; // Set the card width to be smaller
+       margin: 1rem; // Adjust margin as needed for layout
+       overflow: hidden; // Ensure the border-radius is applied to child elements
+  
+       .tcard-top {
+         background-size: cover;
+         background-position: center;
+         color: white;
+         position: relative;
+  
+         &::after {
+           content: '';
+           display: block;
+           position: absolute;
+           top: 0;
+           left: 0;
+           right: 0;
+           bottom: 0;
+           background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+           pointer-events: none;
+           z-index: 1;
+         }
+  
+         .tproject-title {
+           font-size: 1.5rem;
+           margin-left: 5px;
+           padding: 0.5rem;
+           padding-top: 2.5rem;
+           border-radius: 0.25rem;
+           font-weight: 500;
+           position: relative;
+           z-index: 2; // Make sure this is higher than the ::after pseudo-element
+         }
+       }
+
+     .tcard-bottom {
+       padding: 1.2rem;
+       // background-color: #f8f8f8; // Lighter background for the bottom part
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       position: relative; // Relative positioning for the absolute trash icon
+
+       .icon-container{
+        display: "flex";
+        align-Items: "center";
+       }
+     }
+   }
+
+   .no-projects {
+     text-align: center;
+
+     .no-projects-title {
+       font-size: 1.25rem;
+       margin-bottom: 0.5rem;
+     }
+
+     .no-projects-text {
+       margin-bottom: 1rem;
+     }
+
+     .create-button {
+       background-color: #805ad5;
+       color: white;
+       padding: 0.5rem 1rem;
+       border: none;
+       border-radius: 0.25rem;
+       font-size: 1rem;
+       cursor: pointer;
+
+       &:hover {
+         background-color: #6b46c1;
+       }
+     }
+   }
+ }

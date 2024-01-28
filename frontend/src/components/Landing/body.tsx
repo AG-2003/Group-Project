@@ -10,11 +10,7 @@ import "./body.scss"; // Make sure to import the SCSS file for styles
 export const Body: React.FC = () => {
   return (
     <div className="landing-container">
-      <img
-        src={landingBg}
-        alt="Landing Background"
-        className="background-image"
-      />
+      <img src={landingBg} alt="Landing Background" className="trashimg" />
       <div className="header">
         <div className="heading">
           <h1>Welcome to Your Design Platform</h1>

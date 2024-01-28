@@ -2,6 +2,7 @@ import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { ZegoSuperBoardManager } from "zego-superboard-web";
 import { auth } from "../firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
+import "./Call.scss";
 
 function randomID(len: number) {
   let result = "";

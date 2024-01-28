@@ -11980,7 +11980,7 @@ yocto-queue@^0.1.0:
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zego-superboard-web@2.14.1:
-  version "2.14.1"
-  resolved "https://registry.npmjs.org/zego-superboard-web/-/zego-superboard-web-2.14.1.tgz"
-  integrity sha512-598RBjjXeB8BToNXhKxQ3/07MOV818q2oD3f2w0EKceMZacAXfBuGeIGpYHBBCaRZruru2GSX1fYI0oK9EoMYg==
+zego-superboard-web@^2.15.1:
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/zego-superboard-web/-/zego-superboard-web-2.15.1.tgz#478beeeb42849471935ea9395d6a065d9c29de36"
+  integrity sha512-Pqdfs/axMXWJ47Wril8+1HMaNCYmXr9MzlsoX8i9rf2Km/hRdDyo+Anr3moeDEOlsfUJeq4Pcxxv+I3R3AboXQ==

@@ -2,7 +2,17 @@
 # yarn lockfile v1
 
 
+"@zegocloud/zego-uikit-prebuilt@^1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@zegocloud/zego-uikit-prebuilt/-/zego-uikit-prebuilt-1.10.0.tgz#3607e572eb8be353721cdd267d7f7f49c17b986b"
+  integrity sha512-Gv4ao1JQXcrCOL8jg09VJd6/pFz2mmY444EjeN36jXXx7Plo73nXUZFcjJQpealM+tyEy5LJZeGTKOOmd03zwA==
+
 react-firebase-hooks@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/react-firebase-hooks/-/react-firebase-hooks-5.1.1.tgz#fc92bb4b860c6753c806583f64d7f069b6ee6785"
   integrity sha512-y2UpWs82xs+39q5Rc/wq316ca52QsC0n8m801V+yM4IC4hbfOL4yQPVSh7w+ydstdvjN9F+lvs1WrO2VYxpmdA==
+
+zego-superboard-web@^2.15.1:
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/zego-superboard-web/-/zego-superboard-web-2.15.1.tgz#478beeeb42849471935ea9395d6a065d9c29de36"
+  integrity sha512-Pqdfs/axMXWJ47Wril8+1HMaNCYmXr9MzlsoX8i9rf2Km/hRdDyo+Anr3moeDEOlsfUJeq4Pcxxv+I3R3AboXQ==

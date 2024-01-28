@@ -2,6 +2,7 @@ import {
   Avatar,
   Box,
   Button,
+  Divider,
   Flex,
   FormControl,
   Input,
@@ -27,6 +28,9 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import Linkify from "react-linkify";
 
 // import { FaFilePdf } from "react-icons/fa";
+import Navbar from "../Dashboard/Navbar";
+import { AnimatePresence, motion } from "framer-motion";
+import SideBar from "../Dashboard/sidebar";
 
 interface Message {
   id: string;
@@ -223,103 +227,165 @@ const ChattingPage: React.FC = () => {
     }
   };
 
+  // Dashboard routing
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const sidebarVariants = {
+    open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  // Function to toggle the sidebar
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   return (
-    <Box className="chatting-page">
-      {/* Team Header */}
-      <Flex className="team-header">
-        <Avatar
-          className="team-avatar"
-          src={teamDetails ? teamDetails.image : "fallback_image_url"}
-          name={teamDetails ? teamDetails.name : "fallback_image_url"}
-          borderRadius="10%"
-        />
-        <Text className="team-name">
-          {teamDetails ? teamDetails.name : "fallback_image_url"}
-        </Text>
-        <Button className="call-button" onClick={handleStartCall}>
-          Start a call
-        </Button>
-      </Flex>
-
-      {/* Chat Area */}
-      <Box className="chat-area">
-        {messages.map((message) => (
-          <Flex
-            key={message.id}
-            className={
-              message.userId === user?.email
-                ? "sent-message"
-                : "received-message"
-            }
-          >
-            {message.userId !== user?.email && (
+    <>
+      <div style={{ padding: "10px", background: "#484c6c" }}>
+        <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      </div>
+      <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
+      <Box display="flex" height="calc(100vh - 10px)">
+        <AnimatePresence>
+          {isSidebarOpen ? (
+            <motion.div
+              initial="open"
+              animate="open"
+              exit="closed"
+              variants={sidebarVariants}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f6f6f6",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+              }}
+            >
+              <SideBar />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial="closed"
+              animate="clsoed"
+              exit="open"
+              variants={sidebarVariants}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f6f6f6",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+              }}
+            >
+              <SideBar />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <Box flexGrow={1} padding="10px" marginLeft={5}>
+          <Box className="chatting-page">
+            {/* Team Header */}
+            <Flex className="team-header">
               <Avatar
-                className="message-avatar"
-                src={message.userPic}
-                name={message.userName}
-                borderRadius="50%"
+                className="team-avatar"
+                src={teamDetails ? teamDetails.image : "fallback_image_url"}
+                name={teamDetails ? teamDetails.name : "fallback_image_url"}
+                borderRadius="10%"
               />
-            )}
-            {/* Rendering logic for different types of messages */}
-            {message.text.startsWith(
-              "https://firebasestorage.googleapis.com"
-            ) ? (
-              // It's a file message
-              <Box
-                bg={
-                  message.userId === user?.email
-                    ? "sent-message"
-                    : "recieved-message"
-                }
-                p={4}
-                borderRadius="lg"
-                maxW="300px" // Adjust the maximum width as needed
-              >
-                <a
-                  href={message.text}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    src={message.text}
-                    alt="File Preview"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "150px",
-                      borderRadius: "8px",
-                    }}
-                  />
-                </a>
-              </Box>
-            ) : (
-              // It's a text message
-              <Text className="message-text">
-                <Linkify>{message.text}</Linkify>
+              <Text className="team-name">
+                {teamDetails ? teamDetails.name : "fallback_image_url"}
               </Text>
-            )}
-          </Flex>
-        ))}
-      </Box>
+              <Button className="call-button" onClick={handleStartCall}>
+                Start a call
+              </Button>
+            </Flex>
 
-      {/* Text Input Bar */}
-      <Flex className="text-input-bar">
-        <FormControl as="form" onSubmit={handleSendMessage}>
-          <Input
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            placeholder="Type your message..."
-          />
-          <Button onClick={handleSendMessage}>Send</Button>
-          <Button onClick={handleSendFile}>Send File</Button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            onChange={handleFileInputChange}
-          />
-        </FormControl>
-      </Flex>
-    </Box>
+            {/* Chat Area */}
+            <Box className="chat-area">
+              {messages.map((message) => (
+                <Flex
+                  key={message.id}
+                  className={
+                    message.userId === user?.email
+                      ? "sent-message"
+                      : "received-message"
+                  }
+                >
+                  {message.userId !== user?.email && (
+                    <Avatar
+                      className="team-avatar"
+                      src={
+                        teamDetails ? teamDetails.image : "fallback_image_url"
+                      }
+                      name={
+                        teamDetails ? teamDetails.name : "fallback_image_url"
+                      }
+                      borderRadius="10%"
+                    />
+                  )}
+                  {/* Rendering logic for different types of messages */}
+                  {message.text.startsWith(
+                    "https://firebasestorage.googleapis.com"
+                  ) ? (
+                    // It's a file message
+                    <Box
+                      bg={
+                        message.userId === user?.email
+                          ? "sent-message"
+                          : "recieved-message"
+                      }
+                      p={4}
+                      borderRadius="lg"
+                      maxW="300px" // Adjust the maximum width as needed
+                    >
+                      <a
+                        href={message.text}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src={message.text}
+                          alt="File Preview"
+                          style={{
+                            maxWidth: "100%",
+                            maxHeight: "150px",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </a>
+                    </Box>
+                  ) : (
+                    // It's a text message
+                    <Text className="message-text">
+                      <Linkify>{message.text}</Linkify>
+                    </Text>
+                  )}
+                </Flex>
+              ))}
+            </Box>
+
+            {/* Text Input Bar */}
+            <Flex className="text-input-bar">
+              <FormControl as="form" onSubmit={handleSendMessage}>
+                <Input
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  placeholder="Type your message..."
+                />
+                <Button onClick={handleSendMessage}>Send</Button>
+                <Button onClick={handleSendFile}>Send File</Button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: "none" }}
+                  onChange={handleFileInputChange}
+                />
+              </FormControl>
+            </Flex>
+          </Box>
+        </Box>
+      </Box>
+    </>
   );
 };
 
