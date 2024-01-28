@@ -16,6 +16,8 @@ import Navbar from "./Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "./sidebar";
 import { doc, getDoc } from "firebase/firestore";
+import { Link as ReactRouterLink } from 'react-router-dom'
+import { Link as ChakraLink, LinkProps } from '@chakra-ui/react'
 
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
@@ -107,12 +109,13 @@ const Profile: React.FC = () => {
                   borderRadius="10%" // Adjust this value as needed
                 />
                 <Box className="profile-text">
-                  <Text className="profile-name">
-                    {userProfile.displayName || auth.currentUser?.displayName}
-                  </Text>
-                  <Text className="profile-description">
-                    <p style={{ color: "black" }}>{userDescription}</p>
-                  </Text>
+                  <ChakraLink as={ReactRouterLink} to='/settings' className="profile-name">
+                    {(userProfile.displayName || auth.currentUser?.displayName) || 'Set username by clicking on me.'}
+                  </ChakraLink>
+                  <ChakraLink as={ReactRouterLink} to='/settings' className="profile-description">
+                    {userDescription}
+                  </ChakraLink>
+
                 </Box>
               </Flex>
 

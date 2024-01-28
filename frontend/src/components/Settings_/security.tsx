@@ -20,10 +20,12 @@ import { useEffect, useState } from "react";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider, signOut, getRedirectResult, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
 
 const Security = () => {
   const navigate = useNavigate();
+  const showToast = UseToastNotification();
 
   const logOut = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -147,7 +149,7 @@ const Security = () => {
 
     // Call this function right after the component mounts
     updateUserVerificationStatus();
-  }, []);
+  }, [auth.currentUser?.emailVerified]);
 
 
   const handleEmailVerification = async () => {
@@ -155,10 +157,11 @@ const Security = () => {
       try {
         await sendEmailVerification(auth.currentUser);
 
-        alert(`verification mail sent to ${auth.currentUser.email}`)
-        console.log(`email sent to ${auth.currentUser.email}`)
+        showToast('info', `verification mail sent to ${auth.currentUser.email}.`);
+        console.log(`email sent to ${auth.currentUser.email}`);
       } catch (err) {
         console.error(err);
+        showToast('error', `${err}`);
       }
     }
   }
@@ -167,9 +170,11 @@ const Security = () => {
     if (auth.currentUser && auth.currentUser.email) {
       try {
         await sendPasswordResetEmail(auth, auth.currentUser.email)
-        alert(`email sent to ${auth.currentUser.email}`)
+        showToast('info', `link to reset password sent to ${auth.currentUser.email}.`);
         signOut(auth);
+        setTimeout(() => { navigate('/auth') }, 3000);
       } catch (err) {
+        showToast('error', `${err}`);
         console.log(err);
       }
     }
@@ -191,7 +196,7 @@ const Security = () => {
           <Flex align="center">
             <Text
 
-              mr={280}
+              mr='10rem'
             >
               ***********
             </Text>
@@ -207,7 +212,7 @@ const Security = () => {
           <Flex align="center">
             <Text
               color={auth.currentUser?.emailVerified ? 'green' : 'red'}
-              mr={280}
+              mr='10rem'
             >
               {auth.currentUser?.emailVerified ? 'Verified' : 'Not Verified'}
             </Text>

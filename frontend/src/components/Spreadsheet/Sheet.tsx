@@ -144,7 +144,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
 
   const debouncedSaveSheetToFirestore = useMemo(() => debounce(
     saveSheetToFirestore,
-    10000 // Delay in milliseconds
+    2000 // Delay in milliseconds
   ), [saveSheetToFirestore]);
 
   useEffect(() => {
@@ -164,7 +164,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
   //---------------Function to fetch the Sheet from firebase------------------
 
   const fetchSheetFromFirestore = useCallback(async (userEmail: string, abortController: AbortController) => {
-    console.log('TRIGGERING FETVCH')
+    console.log('TRIGGERING FETCH')
     try {
       const userDocRef = doc(db, "users", userEmail);
       const docSnapshot = await getDoc(userDocRef);
@@ -231,7 +231,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
       <Workbook data={workbookData.map(d => {
         return ({
           ...d,
-          data: undefined, 
+          data: undefined,
           celldata: d.celldata,
         })
       })} onChange={onChange} toolbarItems={TOOLBAR_ITEMS} />
