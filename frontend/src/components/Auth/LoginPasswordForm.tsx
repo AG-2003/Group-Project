@@ -21,9 +21,11 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase-config";
 import "./passwordForm.scss";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
 export function LoginPasswordForm() {
   const [pwd, setPwd] = useState("");
+  const showToast = UseToastNotification();
 
   const [isPwdIncorrect, setIsPwdIncorrect] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
@@ -44,15 +46,16 @@ export function LoginPasswordForm() {
         console.log(user);
         setIsPwdIncorrect(false);
         setFailedAttempts(0);
-        alert(`you have signed in into ${user.email}`);
-        navigate("/index");
+        showToast('success', `successfully logged into your account ${email}`);
+        setTimeout(() => { navigate("/index") }, 2000);
+
       })
       .catch((err) => {
         console.log(err.message);
         setIsPwdIncorrect(true);
         setFailedAttempts((prev) => prev + 1); // Increment failed attempts
         console.log(failedAttempts);
-        alert(err.code);
+        showToast('warning', `${err.message}`);
       });
   }
 
@@ -61,12 +64,12 @@ export function LoginPasswordForm() {
     sendPasswordResetEmail(auth, email)
       .then(() => {
         console.log(`recovery mail sent to ${email}`);
-        alert(
-          `please change password through the link sent to your email ID ${email} and try again `
-        );
+        showToast('info', `please change your password through the link we have sent to ${email}`);
       })
       .catch((err) => {
         console.log(err.message);
+        showToast('warning', `${err.message}`);
+
       });
   };
 

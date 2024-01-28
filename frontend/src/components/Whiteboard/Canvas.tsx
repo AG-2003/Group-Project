@@ -14,6 +14,7 @@ import { doc, setDoc, collection, getDoc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 
+
 type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
 type Shape =
   | "rectangle"
@@ -159,10 +160,13 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
   const [showShapeMenu, setShowShapeMenu] = useState(false);
 
+
+
   //---------------Store the serialized data-----------------
   const [serializedLinesData, setSerializedLinesData] = useState('')
   const [serializedTextsData, setSerializedTextsData] = useState('')
   const [serializedRectanglesData, setSerializedRectanglesData] = useState('')
+
 
   useEffect(() => {
     /*
@@ -184,7 +188,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
   useEffect(() => {
     const username = user?.email
-    if(username){
+    if (username) {
       const dataArray = [serializedLinesData, serializedTextsData, serializedRectanglesData]
 
       debouncedSaveBoardToFirestore(
@@ -253,19 +257,20 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       );
     } catch (error) {
       console.error("Error saving document:", error);
+
     }
   };
 
   const debouncedSaveBoardToFirestore = debounce(
     saveBoardToFirestore,
-    5000 // Delay in milliseconds
+    2000 // Delay in milliseconds
   );
   //____________________________________________________________
 
-//---------------------------Function to render the saved whiteboard--------------
+  //---------------------------Function to render the saved whiteboard--------------
   useEffect(() => {
     const username = user?.email
-    if(username){
+    if (username) {
       fetchDocumentFromFirestore(username);
     }
   }, []);
@@ -291,7 +296,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       console.error("Error fetching document:", error);
     }
   };
-//____________________________________________________________
+  //____________________________________________________________
 
 
 

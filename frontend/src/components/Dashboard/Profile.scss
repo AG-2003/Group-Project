@@ -16,12 +16,14 @@
       .profile-name {
         font-size: 25px;
         margin-left: 2rem;
+        display: block;
       }
 
       .profile-description {
         margin-left: 2rem;
         font-size: 0.875rem; // example size, adjust as needed
-        color: #555; // example color, adjust as needed
+        display: block;
+
       }
 
       // .profile-avatar {
