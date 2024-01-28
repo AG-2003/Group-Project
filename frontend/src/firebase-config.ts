@@ -37,8 +37,6 @@ microsoftProvider.setCustomParameters({
 // Google Auth provider configuration
 export const googleProvider = new GoogleAuthProvider();
 
-
-
 export const auth = getAuth(app);
 
 // const analytics = getAnalytics(app);

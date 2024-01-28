@@ -10,9 +10,6 @@ import SideBar from "../Dashboard/sidebar";
 // import JoinedTeams from "../Teams/JoinedTeams";
 
 const Teams = () => {
-  const [currentTeamId, setCurrentTeamId] = useState<string | null>(null);
-  const [inChat, setInChat] = useState(false);
-
   // Dashboard routing
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -23,15 +20,6 @@ const Teams = () => {
 
   // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-  const handleTeamClick = (teamId: string) => {
-    // Update the current team ID when a team is clicked
-    setCurrentTeamId(teamId);
-  };
-
-  const handleChatClick = () => {
-    setInChat(!inChat);
-  };
 
   return (
     <>
