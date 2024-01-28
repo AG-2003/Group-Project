@@ -1,5 +1,6 @@
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { ZegoSuperBoardManager } from "zego-superboard-web";
+import "./Call.scss";
 
 function randomID(len: number) {
   let result = "";
