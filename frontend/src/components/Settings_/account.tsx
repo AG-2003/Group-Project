@@ -171,27 +171,24 @@ const Account = () => {
             const docSnap = await getDoc(userRef);
             if (docSnap.exists()) {
               const userData = docSnap.data();
-              if (userData.userType) {
-                setUserType(userData.userType); // Set the fetched user type
-                setLoadingUserType(false);
-              }
+              setUserType(userData.userType || ''); // Use an empty string if userType is not set
             } else {
               console.log("No such document!");
-              setLoadingUserType(false);
             }
           } catch (error) {
             console.error("Error fetching user data:", error);
-            setLoadingUserType(false);
+          } finally {
+            setLoadingUserType(false); // This ensures we stop the spinner regardless
           }
         } else {
           console.log("User email is null or undefined.");
-          setLoadingUserType(false);
         }
       }
     };
 
     fetchUserData();
   }, []);
+
 
 
   const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

@@ -11,7 +11,6 @@ import {
 import {
   getRedirectResult,
   signInWithRedirect,
-  AuthError,
 } from "firebase/auth";
 import { setDoc, doc, DocumentData, getDoc } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
