@@ -6,9 +6,6 @@ import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Dashboard/sidebar";
 
-// import CreateJoin from "../Teams/CreateJoin";
-// import JoinedTeams from "../Teams/JoinedTeams";
-
 const Teams = () => {
   // Dashboard routing
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

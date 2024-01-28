@@ -1,0 +1,23 @@
+.body {
+  .sidebar-button {
+    // Default state styles
+    transition: color 0.3s ease-in-out;
+
+    &:hover {
+      background: none; // Remove default Chakra-UI hover background change
+      color: #8460b0; // Change color to a light blue, you can choose any color
+
+      // Scale up icon and text on hover
+      .chakra-icon,
+      .chakra-text {
+        transform: scale(1.2);
+      }
+    }
+  }
+
+  // Default state for icon and text
+  .chakra-icon,
+  .chakra-text {
+    transition: transform 0.3s ease-in-out;
+  }
+}
