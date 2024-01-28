@@ -42,6 +42,17 @@ interface Message {
 }
 
 const ChattingPage: React.FC = () => {
+  // Dashboard routing
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const sidebarVariants = {
+    open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  // Function to toggle the sidebar
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState("");
   const [user] = useAuthState(auth);
@@ -227,17 +238,6 @@ const ChattingPage: React.FC = () => {
     }
   };
 
-  // Dashboard routing
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  const sidebarVariants = {
-    open: { width: "200px" },
-    closed: { width: "0px" },
-  };
-
-  // Function to toggle the sidebar
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
   return (
     <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
@@ -313,14 +313,10 @@ const ChattingPage: React.FC = () => {
                 >
                   {message.userId !== user?.email && (
                     <Avatar
-                      className="team-avatar"
-                      src={
-                        teamDetails ? teamDetails.image : "fallback_image_url"
-                      }
-                      name={
-                        teamDetails ? teamDetails.name : "fallback_image_url"
-                      }
-                      borderRadius="10%"
+                      className="message-avatar"
+                      src={message.userPic}
+                      name={message.userName}
+                      borderRadius="50%"
                     />
                   )}
                   {/* Rendering logic for different types of messages */}
