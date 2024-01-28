@@ -24,7 +24,7 @@ import { auth, db } from "../firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { MdRestore } from "react-icons/md";
-import TrashBg from "../assets/TrashBg2.png";
+import TrashBg from "../assets/TrashBg.png";
 import ArchiveBg from "../assets/Archive.png";
 import "./Trash.scss";
 

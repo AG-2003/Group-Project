@@ -8,9 +8,6 @@ import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Dashboard/sidebar";
 
-// import CreateJoin from "../Teams/CreateJoin";
-// import JoinedTeams from "../Teams/JoinedTeams";
-
 const Teams = () => {
   const [currentTeamId, setCurrentTeamId] = useState<string | null>(null);
   const [inChat, setInChat] = useState(false);
@@ -80,27 +77,25 @@ const Teams = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-    <Flex direction="column" height="100vh" p={8}>
-      {/* Conditionally render either JoinedTeams or TeamDetails based on currentTeamId */}
-
-      {currentTeamId ? (
-        <>
-          {inChat ? (
-            <TeamsChat teamId={currentTeamId} />
-          ) : (
-            <TeamDetails
-              teamId={currentTeamId}
-              onChatsClick={handleChatClick}
-            />
-          )}
-        </>
-      ) : (
-        <>
-          <CreateJoin />
-          <JoinedTeams onTeamClick={handleTeamClick} />
-        </>
-      )}
-    </Flex>
+          <Flex direction="column" height="100vh" p={8}>
+            {currentTeamId ? (
+              <>
+                {inChat ? (
+                  <TeamsChat teamId={currentTeamId} />
+                ) : (
+                  <TeamDetails
+                    teamId={currentTeamId}
+                    onChatsClick={handleChatClick}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <CreateJoin />
+                <JoinedTeams onTeamClick={handleTeamClick} />
+              </>
+            )}
+          </Flex>
         </Box>
       </Box>
     </>

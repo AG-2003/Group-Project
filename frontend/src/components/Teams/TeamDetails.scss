@@ -22,36 +22,12 @@
         font-size: 0.875rem; // example size, adjust as needed
         color: #555; // example color, adjust as needed
       }
-
-      // .profile-avatar {
-      //   margin-left: 1rem;
-      // }
       .team-avatar {
         margin-left: 1rem;
         width: 5rem; // Adjust width as needed
         height: 5rem; // Adjust height as needed
         object-fit: cover; // This ensures the image covers the area without stretching
       }
-    }
-
-    .team-stats {
-      display: flex;
-      flex-direction: row;
-      gap: 1rem;
-
-      .badge {
-        font-size: 1em;
-        padding: 0.5rem;
-        background-color: #8587bf;
-        color: white;
-        border-radius: var(--chakra-radii-md);
-      }
-    }
-
-    .leaderboard-button {
-      background-color: #845cd4;
-      color: white;
-      margin-right: 1rem;
     }
   }
 
