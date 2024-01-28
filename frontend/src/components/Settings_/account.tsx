@@ -19,10 +19,14 @@ import { auth, db } from "../../firebase-config";
 import { updateProfile, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
 
 
 const Account = () => {
+
+  const showToast = UseToastNotification();
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [avatarUrl, setAvatarUrl] = useState(auth.currentUser?.photoURL || '');
 
@@ -33,6 +37,7 @@ const Account = () => {
       // Use the file to show a preview to the user
       const previewUrl = URL.createObjectURL(file);
       setAvatarUrl(previewUrl); // Update the state variable for preview
+      showToast('success', `updated User profile pic.`)
 
       // Define where you want to store the image in Firebase Storage
       const storage = getStorage();
@@ -67,6 +72,7 @@ const Account = () => {
 
       } catch (err) {
         console.error("Error updating profile photo:", err);
+        showToast('error', 'error updating profile photo.');
 
       }
     }
@@ -86,9 +92,11 @@ const Account = () => {
         await updateDoc(userRef, {
           displayName: newUsername
         })
-        console.log(`updated username to ${auth.currentUser.displayName}`);
+
+        showToast('success', `updated username to ${newUsername}`);
       } catch (err) {
         console.error(err);
+        showToast('error', 'error updating username.');
       }
     }
   }
@@ -138,10 +146,11 @@ const Account = () => {
         await updateDoc(userRef, {
           desc: description
         })
-        console.log(`description updated to ${description}`);
         setUserDescription(description);
+        showToast('success', `updated user description.`);
       } catch (err) {
         console.log(err);
+        showToast('error', 'error updating user description.');
       }
     }
   }
@@ -191,9 +200,11 @@ const Account = () => {
           userType: selectedRole
         });
         setUserType(selectedRole);
+        showToast('success', `updated user type to ${selectedRole}`);
         console.log(`User type updated to ${selectedRole}`);
       } catch (err) {
         console.error("Error updating user type:", err);
+        showToast('error', 'error updating user type');
       }
     }
   };
@@ -280,13 +291,13 @@ const Account = () => {
               <option value="business">Small Business</option>
               <option value="personal">Personal</option>
             </Select>
-            <Button size="sm" onClick={handleUserTypeSave} ml={10}>
+            <Button size="sm" fontWeight='500' onClick={handleUserTypeSave} ml='2rem'>
               Save Role
             </Button>
           </Flex>
 
         </VStack>
-      </div>
+      </div >
       {/* <Divider borderColor="lightgrey" borderWidth="1px" maxW="" /> */}
     </>
   );

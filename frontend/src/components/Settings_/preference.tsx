@@ -1,15 +1,16 @@
-import { Switch, Divider, Flex, Heading, VStack, Text } from "@chakra-ui/react";
+import { Switch, Divider, Flex, Heading, VStack, Text, useToast, Button, Wrap, WrapItem } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase-config";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { UseToastNotification } from "../../utils/UseToastNotification";
+
+
 
 const Preference = () => {
-
   const [isLight, setIsLight] = useState(true);
-
+  const showToast = UseToastNotification();
 
   useEffect(() => {
-    // Fetch the theme preference when the component mounts
     const fetchThemePreference = async () => {
       if (auth.currentUser) {
         const userRef = doc(db, "users", auth.currentUser.email as string);
@@ -17,8 +18,7 @@ const Preference = () => {
           const docSnap = await getDoc(userRef);
           if (docSnap.exists()) {
             const userData = docSnap.data();
-            // Set the switch based on whether the userTheme is 'light'
-            setIsLight(userData.userTheme === 'dark');
+            setIsLight(userData.userTheme === 'light');
           } else {
             console.log("Document does not exist.");
           }
@@ -31,23 +31,25 @@ const Preference = () => {
     fetchThemePreference();
   }, []);
 
-
-
   const handleUserThemePreference = async () => {
-    const newTheme = isLight ? 'light' : 'dark';
+    const newTheme = isLight ? 'dark' : 'light';
     if (auth.currentUser) {
       try {
         const userRef = doc(db, "users", auth.currentUser.email as string);
         await updateDoc(userRef, {
           userTheme: newTheme
         });
-        setIsLight(!isLight); // Toggle the local state to reflect the new theme preference
-        console.log(`updated preference to ${newTheme}`)
+        setIsLight(!isLight);
+        showToast('success', `Preference updated to ${newTheme} mode.`);
       } catch (error) {
         console.log(error);
+        showToast('error', 'Error updating preference.');
       }
     }
-  }
+  };
+
+
+
   return (
     <>
       <div className="head">
@@ -64,14 +66,13 @@ const Preference = () => {
               colorScheme="purple"
               size="md"
               mx={2}
-              isChecked={isLight}
-              onChange={handleUserThemePreference} // Call handleThemeChange when the switch is toggled
+              isChecked={!isLight}
+              onChange={handleUserThemePreference}
             />
             <Text>Dark</Text>
           </Flex>
         </VStack>
         <Divider borderColor="lightgrey" borderWidth="1px" />
-
         {/* Add a toggle for notifications */}
       </div>
     </>

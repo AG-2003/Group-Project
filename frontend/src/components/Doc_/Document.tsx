@@ -130,7 +130,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
 
   const debouncedSaveDocumentToFirestore = debounce(
     saveDocumentToFirestore,
-    5000 // Delay in milliseconds
+    2000 // Delay in milliseconds
   );
   //____________________________________________________________
 
