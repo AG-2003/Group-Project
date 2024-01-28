@@ -64,11 +64,3 @@ function App() {
 }
 
 export default App;
-
-// import Call from "./pages/Call";
-
-// function App() {
-//   return <Call />;
-// }
-
-// export default App;

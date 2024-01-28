@@ -12,6 +12,11 @@ import {
 import "./NavBar.scss";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../../firebase-config";
+import { useAuthState } from "react-firebase-hooks/auth";
+// import Message from "../Chats/Message";
+import { Message } from "../../interfaces/Message";
 
 interface Props {
   isSidebarOpen: boolean;
@@ -23,6 +28,7 @@ interface Props {
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
+  const [user] = useAuthState(auth);
   const iconStyle = {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
@@ -34,6 +40,51 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
     if (documentTitle.trim() === "") {
       setDocumentTitle("Untitled");
     }
+  };
+
+  function randomID(len: number) {
+    let result = "";
+    if (result) return result;
+    var chars =
+      "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
+      maxPos = chars.length,
+      i;
+    len = len || 5;
+    for (i = 0; i < len; i++) {
+      result += chars.charAt(Math.floor(Math.random() * maxPos));
+    }
+    return result;
+  }
+
+
+
+  // Function to start the call
+  const handleStartCall = () => {
+    // Generate the roomID and construct the meeting link
+    const roomID = randomID(5);
+    const meetingLink =
+      window.location.protocol +
+      "//" +
+      window.location.host +
+      "/meeting?roomID=" +
+      roomID;
+
+    // Navigate to the Zoom meeting page
+    navigate(`/meeting?roomID=${roomID}`);
+
+    // Now you can send the meeting link to the chat or use it as needed
+    // For example, you can add a new message to the chat
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      text: meetingLink,
+      userId: user?.email,
+      timestamp: serverTimestamp(),
+      userPic: user?.photoURL,
+      userName: user?.displayName,
+    };
+
+    // Add the new message to the chat
+
   };
 
   return (
@@ -75,10 +126,11 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
           hasArrow
         >
           <IconButton
+
             className="action-icon call"
             aria-label="Video Call"
             icon={<IoVideocamOutline />}
-            onClick={onOpen}
+            onClick={handleStartCall}
           />
         </Tooltip>
         <Tooltip
