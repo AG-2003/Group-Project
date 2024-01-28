@@ -9826,7 +9826,7 @@ react-konva@^18.2.10:
 
 react-linkify@^1.0.0-alpha:
   version "1.0.0-alpha"
-  resolved "https://registry.npmjs.org/react-linkify/-/react-linkify-1.0.0-alpha.tgz"
+  resolved "https://registry.yarnpkg.com/react-linkify/-/react-linkify-1.0.0-alpha.tgz#b391c7b88e3443752fafe76a95ca4434e82e70d5"
   integrity sha512-7gcIUvJkAXXttt1fmBK9cwn+1jTa4hbKLGCZ9J1U6EOkyb2/+LKL1Z28d9rtDLMnpvImlNlLPdTPooorl5cpmg==
   dependencies:
     linkify-it "^2.0.3"
