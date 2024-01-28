@@ -54,15 +54,15 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({
             </Flex>
 
             <Stack className="profile-stats">
-              <Badge className="badge">7 Projects</Badge>
+              {/* <Badge className="badge">7 Projects</Badge>
               <Badge className="badge">11 Communities</Badge>
-              <Badge className="badge">4 Awards</Badge>
+              <Badge className="badge">4 Awards</Badge> */}
+              <button className="invite-button">Invite Members</button>
             </Stack>
           </Flex>
           <Flex className="profile-body">
             <Flex className="top-titles">
               <Text className="projects-title">Projects</Text>
-              <button className="invite-button">Invite Members</button>
             </Flex>
             <p className="no-documents-message">There are no documents yet.</p>
           </Flex>
