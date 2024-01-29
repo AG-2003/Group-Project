@@ -5,6 +5,7 @@ import {
   Divider,
   Flex,
   FormControl,
+  IconButton,
   Input,
   Text,
 } from "@chakra-ui/react";
@@ -32,8 +33,8 @@ import { Message } from "../../interfaces/Message";
 import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Dashboard/sidebar";
-
-
+import { BsFillSendFill } from "react-icons/bs";
+import { FaPaperclip } from "react-icons/fa6";
 
 const ChattingPage: React.FC = () => {
   // Dashboard routing
@@ -185,7 +186,7 @@ const ChattingPage: React.FC = () => {
     let result = "";
     if (result) return result;
     var chars =
-      "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
+        "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
       maxPos = chars.length,
       i;
     len = len || 5;
@@ -353,17 +354,36 @@ const ChattingPage: React.FC = () => {
                 </Flex>
               ))}
             </Box>
-
-            {/* Text Input Bar */}
-            <Flex className="text-input-bar">
-              <FormControl as="form" onSubmit={handleSendMessage}>
+            <Flex className="text-input-bar" align="center">
+              <FormControl
+                as="form"
+                onSubmit={handleSendMessage}
+                display="flex"
+                alignItems="center"
+              >
                 <Input
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder="Type your message..."
+                  mr="2"
                 />
-                <Button onClick={handleSendMessage}>Send</Button>
-                <Button onClick={handleSendFile}>Send File</Button>
+                <IconButton
+                  className="TextIcon"
+                  aria-label="Send message"
+                  icon={<BsFillSendFill />}
+                  onClick={handleSendMessage}
+                  // style={{ background: "none" }}
+                  size="sm"
+                  mr="2"
+                />
+                <IconButton
+                  className="TextIcon"
+                  aria-label="Attach files"
+                  icon={<FaPaperclip />}
+                  onClick={() => fileInputRef.current?.click()}
+                  // style={{ background: "none" }}
+                  size="sm"
+                />
                 <input
                   type="file"
                   ref={fileInputRef}

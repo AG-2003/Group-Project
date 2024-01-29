@@ -63,7 +63,12 @@ const Teams = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          <Flex direction="column" height="100vh" p={8}>
+          <Flex
+            className="containerTeams"
+            direction="column"
+            marginLeft={5}
+            marginTop={3}
+          >
             <>
               <CreateJoin />
               <JoinedTeams />
