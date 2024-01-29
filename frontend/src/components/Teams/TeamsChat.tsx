@@ -354,33 +354,6 @@ const ChattingPage: React.FC = () => {
                 </Flex>
               ))}
             </Box>
-
-            {/* Text Input Bar */}
-            {/* <Flex className="text-input-bar">
-              <FormControl as="form" onSubmit={handleSendMessage}>
-                <Input
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  placeholder="Type your message..."
-                />
-                <IconButton
-                  aria-label="Send message"
-                  icon={<BsFillSendFill />}
-                  onClick={handleSendMessage}
-                />
-                <IconButton
-                  aria-label="Send message"
-                  icon={<FaPaperclip />}
-                  onClick={handleSendFile}
-                />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={handleFileInputChange}
-                />
-              </FormControl>
-            </Flex> */}
             <Flex className="text-input-bar" align="center">
               <FormControl
                 as="form"

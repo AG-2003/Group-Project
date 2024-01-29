@@ -25,8 +25,18 @@
 }
 
 .call-button {
-  margin-left: auto;
-  background-color: #845cd4;
+  background-color: #845cd4 !important;
+  color: white !important; // Set your desired button text color here
+
+  &:hover {
+    background-color: darken(#845cd4, 10%)!important; // Darken the button on hover for a nice effect
+  }
+
+  &:active {
+    background-color: darken(#845cd4, 20%)!important; // Further darken the button when active/clicked
+  }
+
+  // Add other states if needed like :focus, :disabled etc.
 }
 
 .chat-area {
