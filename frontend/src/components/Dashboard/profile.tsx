@@ -118,7 +118,7 @@ const Profile: React.FC = () => {
                 {isLoadingDesc ? (<Spinner ml='2rem' />) :
                   <Box className="profile-text">
                     <ChakraLink as={ReactRouterLink} to='/settings' className="profile-name">
-                      {(userProfile.displayName || auth.currentUser?.displayName) || 'Set username by clicking on me.'}
+                      {(userProfile.displayName || auth.currentUser?.displayName) || 'Set username here'}
                     </ChakraLink>
                     <ChakraLink as={ReactRouterLink} to='/settings' className="profile-description">
                       {userDescription}
