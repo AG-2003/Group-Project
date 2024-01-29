@@ -21,11 +21,16 @@ import SideBar from "./sidebar";
 import { doc, getDoc } from "firebase/firestore";
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { Link as ChakraLink, LinkProps } from '@chakra-ui/react'
+import { SuiteData } from "../../interfaces/SuiteData";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(true);
+
+  const [user] = useAuthState(auth);
+  const [totalNoOfProjects, setTotalNoOfProjects] = useState(0)
 
   const sidebarVariants = {
     open: { width: "200px" },
@@ -59,7 +64,42 @@ const Profile: React.FC = () => {
     };
 
     fetchDescription();
+    getTotalNoOfProjects()
   }, []);
+
+
+//---------------------Calculate no. of projects---------------
+
+  const getTotalNoOfProjects = async () => {
+    if (user?.email) {
+      const userDocRef = doc(db, "users", user.email);
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        const userDocuments: SuiteData[] = userData.documents || [];
+        const userSheets: SuiteData[] = userData.sheets || [];
+        const userWhiteboards: SuiteData[] = userData.boards || [];
+
+        // Use the existing lastEdited field from Firestore data, don't generate a new one
+        let combinedProjects: SuiteData[] = [
+          ...userDocuments,
+          ...userSheets,
+          ...userWhiteboards
+        ];
+
+        combinedProjects = combinedProjects.filter(
+          (project: SuiteData) => !project.isTrash
+        );
+
+        const projectNum = combinedProjects.length;
+
+        setTotalNoOfProjects(projectNum)
+      }
+    }
+  };
+//_____________________________________________
+
 
   return (
     <>
@@ -128,7 +168,7 @@ const Profile: React.FC = () => {
               </Flex>
 
               <Stack className="profile-stats">
-                <Badge className="badge">7 Projects</Badge>
+                <Badge className="badge">{totalNoOfProjects} Projects</Badge>
                 <Badge className="badge">11 Communities</Badge>
                 <Badge className="badge">4 Awards</Badge>
               </Stack>
