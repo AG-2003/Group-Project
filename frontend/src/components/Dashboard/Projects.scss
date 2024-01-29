@@ -10,8 +10,8 @@
   
     .projects-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+      // gap: 1rem;
       justify-content: center;
     }
 
@@ -19,7 +19,7 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         border-radius: 0.5rem;
         width: 250px; // Set the card width to be smaller
-        margin: 1rem; // Adjust margin as needed for layout
+        // margin: 1rem; // Adjust margin as needed for layout
         overflow: hidden; // Ensure the border-radius is applied to child elements
 
       .card-top {
