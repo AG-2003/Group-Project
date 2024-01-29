@@ -30,11 +30,12 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
 
   const [user] = useAuthState(auth);
 
+
   //---------------Function to render the document in the database----------------
   useEffect(() => {
     const userEmail = user?.email
     if (userEmail) {
-      fetchDocumentFromFirestore(userEmail);
+      fetchDocumentFromFirestore(userEmail)
     }
   }, []);
 
@@ -49,6 +50,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           if (document) {
             setValue(document.content);
             setSuiteTitle(document.title)
+            setComments(document.comments || []);
           }
         }
       }
@@ -67,16 +69,18 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
         userEmail,
         suiteId,
         suiteTitle,
-        value
+        value,
+        comments
       );
     }
-  }, [value, suiteTitle]); // Only re-run the effect if 'value' changes
+  }, [value, suiteTitle, comments]); // Only re-run the effect if 'value' changes
 
   const saveDocumentToFirestore = async (
     userEmail: string,
     suiteId: string,
     suiteTitle: string,
-    text: string
+    text: string,
+    comments: CommentType[]
   ): Promise<void> => {
     try {
       const userDocRef = doc(db, "users", userEmail);
@@ -99,6 +103,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           title: suiteTitle,
           content: text,
           lastEdited: now, // Update last edited time
+          comments
         };
       } else {
         // Add a new document with a unique ID and current last edited time
@@ -108,7 +113,8 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           content: text,
           lastEdited: now, // Set last edited time for new document
           type: 'document',
-          isTrash: false
+          isTrash: false,
+          comments
         });
       }
 
@@ -262,7 +268,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
       if (range && range.length > 0) {
         const commentText = prompt("Enter your comment:");
         if (commentText) {
-          const comment = {
+          const comment: CommentType = {
             id: Date.now(),
             text: commentText,
             rangeIndex: range.index,
