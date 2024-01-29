@@ -22,7 +22,8 @@ import {
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
-import SideBar from "../components/Dashboard/sidebar";
+import SideBar from "../components/Social/sideBar";
+
 const DashboardSection = (title: string, items: any) => {
   return (
     <Box mt={10}>
@@ -91,7 +92,9 @@ const Social = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <SideBar onNavigate={function (arg: string): void {
+                throw new Error("Function not implemented.");
+              } } />
             </motion.div>
           ) : (
             <motion.div
@@ -108,7 +111,9 @@ const Social = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <SideBar onNavigate={function (arg: string): void {
+                  throw new Error("Function not implemented.");
+                } } />
             </motion.div>
           )}
         </AnimatePresence>
