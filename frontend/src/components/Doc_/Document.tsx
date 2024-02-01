@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, collection, getDoc } from "firebase/firestore";
+import { doc, setDoc, collection, getDoc, onSnapshot } from "firebase/firestore";
 
 import ReactQuill from "react-quill";
 import ToolBar from "./Toolbar";
@@ -29,35 +29,61 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
   const [isSpellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(true);
 
   const [user] = useAuthState(auth);
+  //Check if document is going to be used for collaboration
+  const isSharePage = window.location.pathname.includes('/doc/share');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
 
-  //---------------Function to render the document in the database----------------
+  //---------------Function to render the document from the database----------------
+  //If it is a collaboration page, subscribe to the sharedDoc
   useEffect(() => {
-    const userEmail = user?.email
-    if (userEmail) {
-      fetchDocumentFromFirestore(userEmail)
-    }
-  }, []);
+    if (isSharePage && !isEditing) {
+       const docRef = doc(db, "sharedDocs", suiteId);
+       const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
+         if (docSnapshot.exists()) {
+           const document = docSnapshot.data() as SuiteData;
+           setValue(document.content);
+           setSuiteTitle(document.title);
+           setComments(document.comments || []);
+           setIsLoading(false)
+         }
+       });
 
-  const fetchDocumentFromFirestore = async (userEmail: string) => {
-    try {
-      if (userEmail) {
-        const userDocRef = doc(db, "users", userEmail);
-        const docSnapshot = await getDoc(userDocRef);
-        if (docSnapshot.exists()) {
-          const documentsArray: SuiteData[] = docSnapshot.data().documents || [];
-          const document = documentsArray.find((doc: SuiteData) => doc.id === suiteId);
-          if (document) {
-            setValue(document.content);
-            setSuiteTitle(document.title)
-            setComments(document.comments || []);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching document:", error);
+       // Clean up the subscription on unmount
+       return () => {
+         if (unsubscribe) {
+           unsubscribe();
+         }
+       };
     }
-  };
+   }, [isSharePage, suiteId, isEditing]); // Re-run the effect if 'isSharePage' or 'suiteId' changes
+
+  //If it is not a collaboration page, only render once.
+  useEffect(() => {
+    if (!isSharePage) {
+        const fetchDocument = async () => {
+          const userEmail = user?.email;
+          if (userEmail) {
+            const userDocRef = doc(db, "users", userEmail);
+            const docSnapshot = await getDoc(userDocRef);
+            if (docSnapshot.exists()) {
+              const documentsArray: SuiteData[] = docSnapshot.data().documents || [];
+              const document = documentsArray.find((doc: SuiteData) => doc.id === suiteId);
+              if (document) {
+                setValue(document.content);
+                setSuiteTitle(document.title);
+                setComments(document.comments || []);
+              }
+            }
+          }
+
+          setIsLoading(false)
+        };
+
+        fetchDocument();
+    }
+  }, [isSharePage, suiteId, user?.email]); // Re-run the effect if 'isSharePage', 'suiteId', or 'user?.email' changes
   //____________________________________________________________
   //---------------Function to save the document to the database----------------
   // Use useEffect to call saveDocumentToFirestore whenever the value changes
@@ -65,13 +91,23 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
     const userEmail = user?.email;
     if (userEmail) {
 
-      debouncedSaveDocumentToFirestore(
-        userEmail,
-        suiteId,
-        suiteTitle,
-        value,
-        comments
-      );
+      if (!isSharePage) {
+        debouncedSaveDocumentToFirestore(
+          userEmail,
+          suiteId,
+          suiteTitle,
+          value,
+          comments
+        );
+      } else {
+        debouncedSaveSharedDocumentToFirestore(
+          userEmail,
+          suiteId,
+          suiteTitle,
+          value,
+          comments
+        );
+      }
     }
   }, [value, suiteTitle, comments]); // Only re-run the effect if 'value' changes
 
@@ -103,6 +139,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           title: suiteTitle,
           content: text,
           lastEdited: now, // Update last edited time
+          isShared: isSharePage,
           comments
         };
       } else {
@@ -114,6 +151,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           lastEdited: now, // Set last edited time for new document
           type: 'document',
           isTrash: false,
+          isShared: isSharePage,
           comments
         });
       }
@@ -131,6 +169,40 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
     }
   };
 
+  //Save a shared document to firestore
+  const saveSharedDocumentToFirestore = async (
+    userEmail: string,
+    suiteId: string,
+    suiteTitle: string,
+    text: string,
+    comments: CommentType[]
+   ): Promise<void> => {
+    try {
+       if (isSharePage && !isLoading) {
+         // Construct a new SuiteData object
+         const sharedDocument: SuiteData = {
+           id: suiteId,
+           content: text,
+           title: suiteTitle,
+           lastEdited: new Date().toISOString(),
+           type: 'document',
+           isTrash: false,
+           isShared: isSharePage,
+           comments: comments
+         };
+
+         // Save the document as a new document in the 'sharedDocs' collection
+         const sharedDocRef = doc(db, "sharedDocs", suiteId);
+         await setDoc(sharedDocRef, sharedDocument);
+         console.log("Shared document saved successfully");
+       } else {
+         // Handle the case where isSharePage is false (if needed)
+       }
+    } catch (error) {
+       console.error("Error saving shared document:", error);
+    }
+   };
+
   // If you are using debouncing, remember to apply it here as well
 
 
@@ -138,6 +210,15 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
     saveDocumentToFirestore,
     2000 // Delay in milliseconds
   );
+
+  const debouncedSaveSharedDocumentToFirestore = debounce(
+    saveSharedDocumentToFirestore,
+    2000 // Delay in milliseconds
+  );
+
+  const debouncedSetValue = debounce((newValue) => {
+    setValue(newValue);
+   }, 2000); // Debounce time in milliseconds
   //____________________________________________________________
 
   const toggleSearchVisibility = () => {
@@ -430,7 +511,10 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           className="editable-area"
           ref={quillRef}
           value={value}
-          onChange={setValue}
+          onChange={(newValue) => {
+            setIsEditing(true);
+            debouncedSetValue(newValue);
+         }}
           modules={modules}
         />
         <div className="comments-section">

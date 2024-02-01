@@ -2,6 +2,15 @@ import {
   IconButton,
   useDisclosure,
   Tooltip,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  Input,
+  Button,
+  useClipboard
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import {
@@ -27,7 +36,9 @@ interface Props {
 
 
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: shareModalOpen, onOpen: openShareModal, onClose: closeShareModal } = useDisclosure();
+  const { hasCopied, onCopy }: { hasCopied: boolean, onCopy: (text: string) => void } = useClipboard(""); // State for clipboard functionality
+
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const iconStyle = {
@@ -88,6 +99,17 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
   };
 
+  const handleCopyClick: React.MouseEventHandler<HTMLButtonElement> = async (event) => {
+    event.preventDefault(); // Prevent default behavior to avoid issues
+    onCopy("Yo, someone make this nonsense work");
+   };
+
+  const shareLink = (existingUrl : string) => {
+    const docIndex = existingUrl.indexOf("/doc") + 4;
+    const newUrl = existingUrl.substring(0, docIndex) + "/share" + existingUrl.substring(docIndex);
+    return newUrl
+  }
+
 
   return (
     <div className="navbar">
@@ -144,7 +166,6 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             className="action-icon analytics"
             aria-label="Analyse"
             icon={<IoBarChartOutline />}
-            onClick={onOpen}
           />
         </Tooltip>
         <Tooltip
@@ -157,10 +178,26 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             className="action-icon share"
             aria-label="share"
             icon={<IoShareOutline />}
-            onClick={onOpen}
+            onClick={openShareModal}
           />
         </Tooltip>
       </div>
+
+       {/* Share Modal */}
+       <Modal isOpen={shareModalOpen} onClose={closeShareModal} size="md">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Share Your Project</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input value={hasCopied ? "Copied to clipboard!" : "Copy the link below to share your project"} readOnly border="none"/>
+            <Input value={shareLink(window.location.href)} readOnly mt={2}/>
+            <Button onClick={handleCopyClick} mt={2} style={{right: "1"}}>
+              Someone make this work bruh
+            </Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

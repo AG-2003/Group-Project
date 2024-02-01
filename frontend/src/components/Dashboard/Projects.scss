@@ -1,13 +1,13 @@
  .projects-container {
   margin-top: 1rem;
-  
+
     .projects-heading {
       font-size: 2rem;
       margin-bottom: 1.5rem;
       font-weight: 600;
       // text-align: center;
     }
-  
+
     .projects-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
@@ -27,7 +27,7 @@
           background-position: center;
           color: white;
           position: relative;
-      
+
           &::after {
             content: '';
             display: block;
@@ -40,7 +40,7 @@
             pointer-events: none;
             z-index: 1;
           }
-      
+
           .project-title {
             font-size: 1.5rem;
             margin-left: 5px;
@@ -80,7 +80,7 @@
           }
         }
       }
-        
+
     .no-projects {
       text-align: center;
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.1); // Example shadow
@@ -93,13 +93,13 @@
           margin-bottom: 0.5rem;
           font-weight: 600;
           // margin-top: 1rem;
-          
+
         }
-      
+
         .no-projects-text {
           margin-bottom: 1rem;
         }
-      
+
         .create-button {
           background-color: #805ad5;
           color: white;
@@ -109,7 +109,7 @@
           font-size: 1rem;
           cursor: pointer;
           // margin-bottom: 1rem;
-      
+
           &:hover {
             background-color: #6b46c1;
           }
@@ -121,4 +121,5 @@
               height: 50vh;
               position: relative;
               top: 100px;
+              margin: 3rem;
             }

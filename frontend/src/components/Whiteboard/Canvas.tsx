@@ -243,7 +243,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           lastEdited: now,
           content: JSON.stringify(data),
           type: 'board',
-          isTrash: false
+          isTrash: false,
+          isShared: false
         });
       }
 

@@ -30,6 +30,7 @@ import SheetBg from "../../assets/SheetBg.png";
 import NoProj from "../../assets/ProjectsEmpty.png";
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<SuiteData[]>([]);
+  const [sharedProjects, setSharedProjects] = useState<SuiteData[]>([]);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
 
@@ -84,11 +85,16 @@ const Projects: React.FC = () => {
           ...userPowerpoints,
         ];
 
+        const sharedProjects = combinedProjects.filter(
+          (project: SuiteData) => !project.isTrash && project.isShared
+        );
+
         combinedProjects = combinedProjects.filter(
-          (project: SuiteData) => !project.isTrash
+          (project: SuiteData) => !project.isTrash && !project.isShared
         );
 
         setProjects(combinedProjects);
+        setSharedProjects(sharedProjects);
         setIsLoadingProjects(false);
       }
       setIsLoadingProjects(false);
