@@ -27,8 +27,19 @@ import QuickChat from "./pages/Chat";
 import TeamDetails from "./components/Teams/TeamDetails";
 import TeamsChat from "./components/Teams/TeamsChat";
 import Call from "./pages/Call";
+import { reportWebVitals } from "./utils/WebVitals";
+import { useEffect } from "react";
+
 
 function App() {
+
+  useEffect(() => {
+    reportWebVitals(metric => {
+      console.log(metric);
+    });
+  }, []);
+
+
   return (
     <Routes>
       <Route index element={<Landing />} />
@@ -62,5 +73,8 @@ function App() {
     </Routes>
   );
 }
+
+
+
 
 export default App;
