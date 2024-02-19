@@ -8,5 +8,6 @@ export interface SuiteData {
     type: 'document' | 'sheet' | 'board' | 'powerpoint';
     isTrash: boolean;
     isShared: boolean,
-    comments?: CommentType[]
+    comments?: CommentType[],
+    user?: string[]
 }

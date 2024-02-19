@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, collection, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
 
 import ReactQuill from "react-quill";
 import ToolBar from "./Toolbar";
@@ -202,6 +202,15 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
            isShared: isSharePage,
            comments: comments
          };
+
+         const userEmail = user?.email || ""
+
+         // Assuming `sharedDocument` is an instance of SuiteData and `userEmail` is the new user's email
+          if (sharedDocument.user && !sharedDocument.user.includes(userEmail)) {
+            sharedDocument.user.push(userEmail);
+          } else if (!sharedDocument.user) {
+            sharedDocument.user = [userEmail];
+          }
 
          console.log(suiteTitle)
 
