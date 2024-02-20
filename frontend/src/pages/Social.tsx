@@ -24,8 +24,8 @@ import {
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
-import SideBar from "../components/Dashboard/sidebar";
-import { FaShare } from "react-icons/fa6";
+import SideBar from "../components/Social/sideBar";
+
 const DashboardSection = (title: string, items: any) => {
   return (
     <Box mt={10}>
@@ -123,7 +123,11 @@ const Social = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <SideBar
+                onNavigate={function (arg: string): void {
+                  throw new Error("Function not implemented.");
+                }}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -140,12 +144,17 @@ const Social = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <SideBar
+                onNavigate={function (arg: string): void {
+                  throw new Error("Function not implemented.");
+                }}
+              />
             </motion.div>
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          {/* <div style={{ marginTop: "60px" }}>
+          <div style={{ marginTop: "60px" }}>
+            {/* This div contains code to display the comment section */}
             {openComments && (
               <div
                 style={{
@@ -195,6 +204,7 @@ const Social = () => {
               </div>
             )}
 
+            {/*This Div contains the post */}
             <div style={{ width: "800px" }}>
               <div
                 style={{
@@ -305,6 +315,7 @@ const Social = () => {
                 </div>
               </div>
             </div>
+            {/* this contains code to display the filter tab */}
             <div
               style={{
                 width: "320px",
@@ -392,78 +403,7 @@ const Social = () => {
                 </div>
               </div>
             </div>
-          </div> 
-          */}
-
-          <Flex>
-            {/* Sidebar with communities */}
-            <motion.div
-              initial={{ width: "25%" }}
-              animate={{ width: "25%" }}
-              transition={{ type: "spring", duration: 0.5 }}
-              style={{
-                backgroundColor: "#f6f6f6",
-                height: "100vh",
-                overflowY: "scroll",
-              }}
-            >
-              <Box p="4">
-                <Input placeholder="Search" mb="4" />
-                {communities.map((community) => (
-                  <Flex key={community.id} alignItems="center" mb="2">
-                    <Avatar src={community.img} mr="2" />
-                    <Text>{community.name}</Text>
-                    <Button ml="auto" variant="ghost" size="sm">
-                      {/* Star button to favorite */}★
-                    </Button>
-                  </Flex>
-                ))}
-              </Box>
-            </motion.div>
-
-            {/* Posts */}
-            <Box p="4" w="75%" borderLeft="1px solid #ccc" overflowY="scroll">
-              {posts.map((post) => (
-                <Box key={post.id} mb="4">
-                  {/* Header */}
-                  <Flex alignItems="center" mb="2">
-                    <Text fontSize="sm" mr="2">
-                      {post.communityName}
-                    </Text>
-                    <Text fontSize="sm" fontWeight="bold" mr="2">
-                      {post.userName}
-                    </Text>
-                    <Text fontSize="sm">{`${post.likes} likes • ${post.dislikes} dislikes • ${post.comments} comments`}</Text>
-                    <Text fontSize="sm" ml="auto">
-                      2 hours ago
-                    </Text>
-                  </Flex>
-
-                  {/* Post Content */}
-                  <Box mb="2">
-                    <Text fontWeight="bold">{post.postTitle}</Text>
-                    <Image src={post.postContent} alt="Post" mt="2" />
-                  </Box>
-
-                  {/* Action Buttons */}
-                  <Flex alignItems="center">
-                    <Button variant="ghost" size="sm" mr="2">
-                      <FaRegThumbsUp />
-                    </Button>
-                    <Button variant="ghost" size="sm" mr="2">
-                      <FaRegThumbsDown />
-                    </Button>
-                    <Button variant="ghost" size="sm" mr="2">
-                      <FaRegComment />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <FaShare />
-                    </Button>
-                  </Flex>
-                </Box>
-              ))}
-            </Box>
-          </Flex>
+          </div>
         </Box>
       </Box>
     </>
