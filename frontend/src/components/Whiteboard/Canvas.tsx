@@ -188,7 +188,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
           const board = doc.data() as SuiteData;
 
-          if(board){
+          if(board && board.content){
             const boardContent = JSON.parse(board.content)
             setLines(JSON.parse(boardContent[0]))
             setTexts(JSON.parse(boardContent[1]))
@@ -209,7 +209,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           if (docSnapshot.exists()) {
             const boardsArray: SuiteData[] = docSnapshot.data().boards || [];
             const board = boardsArray.find(board => board.id === suiteId);
-            if (board) {
+            if (board && board.content) {
               const boardContent = JSON.parse(board.content)
               setLines(JSON.parse(boardContent[0]))
               setTexts(JSON.parse(boardContent[1]))
@@ -229,7 +229,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           const docSnapshot = await getDoc(sharedBoardRef);
           if (docSnapshot.exists()) {
             const board = docSnapshot.data() as SuiteData;
-            if (board) {
+            if (board && board.content) {
               const boardContent = JSON.parse(board.content)
               setLines(JSON.parse(boardContent[0]))
               setTexts(JSON.parse(boardContent[1]))

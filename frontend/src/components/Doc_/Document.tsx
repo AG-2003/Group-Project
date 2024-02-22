@@ -12,13 +12,29 @@ import { debounce } from "../../utils/Time";
 import { CommentType } from "../../interfaces/CommentType";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 
+import { FirestoreProvider } from '@gmcfall/yjs-firestore-provider'
+import { app as firebaseApp } from '../../firebase-config'
+import { QuillBinding } from "y-quill";
+import QuillCursors from "quill-cursors";
+import * as Y from 'yjs'
+import { FireProvider } from "y-fire";
 
-/**
-* Set up basic rendering, saving of document and isLoading correctly for sharedDocs
-*/
+ReactQuill.Quill.register('modules/cursors', QuillCursors)
+
+function getRandomHexColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i =  0; i <  6; i++) {
+    color += letters[Math.floor(Math.random() *  16)];
+  }
+  return color;
+}
+
 
 const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
+  //Set the current value of the text editor or the react-quill component
   const [value, setValue] = useState<string>("");
+  //Reference the react-quill component
   const quillRef = useRef<ReactQuill>(null);
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentType[]>([]);
@@ -30,6 +46,42 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
 
   const [user] = useAuthState(auth);
 
+  const documentPath = `/sharedDocs/${suiteId}`
+
+  useEffect(() => {
+    if(isSharePage && !isLoading){
+      // A Yjs document holds the shared data
+      const ydoc = new Y.Doc()
+
+      const yprovider = new FireProvider({ firebaseApp, ydoc, path: documentPath });
+
+      if(yprovider.awareness){
+        yprovider.awareness.setLocalStateField('user', {
+          user: user?.email,
+          color: getRandomHexColor()
+        })
+
+        // Define a shared text type on the document
+        const ytext = ydoc.getText('quill')
+
+        // "Bind" the quill editor to a Yjs text type.
+        const binding = new QuillBinding(ytext, quillRef.current?.getEditor(), yprovider.awareness)
+
+        return () => {
+          yprovider.destroy()
+          binding.destroy()
+          ydoc.destroy()
+        }
+      }
+
+      return () => {
+        yprovider.destroy()
+        ydoc.destroy()
+      }
+    }
+  }, [isSharePage, isLoading])
+
+
 
   //---------------Function to render the document in the database----------------
   useEffect(() => {
@@ -39,19 +91,6 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
     } else if(userEmail && isSharePage){
       fetchSharedDocumentFromFirestore()
       setIsLoading(false)
-
-      const unsubscribe = onSnapshot(doc(db, "sharedDocs", suiteId), (doc) => {
-
-        const sourceData = doc.data() as SuiteData;
-
-        if(sourceData){
-          setValue(sourceData.content)
-          setSuiteTitle(sourceData.title)
-          setComments(sourceData.comments || [])
-        }
-      })
-
-      return () => unsubscribe()
     }
   }, []);
 
@@ -63,7 +102,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
         if (docSnapshot.exists()) {
           const documentsArray: SuiteData[] = docSnapshot.data().documents || [];
           const document = documentsArray.find((doc: SuiteData) => doc.id === suiteId);
-          if (document) {
+          if (document && document.content) {
             setValue(document.content);
             setSuiteTitle(document.title)
             setComments(document.comments || []);
@@ -82,7 +121,6 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
         if (docSnapshot.exists()) {
           const sharedDoc = docSnapshot.data() as SuiteData;
           if (sharedDoc) {
-            setValue(sharedDoc.content);
             setSuiteTitle(sharedDoc.title)
             setComments(sharedDoc.comments || []);
           }
@@ -188,43 +226,43 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
     suiteTitle: string,
     text: string,
     comments: CommentType[]
-   ): Promise<void> => {
+  ): Promise<void> => {
     try {
-       if (isSharePage) {
-         // Construct a new SuiteData object
-         const sharedDocument: SuiteData = {
-           id: suiteId,
-           content: text,
-           title: suiteTitle,
-           lastEdited: latestLastEdited || "",
-           type: 'document',
-           isTrash: false,
-           isShared: isSharePage,
-           comments: comments
-         };
+      if (isSharePage) {
+        // Retrieve the existing document
+        const sharedDocRef = doc(db, "sharedDocs", `${suiteId}`);
+        const docSnapshot = await getDoc(sharedDocRef);
+        let sharedDocument: SuiteData;
 
-         const userEmail = user?.email || ""
+        if (docSnapshot.exists()) {
+          // If the document exists, update only the comments and latestLastEdited fields
+          sharedDocument = docSnapshot.data() as SuiteData;
+          sharedDocument.comments = comments;
+          sharedDocument.lastEdited = latestLastEdited || "";
+          sharedDocument.title=suiteTitle
+        } else {
+          // If the document does not exist, construct a new SuiteData object
+          sharedDocument = {
+            id: suiteId,
+            title: suiteTitle,
+            lastEdited: latestLastEdited || "",
+            type: 'document',
+            isTrash: false,
+            isShared: isSharePage,
+            comments: comments
+          };
+        }
 
-         // Assuming `sharedDocument` is an instance of SuiteData and `userEmail` is the new user's email
-          if (sharedDocument.user && !sharedDocument.user.includes(userEmail)) {
-            sharedDocument.user.push(userEmail);
-          } else if (!sharedDocument.user) {
-            sharedDocument.user = [userEmail];
-          }
-
-         console.log(suiteTitle)
-
-         // Save the document as a new document in the 'sharedDocs' collection
-         const sharedDocRef = doc(db, "sharedDocs", suiteId);
-         await setDoc(sharedDocRef, sharedDocument);
-         console.log("Shared document saved successfully");
-       } else {
-         // Handle the case where isSharePage is false (if needed)
-       }
+        // Save the document with the updated fields
+        await setDoc(sharedDocRef, sharedDocument, { merge: true });
+        console.log("Shared document saved successfully");
+      } else {
+        // Handle the case where isSharePage is false (if needed)
+      }
     } catch (error) {
-       console.error("Error saving shared document:", error);
+      console.error("Error saving shared document:", error);
     }
-   };
+  };
 
 
   const debouncedSaveDocumentToFirestore = debounce(
@@ -481,6 +519,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
   const modules = useMemo(
     () => ({
       toolbar: false, // Keep this false if you are using a custom toolbar
+      cursors: true,
       history: {
         delay: 500,
         maxStack: 100,
