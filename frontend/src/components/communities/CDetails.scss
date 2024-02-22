@@ -1,0 +1,93 @@
+.community-container {
+    .community-header {
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background-color: #dcdcf6;
+      border-radius: 15px;
+  
+      .community-info {
+        display: flex;
+        align-items: center;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+  
+        .community-name {
+          font-size: 25px;
+          margin-left: 2rem;
+        }
+  
+        .community-description {
+          margin-left: 2rem;
+          font-size: 0.875rem; // example size, adjust as needed
+          color: #555; // example color, adjust as needed
+        }
+        .community-avatar {
+          margin-left: 1rem;
+          width: 5rem; // Adjust width as needed
+          height: 5rem; // Adjust height as needed
+          object-fit: cover; // This ensures the image covers the area without stretching
+        }
+      }
+    }
+  
+    .community-body {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+  }
+  
+  .top-titles {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; 
+  }
+  
+  .profile-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center; // Align items along the cross-axis (vertically in this case)
+    padding: 20px;
+  
+    .projects-title {
+      font-size: 1.2rem;
+    }
+    
+    .invite-button {
+      background-color: #63b3ed;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  
+    .no-documents-message {
+      color: #888; // Adjust color for the grayed-out style
+      font-size: 1.2rem;
+      margin-top: 150px; // Add margin for spacing
+    }
+  }
+  
+  .circular-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #845cd4; // Dark purple color, adjust as needed
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px; // Adjust as needed
+    height: 50px; // Adjust as needed
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem; // Adjust as needed
+  }
+  
+  .circular-button:hover {
+    background-color: #6348a9; // Darker purple color on hover, adjust as needed
+  }

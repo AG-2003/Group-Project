@@ -157,6 +157,7 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
 
         console.log("Community saved successfully");
       }
+      window.location.reload();
     } catch (error) {
       console.error("Error saving community:", error);
     }

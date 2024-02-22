@@ -28,6 +28,7 @@ import TeamDetails from "./components/Teams/TeamDetails";
 import TeamsChat from "./components/Teams/TeamsChat";
 import Call from "./pages/Call";
 import Communities from "./pages/Communities";
+import CDetails from "./components/communities/CDetails";
 
 function App() {
   return (
@@ -60,6 +61,10 @@ function App() {
         <Route path="/In_teams/chat/:team_id" element={<TeamsChat />} />
         <Route path="/meeting" element={<Call />} />
         <Route path="/communities" element={<Communities />} />
+        <Route
+          path="/Communities/In_communities/:C_id"
+          element={<CDetails />}
+        />
       </Route>
     </Routes>
   );

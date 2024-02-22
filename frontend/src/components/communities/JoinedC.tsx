@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { getDocs, collection } from "firebase/firestore";
+import {
+  getDoc,
+  getDocs,
+  collection,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import "./JoinedC.scss"; // Update the import as per your CSS file
 import { useNavigate } from "react-router-dom";
 
@@ -16,6 +22,7 @@ interface Community {
 
 const JoinedCommunities: React.FC = () => {
   const [communities, setCommunities] = useState<Community[]>([]);
+  const [joinedCommunityIds, setJoinedCommunityIds] = useState<string[]>([]);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const [filteredCommunities, setFilteredCommunities] = useState<Community[]>(
@@ -36,6 +43,19 @@ const JoinedCommunities: React.FC = () => {
 
         setCommunities(communitiesData);
         setFilteredCommunities(communitiesData); // Initialize filteredCommunities with all communities
+
+        // Fetch user data and add user's communities to joinedCommunityIds
+        if (user?.email) {
+          const userRef = doc(db, "users", user.email);
+          const userDoc = await getDoc(userRef);
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData?.communities) {
+              setJoinedCommunityIds(userData.communities);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error fetching communities:", error);
       }
@@ -43,6 +63,25 @@ const JoinedCommunities: React.FC = () => {
 
     fetchCommunities();
   }, []);
+
+  const handleJoinClick = async (communityId: string) => {
+    if (!user) return;
+
+    if (user?.email) {
+      const userRef = doc(db, "users", user.email);
+      const userDoc = await getDoc(userRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (!userData?.communities.includes(communityId)) {
+          await updateDoc(userRef, {
+            communities: [...userData?.communities, communityId],
+          });
+        }
+      }
+      setJoinedCommunityIds([...joinedCommunityIds, communityId]);
+    }
+  };
 
   // Function to handle click on a community card
   const handleCardClick = (communityId: string) => {
@@ -91,6 +130,20 @@ const JoinedCommunities: React.FC = () => {
             )}
             <h3 className="community-name">{community.name}</h3>
             <p className="community-description">{community.description}</p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleJoinClick(community.id);
+              }}
+              className={
+                joinedCommunityIds.includes(community.id)
+                  ? "joined-button"
+                  : "join-button"
+              }
+              disabled={joinedCommunityIds.includes(community.id)}
+            >
+              {joinedCommunityIds.includes(community.id) ? "Joined" : "Join"}
+            </button>
           </div>
         ))}
         {filteredCommunities.length === 0 && (
