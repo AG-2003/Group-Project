@@ -6,11 +6,13 @@ import {
   ViewIcon,
   InfoOutlineIcon,
 } from "@chakra-ui/icons";
-import { FaHouse,
-         FaChartColumn,
-         FaCircleUser,
-         FaBookmark,
-         FaPeopleGroup} from "react-icons/fa6";
+import {
+  FaHouse,
+  FaChartColumn,
+  FaCircleUser,
+  FaBookmark,
+  FaPeopleGroup,
+} from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -36,14 +38,6 @@ const SideBar = ({ onNavigate }: Props) => {
       <Button
         variant="ghost"
         justifyContent="flex-start"
-        leftIcon={<FaChartColumn />}
-        // onClick={() => onNavigate("security")}
-      >
-        Popular
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
         leftIcon={<FaCircleUser />}
         // onClick={() => onNavigate("preferences")}
       >
@@ -61,7 +55,7 @@ const SideBar = ({ onNavigate }: Props) => {
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaPeopleGroup />}
-        // onClick={goBack}
+        onClick={() => navigate("/communities")}
       >
         Community
       </Button>
