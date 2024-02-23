@@ -6,11 +6,13 @@ import {
   ViewIcon,
   InfoOutlineIcon,
 } from "@chakra-ui/icons";
-import { FaHouse,
-         FaChartColumn,
-         FaCircleUser,
-         FaBookmark,
-         FaPeopleGroup} from "react-icons/fa6";
+import {
+  FaHouse,
+  FaChartColumn,
+  FaCircleUser,
+  FaBookmark,
+  FaPeopleGroup,
+} from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -21,7 +23,7 @@ const SideBar = ({ onNavigate }: Props) => {
 
   // Function to go back
   const goBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate("/index"); // Go back to previous page
   };
   return (
     <VStack spacing={4} align="stretch" className="body">
@@ -32,14 +34,6 @@ const SideBar = ({ onNavigate }: Props) => {
         // onClick={() => onNavigate("account")}
       >
         All posts
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        leftIcon={<FaChartColumn />}
-        // onClick={() => onNavigate("security")}
-      >
-        Popular
       </Button>
       <Button
         variant="ghost"
@@ -61,7 +55,7 @@ const SideBar = ({ onNavigate }: Props) => {
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaPeopleGroup />}
-        // onClick={goBack}
+        onClick={() => navigate("/communities")}
       >
         Community
       </Button>

@@ -1,124 +1,125 @@
  .projects-container {
-  margin-top: 1rem;
-  
-    .projects-heading {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      // text-align: center;
-    }
-  
-    .projects-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
-      // gap: 1rem;
-      justify-content: center;
-    }
+   margin-top: 1rem;
 
-      .project-card {
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 0.5rem;
-        width: 250px; // Set the card width to be smaller
-        // margin: 1rem; // Adjust margin as needed for layout
-        overflow: hidden; // Ensure the border-radius is applied to child elements
+   .projects-heading {
+     font-size: 2rem;
+     margin-bottom: 1.5rem;
+     font-weight: 600;
+     // text-align: center;
+   }
 
-      .card-top {
-          background-size: cover;
-          background-position: center;
-          color: white;
-          position: relative;
-      
-          &::after {
-            content: '';
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
-            pointer-events: none;
-            z-index: 1;
-          }
-      
-          .project-title {
-            font-size: 1.5rem;
-            margin-left: 5px;
-            padding: 0.5rem;
-            padding-top: 2.5rem;
-            border-radius: 0.25rem;
-            font-weight: 500;
-            position: relative;
-            z-index: 2; // Make sure this is higher than the ::after pseudo-element
-          }
-        }
+   .projects-list {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+     // gap: 1rem;
+     justify-content: center;
+   }
 
-        .card-bottom {
-          padding: .75rem;
-          // background-color: #f8f8f8; // Lighter background for the bottom part
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          position: relative; // Relative positioning for the absolute trash icon
+   .project-card {
+     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+     border-radius: 0.5rem;
+     width: 250px; // Set the card width to be smaller
+     // margin: 1rem; // Adjust margin as needed for layout
+     overflow: hidden; // Ensure the border-radius is applied to child elements
 
-          .last-edited {
-            font-size: 0.75rem; // Make the "Last edited" text much smaller
-            margin: 0;
-          }
+     .card-top {
+       background-size: cover;
+       background-position: center;
+       color: white;
+       position: relative;
 
-          .delete-icon {
-            position: absolute;
-            // bottom: 5px; // Position at the bottom corner
-            right: 5px;
-            background-color: transparent;
-            border: none;
-            cursor: pointer; // Ensure it's clear the icon is clickable
+       &::after {
+         content: '';
+         display: block;
+         position: absolute;
+         top: 0;
+         left: 0;
+         right: 0;
+         bottom: 0;
+         background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+         pointer-events: none;
+         z-index: 1;
+       }
 
-            &:hover {
-              transform: scale(1.1);
-            }
-          }
-        }
-      }
-        
-    .no-projects {
-      text-align: center;
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.1); // Example shadow
-      border-radius: 1rem;
-      padding: 1rem;
-      height: 45%;
+       .project-title {
+         font-size: 1.5rem;
+         margin-left: 5px;
+         padding: 0.5rem;
+         padding-top: 2.5rem;
+         border-radius: 0.25rem;
+         font-weight: 500;
+         position: relative;
+         z-index: 2; // Make sure this is higher than the ::after pseudo-element
+       }
+     }
 
-      .no-projects-title {
-          font-size: 1.25rem;
-          margin-bottom: 0.5rem;
-          font-weight: 600;
-          // margin-top: 1rem;
-          
-        }
-      
-        .no-projects-text {
-          margin-bottom: 1rem;
-        }
-      
-        .create-button {
-          background-color: #805ad5;
-          color: white;
-          // padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 0.25rem;
-          font-size: 1rem;
-          cursor: pointer;
-          // margin-bottom: 1rem;
-      
-          &:hover {
-            background-color: #6b46c1;
-          }
-        }
-      }
-    }
+     .card-bottom {
+       padding: .75rem;
+       // background-color: #f8f8f8; // Lighter background for the bottom part
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       position: relative; // Relative positioning for the absolute trash icon
 
-            .ProjImage {
-              height: 50vh;
-              position: relative;
-              top: 100px;
-            }
+       .last-edited {
+         font-size: 0.75rem; // Make the "Last edited" text much smaller
+         margin: 0;
+       }
+
+       .delete-icon {
+         position: absolute;
+         // bottom: 5px; // Position at the bottom corner
+         right: 5px;
+         background-color: transparent;
+         border: none;
+         cursor: pointer; // Ensure it's clear the icon is clickable
+
+         &:hover {
+           transform: scale(1.1);
+         }
+       }
+     }
+   }
+
+   .no-projects {
+     text-align: center;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.1); // Example shadow
+     border-radius: 1rem;
+     padding: 1rem;
+     height: 45%;
+
+     .no-projects-title {
+       font-size: 1.25rem;
+       margin-bottom: 0.5rem;
+       font-weight: 600;
+       // margin-top: 1rem;
+
+     }
+
+     .no-projects-text {
+       margin-bottom: 1rem;
+     }
+
+     .create-button {
+       background-color: #805ad5;
+       color: white;
+       // padding: 0.5rem 1rem;
+       border: none;
+       border-radius: 0.25rem;
+       font-size: 1rem;
+       cursor: pointer;
+       // margin-bottom: 1rem;
+
+       &:hover {
+         background-color: #6b46c1;
+       }
+     }
+   }
+ }
+
+ .ProjImage {
+   height: 50vh;
+   position: relative;
+   top: 100px;
+   margin: 2rem;
+ }

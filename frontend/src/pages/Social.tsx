@@ -8,6 +8,8 @@ import {
   Avatar,
   Button,
   Divider,
+  Input,
+  Image,
 } from "@chakra-ui/react";
 import {
   FaSearch,
@@ -54,7 +56,36 @@ const DashboardSection = (title: string, items: any) => {
   );
 };
 
+const posts = [
+  {
+    id: 1,
+    communityName: "Community 1",
+    userName: "User 1",
+    postTitle: "Post Title 1",
+    postContent: "https://via.placeholder.com/300",
+    likes: 10,
+    dislikes: 2,
+    comments: 5,
+  },
+  {
+    id: 2,
+    communityName: "Community 2",
+    userName: "User 2",
+    postTitle: "Post Title 2",
+    postContent: "https://via.placeholder.com/300",
+    likes: 20,
+    dislikes: 5,
+    comments: 8,
+  },
+];
+
+const communities = [
+  { id: 1, name: "Community 1", img: "https://via.placeholder.com/50" },
+  { id: 2, name: "Community 2", img: "https://via.placeholder.com/50" },
+];
+
 const Social = () => {
+  const [selectedCommunity, setSelectedCommunity] = useState(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDisLikes] = useState(0);
   const [comments, setComments] = useState(0);
