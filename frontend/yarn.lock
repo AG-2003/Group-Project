@@ -12319,6 +12319,11 @@ xmlchars@^2.2.0:
   resolved "https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
 
+y-array@^10.1.4:
+  version "10.1.4"
+  resolved "https://registry.yarnpkg.com/y-array/-/y-array-10.1.4.tgz#e131a5b030d6dcbca10268d4293ecf44bdae7b34"
+  integrity sha512-RuIyy51UA+p20mLmXKpSa16Vur6g2kEPMjdE/zh5lBncfi6YRO8pHog+30GhaRZCUJaAMmeNNm6sD6LJv9ZggA==
+
 y-fire@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/y-fire/-/y-fire-1.0.2.tgz#ab2097a09719d21e58af336c70e8834a3a9e3576"

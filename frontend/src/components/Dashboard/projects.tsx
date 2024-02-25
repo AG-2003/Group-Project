@@ -285,7 +285,7 @@ const Projects: React.FC = () => {
           </Flex>) :
           <>
             <div className="projects-container">
-              <h2 className="projects-heading">Recent Designs</h2>
+              {sharedProjects.length!==0 && projects.length!==0 && <h2 className="projects-heading">Recent Designs</h2>}
               <div className="projects-list">
                 {projects.map((project: SuiteData) => (
                   <div
@@ -320,7 +320,7 @@ const Projects: React.FC = () => {
                     </div>
                   </div>
                 ))}
-                {projects.length === 0 && (
+                {projects.length === 0 && sharedProjects.length===0 && (
                   <>
                     <div className="no-projects">
                       <h3 className="no-projects-title">Don't have a design?</h3>
@@ -372,7 +372,8 @@ const Projects: React.FC = () => {
               </div>
             </div>
 
-            <div className="projects-container">
+          {sharedProjects.length !==0 &&
+          <div className="projects-container">
             <h2 className="projects-heading">Shared</h2>
             <div className="projects-list">
               {sharedProjects.map((project: SuiteData) => (
@@ -399,7 +400,7 @@ const Projects: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div>}
           </>
           }
 

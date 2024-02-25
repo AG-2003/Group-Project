@@ -12,7 +12,6 @@ import { debounce } from "../../utils/Time";
 import { CommentType } from "../../interfaces/CommentType";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 
-import { FirestoreProvider } from '@gmcfall/yjs-firestore-provider'
 import { app as firebaseApp } from '../../firebase-config'
 import { QuillBinding } from "y-quill";
 import QuillCursors from "quill-cursors";
@@ -60,6 +59,14 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           user: user?.email,
           color: getRandomHexColor()
         })
+
+        yprovider.awareness.setLocalState({
+          user: {
+            name: user?.email,
+            color: getRandomHexColor()
+          },
+        });
+
 
         // Define a shared text type on the document
         const ytext = ydoc.getText('quill')
@@ -119,10 +126,10 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
         const sharedDocRef = doc(db, "sharedDocs", suiteId);
         const docSnapshot = await getDoc(sharedDocRef);
         if (docSnapshot.exists()) {
-          const sharedDoc = docSnapshot.data() as SuiteData;
-          if (sharedDoc) {
-            setSuiteTitle(sharedDoc.title)
-            setComments(sharedDoc.comments || []);
+          const {title, comments} = docSnapshot.data() as SuiteData;
+          if (title && comments) {
+            setSuiteTitle(title)
+            setComments(comments || []);
           }
         }
     } catch (error) {
@@ -234,12 +241,18 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
         const docSnapshot = await getDoc(sharedDocRef);
         let sharedDocument: SuiteData;
 
-        if (docSnapshot.exists()) {
+        if (docSnapshot.exists() && user?.email) {
           // If the document exists, update only the comments and latestLastEdited fields
           sharedDocument = docSnapshot.data() as SuiteData;
           sharedDocument.comments = comments;
           sharedDocument.lastEdited = latestLastEdited || "";
           sharedDocument.title=suiteTitle
+
+          if (sharedDocument.user && !sharedDocument.user.includes(user?.email)) {
+            sharedDocument.user.push(user?.email);
+          } else if (!sharedDocument.user) {
+            sharedDocument.user = [user?.email];
+          }
         } else {
           // If the document does not exist, construct a new SuiteData object
           sharedDocument = {
