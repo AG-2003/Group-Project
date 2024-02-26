@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 import ReactQuill from "react-quill";
 import ToolBar from "./Toolbar";
@@ -28,7 +28,6 @@ function getRandomHexColor() {
   }
   return color;
 }
-
 
 const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
   //Set the current value of the text editor or the react-quill component
