@@ -1,3 +1,4 @@
+import { Badges } from "./components/Badges";
 import { Route, Routes } from "react-router-dom";
 import { Login } from "./pages/Auth/Login";
 import { EmailLogin } from "./pages/Auth/EmailLogin";
@@ -62,6 +63,7 @@ function App() {
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />
         <Route path="/Social" element={<Social />} />
+        <Route path="/badges" element={<Badges/>} /> 
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
