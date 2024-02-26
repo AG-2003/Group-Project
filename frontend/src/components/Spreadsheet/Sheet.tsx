@@ -123,7 +123,8 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
           content: data,
           type: 'sheet',
           lastEdited: now,
-          isTrash: false
+          isTrash: false,
+          isShared: false
         });
       }
 

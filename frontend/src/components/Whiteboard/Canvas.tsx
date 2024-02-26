@@ -10,7 +10,7 @@ import { debounce } from "../../utils/Time";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 import { SuiteData } from "../../interfaces/SuiteData";
 
-import { doc, setDoc, collection, getDoc } from "firebase/firestore";
+import { doc, setDoc, collection, getDoc, DocumentData, DocumentReference, onSnapshot } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 
@@ -167,6 +167,83 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
   const [serializedTextsData, setSerializedTextsData] = useState('')
   const [serializedRectanglesData, setSerializedRectanglesData] = useState('')
 
+  /**
+   * Collaboration purpose
+   */
+
+  const isSharePage = window.location.pathname.includes('/board/share')
+  const [isLoading, setIsLoading] = useState(true)
+
+    //---------------------------Function to render the saved whiteboard--------------
+    useEffect(() => {
+      const username = user?.email
+      if (username && !isSharePage) {
+        fetchDocumentFromFirestore(username);
+        setIsLoading(false)
+      } else if(isSharePage){
+        fetchSharedBoardFromFirestore(doc(collection(db, "sharedBoards"), suiteId))
+        setIsLoading(false)
+
+        const unsubscribe = onSnapshot(doc(db, "sharedBoards", suiteId), (doc) => {
+
+          const board = doc.data() as SuiteData;
+
+          if(board && board.content){
+            const boardContent = JSON.parse(board.content)
+            setLines(JSON.parse(boardContent[0]))
+            setTexts(JSON.parse(boardContent[1]))
+            setRectangles(JSON.parse(boardContent[2]))
+            setSuiteTitle(board.title)
+          }
+        })
+
+        return () => unsubscribe()
+      }
+    }, []);
+
+    const fetchDocumentFromFirestore = async (username: string) => {
+      try {
+        if (username) {
+          const userDocRef = doc(collection(db, "users"), username);
+          const docSnapshot = await getDoc(userDocRef);
+          if (docSnapshot.exists()) {
+            const boardsArray: SuiteData[] = docSnapshot.data().boards || [];
+            const board = boardsArray.find(board => board.id === suiteId);
+            if (board && board.content) {
+              const boardContent = JSON.parse(board.content)
+              setLines(JSON.parse(boardContent[0]))
+              setTexts(JSON.parse(boardContent[1]))
+              setRectangles(JSON.parse(boardContent[2]))
+              setSuiteTitle(board.title)
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching document:", error);
+      }
+    };
+
+    const fetchSharedBoardFromFirestore = async (sharedBoardRef: DocumentReference<DocumentData, DocumentData>) => {
+      try {
+        if (isSharePage) {
+          const docSnapshot = await getDoc(sharedBoardRef);
+          if (docSnapshot.exists()) {
+            const board = docSnapshot.data() as SuiteData;
+            if (board && board.content) {
+              const boardContent = JSON.parse(board.content)
+              setLines(JSON.parse(boardContent[0]))
+              setTexts(JSON.parse(boardContent[1]))
+              setRectangles(JSON.parse(boardContent[2]))
+              setSuiteTitle(board.title)
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching document:", error);
+      }
+    };
+    //____________________________________________________________
+
 
   useEffect(() => {
     /*
@@ -174,9 +251,12 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       *texts-> text from toolbar
       *rectangles-> a part of the 'shapes' on the toolbar
     */
-    setSerializedLinesData(JSON.stringify(lines))
-    setSerializedTextsData(JSON.stringify(texts))
-    setSerializedRectanglesData(JSON.stringify(rectangles))
+    if(!isLoading)
+      {
+        setSerializedLinesData(JSON.stringify(lines))
+        setSerializedTextsData(JSON.stringify(texts))
+        setSerializedRectanglesData(JSON.stringify(rectangles))
+      }
 
   }, [lines, texts, rectangles]); // This effect runs whenever user changes the board
   //____________________________________________________________
@@ -188,18 +268,26 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
   useEffect(() => {
     const username = user?.email
-    if (username) {
+    if (username && !isLoading) {
       const dataArray = [serializedLinesData, serializedTextsData, serializedRectanglesData]
 
-      debouncedSaveBoardToFirestore(
-        username,
-        suiteId,
-        suiteTitle,
-        dataArray
-      )
+      if(!isSharePage) {
+        debouncedSaveBoardToFirestore(
+          username,
+          suiteId,
+          suiteTitle,
+          dataArray
+        )
+      } else if (isSharePage) {
+        saveSharedBoardToFirestore(
+          username,
+          suiteId,
+          suiteTitle,
+          dataArray as [string, string, string]
+        )
+      }
     }
   }, [serializedLinesData, serializedTextsData, serializedRectanglesData, suiteTitle])
-
 
   const saveBoardToFirestore = async (
     username: string,
@@ -243,7 +331,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           lastEdited: now,
           content: JSON.stringify(data),
           type: 'board',
-          isTrash: false
+          isTrash: false,
+          isShared: false
         });
       }
 
@@ -261,41 +350,47 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     }
   };
 
+  /**
+   * For collaborative storage
+   */
+
+  const saveSharedBoardToFirestore = async (
+    username: string,
+    boardId: string,
+    boardTitle: string,
+    data: [string, string, string]
+  ) => {
+    try {
+
+      const sharedBoard: SuiteData = {
+        id: boardId,
+        title: boardTitle,
+        lastEdited: new Date().toISOString(),
+        content: JSON.stringify(data),
+        type: 'board',
+        isTrash: false,
+        isShared: false,
+      };
+
+      if (sharedBoard.user && !sharedBoard.user.includes(username)) {
+        sharedBoard.user.push(username);
+      } else if (!sharedBoard.user) {
+        sharedBoard.user = [username];
+      }
+
+      const sharedBoardRef = doc(collection(db, "sharedBoards"), boardId);
+      await setDoc(sharedBoardRef, sharedBoard);
+      // Get the current document to see if there are existing documents
+    } catch (error) {
+      console.error("Error saving board:", error);
+
+    }
+  };
+
   const debouncedSaveBoardToFirestore = debounce(
     saveBoardToFirestore,
     2000 // Delay in milliseconds
   );
-  //____________________________________________________________
-
-  //---------------------------Function to render the saved whiteboard--------------
-  useEffect(() => {
-    const username = user?.email
-    if (username) {
-      fetchDocumentFromFirestore(username);
-    }
-  }, []);
-
-  const fetchDocumentFromFirestore = async (username: string) => {
-    try {
-      if (username) {
-        const userDocRef = doc(collection(db, "users"), username);
-        const docSnapshot = await getDoc(userDocRef);
-        if (docSnapshot.exists()) {
-          const boardsArray: SuiteData[] = docSnapshot.data().boards || [];
-          const board = boardsArray.find(board => board.id === suiteId);
-          if (board) {
-            const boardContent = JSON.parse(board.content)
-            setLines(JSON.parse(boardContent[0]))
-            setTexts(JSON.parse(boardContent[1]))
-            setRectangles(JSON.parse(boardContent[2]))
-            setSuiteTitle(board.title)
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching document:", error);
-    }
-  };
   //____________________________________________________________
 
 
