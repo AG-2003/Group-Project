@@ -30,6 +30,7 @@ import TeamsChat from "./components/Teams/TeamsChat";
 import Call from "./pages/Call";
 import { reportWebVitals } from "./utils/WebVitals";
 import { useEffect } from "react";
+import { BadgesPage } from "./pages/BadgesPage";
 
 
 function App() {
@@ -63,7 +64,7 @@ function App() {
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />
         <Route path="/Social" element={<Social />} />
-        <Route path="/badges" element={<Badges/>} /> 
+        <Route path="/badges" element={<BadgesPage />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
