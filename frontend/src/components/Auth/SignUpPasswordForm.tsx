@@ -26,7 +26,7 @@ export function SignUpPasswordForm() {
   const location = useLocation();
   const showToast = UseToastNotification();
 
-  const email: string = location.state?.emailS; // getting the email the user entered earlier
+  const email: string = location.state?.email; // getting the email the user entered earlier
 
   const [pwd, setPwd] = useState<string>("");
   const [rePwd, setRePwd] = useState<string>("");

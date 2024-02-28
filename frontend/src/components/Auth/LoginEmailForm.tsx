@@ -28,7 +28,7 @@ export function LoginEmailForm() {
       if (emailExists) {
         navigate("/loginPassword", { state: { email: email } });
       } else {
-        navigate("/signUpEmail", { state: { email: email } });
+        navigate("/signUpPwd", { state: { email: email } });
       }
     } catch (err) {
       console.error("Error handling email submission:", err);
