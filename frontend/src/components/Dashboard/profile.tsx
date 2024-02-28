@@ -23,6 +23,7 @@ import { Link as ReactRouterLink } from 'react-router-dom'
 import { Link as ChakraLink, LinkProps } from '@chakra-ui/react'
 import { SuiteData } from "../../interfaces/SuiteData";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { FiAward } from "react-icons/fi";
 
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
@@ -68,7 +69,7 @@ const Profile: React.FC = () => {
   }, []);
 
 
-//---------------------Calculate no. of projects---------------
+  //---------------------Calculate no. of projects---------------
 
   const getTotalNoOfProjects = async () => {
     if (user?.email) {
@@ -98,7 +99,7 @@ const Profile: React.FC = () => {
       }
     }
   };
-//_____________________________________________
+  //_____________________________________________
 
 
   return (

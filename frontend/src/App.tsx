@@ -1,3 +1,4 @@
+import { Badges } from "./components/Badges";
 import { Route, Routes } from "react-router-dom";
 import { Login } from "./pages/Auth/Login";
 import { EmailLogin } from "./pages/Auth/EmailLogin";
@@ -27,9 +28,21 @@ import QuickChat from "./pages/Chat";
 import TeamDetails from "./components/Teams/TeamDetails";
 import TeamsChat from "./components/Teams/TeamsChat";
 import Call from "./pages/Call";
+import { reportWebVitals } from "./utils/WebVitals";
+import { useEffect } from "react";
+import { BadgesPage } from "./pages/BadgesPage";
+
 import Test from "./testFolder/Test";
 
 function App() {
+
+  useEffect(() => {
+    reportWebVitals(metric => {
+      console.log(metric);
+    });
+  }, []);
+
+
   return (
     <Routes>
       <Route index element={<Landing />} />
@@ -52,6 +65,7 @@ function App() {
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />
         <Route path="/Social" element={<Social />} />
+        <Route path="/badges" element={<BadgesPage />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
@@ -64,5 +78,8 @@ function App() {
     </Routes>
   );
 }
+
+
+
 
 export default App;
