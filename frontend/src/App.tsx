@@ -62,7 +62,7 @@ function App() {
         <Route path="/meeting" element={<Call />} />
         <Route path="/communities" element={<Communities />} />
         <Route
-          path="/Communities/In_communities/:C_id"
+          path="/Communities/In_communities/:community_id"
           element={<CDetails />}
         />
       </Route>

@@ -21,7 +21,9 @@ import { useNavigate, useParams } from "react-router-dom";
 // import InvModal from "./InvModal";
 import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
-import SideBar from "../Dashboard/sidebar";
+import SideBar from "../Social/sideBar";
+import Posts from "./Posts";
+import "./Posts.scss";
 
 const CommunityDetails: React.FC = () => {
   const [communityDetails, setCommunityDetails] = useState<DocumentData | null>(
@@ -56,7 +58,7 @@ const CommunityDetails: React.FC = () => {
           // Ensure communityId is defined before creating the DocumentReference
           const communityDocRef: DocumentReference<DocumentData> = doc(
             db,
-            "communities",
+            "public_communities",
             community_id
           );
           const communityDocSnapshot = await getDoc(communityDocRef);
@@ -107,7 +109,11 @@ const CommunityDetails: React.FC = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <SideBar
+                onNavigate={function (arg: string): void {
+                  throw new Error("Function not implemented.");
+                }}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -124,7 +130,11 @@ const CommunityDetails: React.FC = () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <SideBar
+                onNavigate={function (arg: string): void {
+                  throw new Error("Function not implemented.");
+                }}
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -151,14 +161,14 @@ const CommunityDetails: React.FC = () => {
                   </Flex>
 
                   <Stack className="profile-stats">
-                    <Badge className="badge">0 Projects</Badge>
+                    <Badge className="badge">0 Posts</Badge>
                     <Badge className="badge">
                       {communityDetails.members.length + 1} Members
                     </Badge>
                     <Badge className="badge">0 Awards</Badge>
                   </Stack>
                 </Flex>
-                <Flex className="profile-body">
+                {/* <Flex className="profile-body">
                   <Flex className="top-titles">
                     <Text className="projects-title">Projects</Text>
                     <button className="invite-button" onClick={handleInvClick}>
@@ -168,10 +178,10 @@ const CommunityDetails: React.FC = () => {
                   <p className="no-documents-message">
                     There are no documents yet.
                   </p>
-                </Flex>
+                </Flex> */}
                 {/* chat onclick goes here */}
 
-                <div
+                {/* <div
                   className="circular-button"
                   onClick={() => {
                     if (community_id) {
@@ -180,16 +190,19 @@ const CommunityDetails: React.FC = () => {
                   }}
                 >
                   <IoChatbubblesSharp />
-                </div>
+                </div> */}
 
                 {/* <InvModal
                   communityId={community_id}
                   isOpen={isInvModalOpen}
                   onClose={handleInvModalClose}
                 /> */}
+                <div className="posts-container">
+                  <Posts />
+                </div>
               </div>
             ) : (
-              <p>Loading community details...</p>
+              <p>Loading community details..</p>
             )}
           </div>
         </Box>
