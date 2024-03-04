@@ -17,32 +17,12 @@ import { User } from "firebase/auth"; // Import the User type from your Firebase
 import "./loginForm.scss";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { BadgesType } from "../../interfaces/BadgesType";
+import { initialBadges } from "../../utils/Tasks";
 
 export function LoginForm() {
   const navigate = useNavigate(); // Initialize the navigate function
   const [user] = useAuthState(auth);
 
-  const initialBadges: BadgesType[] = [
-    { name: 'Verify email', status: auth.currentUser?.emailVerified || false },
-    { name: 'Create a document', status: false },
-    { name: 'Join a team', status: false },
-    { name: 'join a community', status: false },
-    { name: 'Post in any community', status: false },
-    { name: 'Get 10 likes on a community Post', status: false },
-    { name: 'Get 100 likes on a community Post', status: false },
-    { name: 'Get 500 likes on a community Post', status: false },
-    { name: 'Get 1000 likes on a community Post', status: false },
-    { name: 'Get 5000 likes on a community Post', status: false },
-    { name: 'Get 10000 likes on a community Post', status: false },
-    { name: 'Place top 3 in a community leaderboard', status: false },
-    { name: 'Place 1st in a community leaderboard', status: false },
-    { name: 'Create a community', status: false },
-    { name: 'Reach 10 daily user in your community', status: false },
-    { name: 'Reach 100 daily user in your community', status: false },
-    { name: 'Reach 500 daily user in your community', status: false },
-    { name: 'Reach 1000 daily user in your community', status: false },
-
-  ]
 
   //Remove the line if you want to test out log In page
   if (user != null) {
@@ -77,9 +57,9 @@ export function LoginForm() {
       const docSnapshot = await getDoc(userRef);
       if (!docSnapshot.exists()) {
         // setting the status for email verified here when creating an account through google/microsoft
-        const emailVerifiedBadge = {  
+        const emailVerifiedBadge = {
           name: 'Verify email',
-          status: user.emailVerified 
+          status: user.emailVerified
         };
         const otherBadges = initialBadges.filter(badge => badge.name !== 'Verify email');
         const allBadges = [emailVerifiedBadge, ...otherBadges];
