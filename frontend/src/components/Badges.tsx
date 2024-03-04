@@ -1,48 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Flex, Text, Heading, Divider, Badge, useColorModeValue, IconButton } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import Navbar from '../components/Dashboard/Navbar';
 import SideBar from '../components/Dashboard/sidebar';
 import carbBg2 from '../assets/carbBg2.png';
-
-// sample tasks for now, have to add more and make it dynamic.
-const tasks = [
-    { name: 'Complete profile', completed: true },
-    { name: 'Create a document', completed: false },
-    { name: 'Join a team', completed: false },
-    { name: 'join a community', completed: false },
-    { name: 'Post in any community', completed: false },
-    { name: 'Get 10 likes on a community Post', completed: false },
-    { name: 'Get 100 likes on a community Post', completed: false },
-    { name: 'Get 500 likes on a community Post', completed: false },
-    { name: 'Get 1000 likes on a community Post', completed: false },
-    { name: 'Get 5000 likes on a community Post', completed: false },
-    { name: 'Get 10000 likes on a community Post', completed: false },
-    { name: 'Place top 3 in a community leaderboard', completed: false },
-    { name: 'Place 1st in a community leaderboard', completed: false },
-    { name: 'Create a community', completed: false },
-    { name: 'Reach 10 daily user in your community', completed: false },
-    { name: 'Reach 100 daily user in your community', completed: false },
-    { name: 'Reach 500 daily user in your community', completed: false },
-    { name: 'Reach 1000 daily user in your community', completed: false },
+import { BadgesType } from '../interfaces/BadgesType';
+import { db } from '../firebase-config';
+import { auth } from '../firebase-config';
+import { collection, getDocs, query, where, DocumentData, getDoc, doc, updateDoc } from 'firebase/firestore';
+import { SuiteData } from '../interfaces/SuiteData';
 
 
-    // Add more tasks here
-];
+
 
 export const Badges: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [tasks, setTasks] = useState<BadgesType[]>([]);
+
+    const email = auth.currentUser?.email;
+
+
     const sidebarVariants = {
         open: { width: '200px' },
         closed: { width: '0px' },
     };
 
     const bgColor = useColorModeValue('gray.50', 'gray.800');
-    
+
 
     // Function to toggle the sidebar
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+    const fetchUserTasks = async () => {
+        if (email) {
+            const userRef = doc(db, 'users', email);
+            const userDoc = await getDoc(userRef);
+
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const userBadges: BadgesType[] = userData.Badges.map((badge: any) => ({
+                    name: badge.name,
+                    status: badge.status,
+                }));
+
+                console.log(userBadges);
+                setTasks(userBadges);
+            } else {
+                console.log("No such document!");
+            }
+        } else {
+            console.log("No authenticated user!");
+        }
+    }
+
+    useEffect(() => {
+        fetchUserTasks();
+    }, [fetchUserTasks])
+
+    const updateCreateDocTask = async () => {
+        if (email) {
+            const docRef = doc(db, 'users', email)
+            const userDoc = await getDoc(docRef);
+            if (userDoc.exists()) {
+                const userDocData = userDoc.data();
+                const badges: BadgesType[] = userDocData.Badges || [];
+                const createDocumentBadgeIndex: number = badges.findIndex(badge => badge.name === 'Create a document');
+
+                if (userDoc.data().documents && !badges[createDocumentBadgeIndex].status && createDocumentBadgeIndex !== -1) {
+                    badges[createDocumentBadgeIndex].status = true;
+                    await updateDoc(docRef, {
+                        Badges: badges
+                    })
+                }
+            }
+
+        }
+    }
+
+    useEffect(() => {
+        updateCreateDocTask();
+    }, [updateCreateDocTask])
 
     return (
         <>
@@ -95,14 +133,14 @@ export const Badges: React.FC = () => {
                             <Flex align="center" justify="space-between">
                                 <Text fontWeight="bold">{task.name}</Text>
                                 <IconButton
-                                    aria-label={task.completed ? 'Task completed' : 'Task not completed'}
-                                    icon={task.completed ? <CheckIcon /> : <CloseIcon />}
+                                    aria-label={task.status ? 'Task completed' : 'Task not completed'}
+                                    icon={task.status ? <CheckIcon /> : <CloseIcon />}
                                     isRound
                                     size="sm"
-                                    colorScheme={task.completed ? 'green' : 'red'}
+                                    colorScheme={task.status ? 'green' : 'red'}
                                 />
                             </Flex>
-                            {task.completed && (
+                            {task.status && (
                                 <Badge colorScheme="green" ml="1" mt="2">
                                     Completed
                                 </Badge>
