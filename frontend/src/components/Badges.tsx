@@ -57,6 +57,10 @@ export const Badges: React.FC = () => {
 
     useEffect(() => {
         fetchUserTasks();
+        updateCreateBoardTask();
+        updateCreateDocTask();
+        updateCreateSheetTask();
+        updateJoinTeamTask();
     }, [fetchUserTasks])
 
     const updateCreateDocTask = async () => {
@@ -79,10 +83,6 @@ export const Badges: React.FC = () => {
         }
     }
 
-    useEffect(() => {
-        updateCreateDocTask();
-    }, [updateCreateDocTask])
-
 
     const updateCreateSheetTask = async () => {
         if (email) {
@@ -103,11 +103,6 @@ export const Badges: React.FC = () => {
         }
     }
 
-    useEffect(() => {
-        updateCreateSheetTask();
-    }, [updateCreateSheetTask])
-
-
     const updateCreateBoardTask = async () => {
         if (email) {
             const docRef = doc(db, 'users', email);
@@ -126,11 +121,6 @@ export const Badges: React.FC = () => {
             }
         }
     }
-
-    useEffect(() => {
-        updateCreateBoardTask();
-    }, [updateCreateBoardTask])
-
 
     const updateJoinTeamTask = async () => {
         if (email) {
@@ -151,10 +141,6 @@ export const Badges: React.FC = () => {
             }
         }
     }
-
-    useEffect(() => {
-        updateJoinTeamTask();
-    }, [updateJoinTeamTask])
 
 
     return (
