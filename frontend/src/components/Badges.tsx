@@ -14,6 +14,7 @@ import { SuiteData } from '../interfaces/SuiteData';
 
 
 
+
 export const Badges: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [tasks, setTasks] = useState<BadgesType[]>([]);
@@ -39,12 +40,12 @@ export const Badges: React.FC = () => {
 
             if (userDoc.exists()) {
                 const userData = userDoc.data();
-                const userBadges: BadgesType[] = userData.Badges.map((badge: any) => ({
+                const userBadges: BadgesType[] = userData.Badges.map((badge: BadgesType) => ({
                     name: badge.name,
                     status: badge.status,
                 }));
 
-                console.log(userBadges);
+
                 setTasks(userBadges);
             } else {
                 console.log("No such document!");
@@ -81,6 +82,80 @@ export const Badges: React.FC = () => {
     useEffect(() => {
         updateCreateDocTask();
     }, [updateCreateDocTask])
+
+
+    const updateCreateSheetTask = async () => {
+        if (email) {
+            const docRef = doc(db, 'users', email);
+            const userDoc = await getDoc(docRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const badges: BadgesType[] = userData.Badges || [];
+                const createSheetTaskIndex: number = badges.findIndex(badge => badge.name === 'Create a spreadsheet');
+                if (userDoc.data().sheets.length > 0 && !badges[createSheetTaskIndex].status && createSheetTaskIndex !== -1) {
+                    badges[createSheetTaskIndex].status = true;
+                    await updateDoc(docRef, {
+                        Badges: badges
+                    })
+                }
+
+            }
+        }
+    }
+
+    useEffect(() => {
+        updateCreateSheetTask();
+    }, [updateCreateSheetTask])
+
+
+    const updateCreateBoardTask = async () => {
+        if (email) {
+            const docRef = doc(db, 'users', email);
+            const userDoc = await getDoc(docRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const badges: BadgesType[] = userData.Badges || [];
+                const createBoardTaskIndex: number = badges.findIndex(badge => badge.name === 'Create a whiteboard');
+                if (userDoc.data().boards && !badges[createBoardTaskIndex].status && createBoardTaskIndex !== -1) {
+                    badges[createBoardTaskIndex].status = true;
+                    await updateDoc(docRef, {
+                        Badges: badges
+                    })
+                }
+
+            }
+        }
+    }
+
+    useEffect(() => {
+        updateCreateBoardTask();
+    }, [updateCreateBoardTask])
+
+
+    const updateJoinTeamTask = async () => {
+        if (email) {
+            const docRef = doc(db, 'users', email);
+            const userDoc = await getDoc(docRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const badges: BadgesType[] = userData.Badges || [];
+                const joinTeamTaskIndex: number = badges.findIndex(badge => badge.name === 'Join a team');
+
+                if (userDoc.data().teams && !badges[joinTeamTaskIndex].status && joinTeamTaskIndex !== -1) {
+                    badges[joinTeamTaskIndex].status = true;
+                    await updateDoc(docRef, {
+                        Badges: badges
+                    })
+                }
+
+            }
+        }
+    }
+
+    useEffect(() => {
+        updateJoinTeamTask();
+    }, [updateJoinTeamTask])
+
 
     return (
         <>

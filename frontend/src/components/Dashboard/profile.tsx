@@ -24,6 +24,7 @@ import { Link as ChakraLink, LinkProps } from '@chakra-ui/react'
 import { SuiteData } from "../../interfaces/SuiteData";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FiAward } from "react-icons/fi";
+import { BadgesType } from "../../interfaces/BadgesType";
 
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
@@ -31,7 +32,8 @@ const Profile: React.FC = () => {
   const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(true);
 
   const [user] = useAuthState(auth);
-  const [totalNoOfProjects, setTotalNoOfProjects] = useState(0)
+  const [totalNoOfProjects, setTotalNoOfProjects] = useState<number>(0)
+  const [totalNoOfAwards, setTotalNoOfAwards] = useState<number>(0);
 
   const sidebarVariants = {
     open: { width: "200px" },
@@ -65,7 +67,8 @@ const Profile: React.FC = () => {
     };
 
     fetchDescription();
-    getTotalNoOfProjects()
+    getTotalNoOfProjects();
+    getTotalNoOfAwards();
   }, []);
 
 
@@ -93,13 +96,28 @@ const Profile: React.FC = () => {
           (project: SuiteData) => !project.isTrash
         );
 
-        const projectNum = combinedProjects.length;
 
-        setTotalNoOfProjects(projectNum)
+
+        setTotalNoOfProjects(combinedProjects.length)
       }
     }
   };
   //_____________________________________________
+
+  //-------------------Calculate no. of awards----------------------
+
+  const getTotalNoOfAwards = async () => {
+    if (user?.email) {
+      const docRef = doc(db, 'users', user?.email);
+      const docSnapshot = await getDoc(docRef);
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        const badges: BadgesType[] = userData.Badges || [];
+        const awards: BadgesType[] = badges.filter(badge => badge.status === true);
+        setTotalNoOfAwards(awards.length);
+      }
+    }
+  }
 
 
   return (
@@ -171,7 +189,7 @@ const Profile: React.FC = () => {
               <Stack className="profile-stats">
                 <Badge className="badge">{totalNoOfProjects} Projects</Badge>
                 <Badge className="badge">11 Communities</Badge>
-                <Badge className="badge">4 Awards</Badge>
+                <Badge className="badge">{totalNoOfAwards} Awards</Badge>
               </Stack>
 
               <Button className="leaderboard-button">Leaderboard</Button>
