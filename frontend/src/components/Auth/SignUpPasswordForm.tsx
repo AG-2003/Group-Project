@@ -20,8 +20,31 @@ import { setDoc, doc, collection, DocumentData } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import "./passwordForm.scss";
 import { UseToastNotification } from "../../utils/UseToastNotification";
+import { BadgesType } from "../../interfaces/BadgesType";
 
 export function SignUpPasswordForm() {
+
+  const initialBadges: BadgesType[] = [
+    { name: 'Verify email', status: auth.currentUser?.emailVerified || false },
+    { name: 'Create a document', status: false },
+    { name: 'Join a team', status: false },
+    { name: 'join a community', status: false },
+    { name: 'Post in any community', status: false },
+    { name: 'Get 10 likes on a community Post', status: false },
+    { name: 'Get 100 likes on a community Post', status: false },
+    { name: 'Get 500 likes on a community Post', status: false },
+    { name: 'Get 1000 likes on a community Post', status: false },
+    { name: 'Get 5000 likes on a community Post', status: false },
+    { name: 'Get 10000 likes on a community Post', status: false },
+    { name: 'Place top 3 in a community leaderboard', status: false },
+    { name: 'Place 1st in a community leaderboard', status: false },
+    { name: 'Create a community', status: false },
+    { name: 'Reach 10 daily user in your community', status: false },
+    { name: 'Reach 100 daily user in your community', status: false },
+    { name: 'Reach 500 daily user in your community', status: false },
+    { name: 'Reach 1000 daily user in your community', status: false },
+
+  ]
   const navigate = useNavigate();
   const location = useLocation();
   const showToast = UseToastNotification();
@@ -53,7 +76,8 @@ export function SignUpPasswordForm() {
           userType: "",
           userTheme: "light",
           photoURL: user.photoURL,
-          sheets: []
+          sheets: [],
+          Badges: initialBadges
         } as DocumentData);
         showToast('success', `you have successfully created an account`)
         setTimeout(() => { navigate("/index") }, 1000)
