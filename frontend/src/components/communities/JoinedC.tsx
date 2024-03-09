@@ -18,6 +18,7 @@ interface Community {
   role: string;
   members: string[];
   image: string | null;
+  status: string;
 }
 
 const JoinedCommunities: React.FC = () => {
@@ -32,13 +33,15 @@ const JoinedCommunities: React.FC = () => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
-        const querySnapshot = await getDocs(
-          collection(db, "public_communities")
-        );
+        const querySnapshot = await getDocs(collection(db, "communities"));
         const communitiesData: Community[] = [];
 
         querySnapshot.forEach((doc) => {
-          communitiesData.push({ id: doc.id, ...doc.data() } as Community);
+          const { id: communityId, ...communityData } = doc.data() as Community;
+          if (communityData.status === "Public") {
+            // Filter communities by status
+            communitiesData.push({ id: communityId, ...communityData });
+          }
         });
 
         setCommunities(communitiesData);

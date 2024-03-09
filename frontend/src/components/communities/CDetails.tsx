@@ -7,28 +7,46 @@ import {
   Stack,
   Badge,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 import { db } from "../../firebase-config";
 import {
   doc,
   getDoc,
+  setDoc,
   DocumentData,
   DocumentReference,
+  Firestore,
+  collection,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import "./CDetails.scss"; // Import the SCSS file
 import { IoChatbubblesSharp } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
-// import InvModal from "./InvModal";
 import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Social/sideBar";
-import Posts from "./Posts";
-import "./Posts.scss";
+import Posts from "./Posts"; // Import the Posts component
+import "./Posts.scss"; // Import the CSS file for post styling
+import PostModal from "./PostModal";
 
 const CommunityDetails: React.FC = () => {
   const [communityDetails, setCommunityDetails] = useState<DocumentData | null>(
     null
   );
+  const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
+  const [communityPosts, setCommunityPosts] = useState<any[]>([]);
+
+  const handleCreatePostClick = () => {
+    setCreatePostModalOpen(true);
+  };
+
+  const handleCloseCreatePostModal = () => {
+    setCreatePostModalOpen(false);
+  };
+
   let { community_id } = useParams();
   const navigate = useNavigate();
 
@@ -55,10 +73,9 @@ const CommunityDetails: React.FC = () => {
     const fetchCommunityDetails = async () => {
       try {
         if (community_id) {
-          // Ensure communityId is defined before creating the DocumentReference
           const communityDocRef: DocumentReference<DocumentData> = doc(
             db,
-            "public_communities",
+            "communities",
             community_id
           );
           const communityDocSnapshot = await getDoc(communityDocRef);
@@ -75,15 +92,70 @@ const CommunityDetails: React.FC = () => {
     fetchCommunityDetails();
   }, [community_id]);
 
-  // inv stuff
-  const [isInvModalOpen, setInvModalOpen] = useState(false);
+  // Fetch community posts
+  useEffect(() => {
+    const fetchCommunityPosts = async () => {
+      try {
+        if (community_id) {
+          const firestoreDB = db as Firestore;
 
-  const handleInvClick = () => {
-    setInvModalOpen(true);
+          const communityPostsRef = collection(firestoreDB, "communityPosts");
+          const q = query(communityPostsRef, where("Cid", "==", community_id));
+          const snapshot = await getDocs(q);
+
+          const postsData = snapshot.docs.map((doc) => doc.data());
+          setCommunityPosts(postsData);
+        }
+      } catch (error) {
+        console.error("Error fetching community posts:", error);
+      }
+    };
+
+    fetchCommunityPosts();
+  }, [community_id]);
+
+  // Function to handle liking a post
+  const handleLike = async (postId: string) => {
+    const updatedPosts = communityPosts.map((post) => {
+      if (post.id === postId) {
+        return { ...post, like: post.like + 1 };
+      }
+      return post;
+    });
+    setCommunityPosts(updatedPosts);
+
+    try {
+      const postRef = doc(db, "communityPosts", postId);
+      await setDoc(
+        postRef,
+        { like: updatedPosts.find((post) => post.id === postId)?.like },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error("Error updating like count:", error);
+    }
   };
 
-  const handleInvModalClose = () => {
-    setInvModalOpen(false);
+  // Function to handle disliking a post
+  const handleDislike = async (postId: string) => {
+    const updatedPosts = communityPosts.map((post) => {
+      if (post.id === postId) {
+        return { ...post, like: post.like - 1 };
+      }
+      return post;
+    });
+    setCommunityPosts(updatedPosts);
+
+    try {
+      const postRef = doc(db, "communityPosts", postId);
+      await setDoc(
+        postRef,
+        { like: updatedPosts.find((post) => post.id === postId)?.like },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error("Error updating like count:", error);
+    }
   };
 
   return (
@@ -168,38 +240,41 @@ const CommunityDetails: React.FC = () => {
                     <Badge className="badge">0 Awards</Badge>
                   </Stack>
                 </Flex>
-                {/* <Flex className="profile-body">
+                <Flex className="profile-body">
                   <Flex className="top-titles">
-                    <Text className="projects-title">Projects</Text>
-                    <button className="invite-button" onClick={handleInvClick}>
-                      Invite Members
-                    </button>
+                    <Text fontSize="xl" fontWeight="bold" mb="4" mt="2">
+                      Latest Posts
+                    </Text>
+                    <Button
+                      colorScheme="blue"
+                      size="sm"
+                      ml="2"
+                      onClick={handleCreatePostClick}
+                    >
+                      Create a Post
+                    </Button>
                   </Flex>
-                  <p className="no-documents-message">
-                    There are no documents yet.
-                  </p>
-                </Flex> */}
-                {/* chat onclick goes here */}
 
-                {/* <div
-                  className="circular-button"
-                  onClick={() => {
-                    if (community_id) {
-                      handleChatClick(community_id);
-                    }
-                  }}
-                >
-                  <IoChatbubblesSharp />
-                </div> */}
+                  <PostModal
+                    isOpen={isCreatePostModalOpen}
+                    onClose={handleCloseCreatePostModal}
+                    Cid={community_id ? community_id : "null"}
+                  />
 
-                {/* <InvModal
-                  communityId={community_id}
-                  isOpen={isInvModalOpen}
-                  onClose={handleInvModalClose}
-                /> */}
-                <div className="posts-container">
-                  <Posts />
-                </div>
+                  <div className="posts-container">
+                    {communityPosts
+                      .slice()
+                      .reverse()
+                      .map((post, index) => (
+                        <Posts
+                          key={index}
+                          post={post}
+                          onLike={handleLike} // Pass onLike function to Posts component
+                          onDislike={handleDislike} // Pass onDislike function to Posts component
+                        />
+                      ))}
+                  </div>
+                </Flex>
               </div>
             ) : (
               <p>Loading community details..</p>

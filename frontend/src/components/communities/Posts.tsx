@@ -1,80 +1,125 @@
 import React, { useState } from "react";
-import { Box, Text, Button } from "@chakra-ui/react"; // Import Chakra UI components for styling
+import { Box, Text, Button, Flex } from "@chakra-ui/react"; // Import Chakra UI components for styling
+import { DocumentData } from "firebase/firestore";
 
-const Posts: React.FC = () => {
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
+interface Props {
+  post: DocumentData;
+  onLike: (postId: string) => void; // Callback function to handle liking
+  onDislike: (postId: string) => void; // Callback function to handle disliking
+}
+
+const Posts = ({ post, onLike, onDislike }: Props) => {
   const [likeClicked, setLikeClicked] = useState(false);
   const [dislikeClicked, setDislikeClicked] = useState(false);
 
   const handleLikeClick = () => {
     if (!likeClicked) {
-      setLikes(likes + 1);
+      onLike(post.id); // Call the onLike callback with the post id
       setLikeClicked(true);
       if (dislikeClicked) {
-        setDislikes(dislikes - 1);
+        onDislike(post.id); // Call the onDislike callback to remove dislike
         setDislikeClicked(false);
       }
+    } else {
+      onDislike(post.id); // Call the onDislike callback to remove like
+      setLikeClicked(false);
     }
   };
 
   const handleDislikeClick = () => {
     if (!dislikeClicked) {
-      setDislikes(dislikes + 1);
+      onDislike(post.id); // Call the onDislike callback with the post id
       setDislikeClicked(true);
       if (likeClicked) {
-        setLikes(likes - 1);
+        onLike(post.id); // Call the onLike callback to remove like
         setLikeClicked(false);
       }
+    } else {
+      onLike(post.id); // Call the onDislike callback to remove dislike
+      setDislikeClicked(false);
     }
+  };
+
+  const handleShareClick = () => {
+    // Logic to share the post link
+    console.log("Share clicked");
+  };
+
+  const handleCommentsClick = () => {
+    // Logic to navigate to full screen post view with comments
+    console.log("Comments clicked");
   };
 
   return (
     <Box>
-      <Text fontSize="xl" fontWeight="bold" mb="4">
-        Latest Posts
-      </Text>
-      {/* Example post */}
       <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
-        {/* Blank square for picture */}
-        <Box
-          bg="gray.200"
-          w="100%"
-          h="300px" // Adjust the height of the square as needed
-          mb="4"
-        />
+        {/* Display post image if available, otherwise display a placeholder */}
+        {post.image ? (
+          <img
+            src={post.image}
+            alt=""
+            style={{
+              width: "100%",
+              height: "300px",
+              objectFit: "cover",
+              marginBottom: "1rem",
+            }}
+          />
+        ) : (
+          <Box
+            bg="gray.200"
+            w="100%"
+            h="300px" // Adjust the height of the square as needed
+            mb="4"
+          />
+        )}
         <Text fontSize="lg" fontWeight="bold" mb="2">
-          Post Title
+          {post.title}
         </Text>
         <Text fontSize="sm" color="gray.500" mb="2">
-          Date Posted: January 1, 2024
+          Date Posted: {post.date}
         </Text>
-        <Text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris
-          tristique magna ut purus facilisis, non hendrerit risus fringilla.
-          Nullam eget consequat mi.
-        </Text>
+        <Text>{post.description}</Text>
         {/* Like and Dislike buttons with counters */}
-        <Button
-          colorScheme="green"
-          size="sm"
-          mt="2"
-          mr="2"
-          onClick={handleLikeClick}
-          isDisabled={likeClicked}
-        >
-          Like ({likes})
-        </Button>
-        <Button
-          colorScheme="red"
-          size="sm"
-          mt="2"
-          mr="2"
-          onClick={handleDislikeClick}
-          isDisabled={dislikeClicked}
-        >
-          Dislike ({dislikes})
-        </Button>
+        <Flex align="center" mt="2">
+          <Button
+            colorScheme={likeClicked ? "green" : "gray"}
+            size="sm"
+            mr="2"
+            onClick={handleLikeClick}
+            isDisabled={dislikeClicked}
+          >
+            Like
+          </Button>
+          <Text fontSize="sm" mr="2">
+            {post.like}
+          </Text>
+          <Button
+            colorScheme={dislikeClicked ? "red" : "gray"}
+            size="sm"
+            mr="2"
+            onClick={handleDislikeClick}
+            isDisabled={likeClicked}
+          >
+            Dislike
+          </Button>
+          <Button
+            colorScheme="blue"
+            size="sm"
+            mr="2"
+            onClick={handleShareClick}
+          >
+            Share
+          </Button>
+          <Button size="sm" onClick={handleCommentsClick}>
+            <Box as="span" mr="1">
+              <Text as="span">{post.commentsCount || 0}</Text>{" "}
+            </Box>
+            <Box as="span">
+              <Text as="span">Comments</Text>
+            </Box>
+          </Button>
+        </Flex>
       </Box>
     </Box>
   );

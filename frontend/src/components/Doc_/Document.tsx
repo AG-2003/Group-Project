@@ -12,24 +12,28 @@ import { debounce } from "../../utils/Time";
 import { CommentType } from "../../interfaces/CommentType";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 
-import { app as firebaseApp } from '../../firebase-config'
+import { app as firebaseApp } from "../../firebase-config";
 import { QuillBinding } from "y-quill";
 import QuillCursors from "quill-cursors";
-import * as Y from 'yjs'
+import * as Y from "yjs";
 import { FireProvider } from "y-fire";
 
-ReactQuill.Quill.register('modules/cursors', QuillCursors)
+ReactQuill.Quill.register("modules/cursors", QuillCursors);
 
 function getRandomHexColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i =  0; i <  6; i++) {
-    color += letters[Math.floor(Math.random() *  16)];
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
 }
 
-const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
+const Document: React.FC<SuiteProps> = ({
+  suiteId,
+  suiteTitle,
+  setSuiteTitle,
+}: SuiteProps) => {
   //Set the current value of the text editor or the react-quill component
   const [value, setValue] = useState<string>("");
   //Reference the react-quill component
@@ -37,66 +41,71 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isSpellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(true);
-  const isSharePage = window.location.pathname.includes('/doc/share')
+  const isSharePage = window.location.pathname.includes("/doc/share");
 
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
   const [latestLastEdited, setLatestLastEdited] = useState<string | null>(null);
 
   const [user] = useAuthState(auth);
 
-  const documentPath = `/sharedDocs/${suiteId}`
+  const documentPath = `/sharedDocs/${suiteId}`;
 
   useEffect(() => {
-    if(isSharePage && !isLoading){
+    if (isSharePage && !isLoading) {
       // A Yjs document holds the shared data
-      const ydoc = new Y.Doc()
+      const ydoc = new Y.Doc();
 
-      const yprovider = new FireProvider({ firebaseApp, ydoc, path: documentPath });
+      const yprovider = new FireProvider({
+        firebaseApp,
+        ydoc,
+        path: documentPath,
+      });
 
-      if(yprovider.awareness){
-        yprovider.awareness.setLocalStateField('user', {
+      if (yprovider.awareness) {
+        yprovider.awareness.setLocalStateField("user", {
           user: user?.email,
-          color: getRandomHexColor()
-        })
+          color: getRandomHexColor(),
+        });
 
         yprovider.awareness.setLocalState({
           user: {
             name: user?.email,
-            color: getRandomHexColor()
+            color: getRandomHexColor(),
           },
         });
 
-
         // Define a shared text type on the document
-        const ytext = ydoc.getText('quill')
+        const ytext = ydoc.getText("quill");
 
         // "Bind" the quill editor to a Yjs text type.
-        const binding = new QuillBinding(ytext, quillRef.current?.getEditor(), yprovider.awareness)
+        const binding = new QuillBinding(
+          ytext,
+          quillRef.current?.getEditor(),
+          yprovider.awareness
+        );
 
         return () => {
-          yprovider.destroy()
-          binding.destroy()
-          ydoc.destroy()
-        }
+          yprovider.destroy();
+          binding.destroy();
+          ydoc.destroy();
+        };
       }
 
       return () => {
-        yprovider.destroy()
-        ydoc.destroy()
-      }
+        yprovider.destroy();
+        ydoc.destroy();
+      };
     }
-  }, [isSharePage, isLoading])
-
-
+  }, [isSharePage, isLoading]);
 
   //---------------Function to render the document in the database----------------
   useEffect(() => {
-    const userEmail = user?.email
+    const userEmail = user?.email;
     if (userEmail && !isSharePage) {
-      fetchDocumentFromFirestore(userEmail)
-    } else if(userEmail && isSharePage){
-      fetchSharedDocumentFromFirestore()
-      setIsLoading(false)
+      fetchDocumentFromFirestore(userEmail);
+    } else if (userEmail && isSharePage) {
+      fetchSharedDocumentFromFirestore();
+      setIsLoading(false);
     }
   }, []);
 
@@ -106,11 +115,14 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
         const userDocRef = doc(db, "users", userEmail);
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
-          const documentsArray: SuiteData[] = docSnapshot.data().documents || [];
-          const document = documentsArray.find((doc: SuiteData) => doc.id === suiteId);
+          const documentsArray: SuiteData[] =
+            docSnapshot.data().documents || [];
+          const document = documentsArray.find(
+            (doc: SuiteData) => doc.id === suiteId
+          );
           if (document && document.content) {
             setValue(document.content);
-            setSuiteTitle(document.title)
+            setSuiteTitle(document.title);
             setComments(document.comments || []);
           }
         }
@@ -122,15 +134,15 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
 
   const fetchSharedDocumentFromFirestore = async () => {
     try {
-        const sharedDocRef = doc(db, "sharedDocs", suiteId);
-        const docSnapshot = await getDoc(sharedDocRef);
-        if (docSnapshot.exists()) {
-          const {title, comments} = docSnapshot.data() as SuiteData;
-          if (title && comments) {
-            setSuiteTitle(title)
-            setComments(comments || []);
-          }
+      const sharedDocRef = doc(db, "sharedDocs", suiteId);
+      const docSnapshot = await getDoc(sharedDocRef);
+      if (docSnapshot.exists()) {
+        const { title, comments } = docSnapshot.data() as SuiteData;
+        if (title && comments) {
+          setSuiteTitle(title);
+          setComments(comments || []);
         }
+      }
     } catch (error) {
       console.error("Error fetching document:", error);
     }
@@ -141,33 +153,23 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
   useEffect(() => {
     const userEmail = user?.email;
     if (userEmail && !isSharePage) {
-
-        debouncedSaveDocumentToFirestore(
-          userEmail,
-          suiteId,
-          suiteTitle,
-          value,
-          comments
-        );
-    }
-  }, [value, suiteTitle, comments]); // Only re-run the effect if 'value' changes
-
-  useEffect(() => {
-
-    const userEmail = user?.email
-
-    if(userEmail && isSharePage && !isLoading){
-
-      saveSharedDocumentToFirestore(
+      debouncedSaveDocumentToFirestore(
+        userEmail,
         suiteId,
         suiteTitle,
         value,
         comments
       );
-
     }
+  }, [value, suiteTitle, comments]); // Only re-run the effect if 'value' changes
 
-  }, [latestLastEdited, suiteTitle])
+  useEffect(() => {
+    const userEmail = user?.email;
+
+    if (userEmail && isSharePage && !isLoading) {
+      saveSharedDocumentToFirestore(suiteId, suiteTitle, value, comments);
+    }
+  }, [latestLastEdited, suiteTitle]);
 
   const saveDocumentToFirestore = async (
     userEmail: string,
@@ -188,7 +190,9 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
       const now = new Date().toISOString(); // Get current time as ISO string
 
       // Check if the document with the given ID already exists
-      const existingDocIndex = documentsArray.findIndex(doc => doc.id === suiteId);
+      const existingDocIndex = documentsArray.findIndex(
+        (doc) => doc.id === suiteId
+      );
 
       if (existingDocIndex !== -1) {
         // Update the existing document's title, content, and last edited time
@@ -197,7 +201,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           title: suiteTitle,
           content: text,
           lastEdited: now, // Update last edited time
-          comments
+          comments,
         };
       } else {
         // Add a new document with a unique ID and current last edited time
@@ -206,20 +210,15 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           title: suiteTitle,
           content: text,
           lastEdited: now, // Set last edited time for new document
-          type: 'document',
+          type: "document",
           isTrash: false,
           isShared: false,
-          comments
+          comments,
         });
       }
 
       // Update the user's document with the new or updated documents array
-      await setDoc(
-        userDocRef,
-        { documents: documentsArray },
-        { merge: true }
-
-      );
+      await setDoc(userDocRef, { documents: documentsArray }, { merge: true });
       console.log("Document saved successfully");
     } catch (error) {
       console.error("Error saving document:", error);
@@ -245,9 +244,12 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           sharedDocument = docSnapshot.data() as SuiteData;
           sharedDocument.comments = comments;
           sharedDocument.lastEdited = latestLastEdited || "";
-          sharedDocument.title=suiteTitle
+          sharedDocument.title = suiteTitle;
 
-          if (sharedDocument.user && !sharedDocument.user.includes(user?.email)) {
+          if (
+            sharedDocument.user &&
+            !sharedDocument.user.includes(user?.email)
+          ) {
             sharedDocument.user.push(user?.email);
           } else if (!sharedDocument.user) {
             sharedDocument.user = [user?.email];
@@ -258,10 +260,10 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
             id: suiteId,
             title: suiteTitle,
             lastEdited: latestLastEdited || "",
-            type: 'document',
+            type: "document",
             isTrash: false,
             isShared: isSharePage,
-            comments: comments
+            comments: comments,
           };
         }
 
@@ -275,7 +277,6 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
       console.error("Error saving shared document:", error);
     }
   };
-
 
   const debouncedSaveDocumentToFirestore = debounce(
     saveDocumentToFirestore,
@@ -576,8 +577,8 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           ref={quillRef}
           value={value}
           onChange={(newValue) => {
-            setValue(newValue)
-            setLatestLastEdited(new Date().toISOString())
+            setValue(newValue);
+            setLatestLastEdited(new Date().toISOString());
           }}
           modules={modules}
         />

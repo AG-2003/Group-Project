@@ -31,7 +31,6 @@ interface CommunityData {
   status: string;
   members: string[];
   image: string | null;
-  postID: string;
 }
 
 interface Props {
@@ -42,7 +41,7 @@ interface Props {
 const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const [communityName, setCommunityName] = useState("");
   const [communityDescription, setCommunityDescription] = useState("");
-  const [communityStatus, setCommunityStatus] = useState("");
+  const [communityStatus, setCommunityStatus] = useState("Public");
   const [emailInputs, setEmailInputs] = useState([""]);
   const [image, setImage] = useState<File | null>(null);
   const [user] = useAuthState(auth);
@@ -83,7 +82,6 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const saveCommunityToFirestore = async () => {
     try {
       const userMail = user?.email;
-      const postID = communityName.toLowerCase().replace(/\s+/g, "-163146");
 
       if (userMail) {
         const newCommunity: CommunityData = {
@@ -93,17 +91,11 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
           status: communityStatus,
           members: emailInputs.filter((email) => email.trim() !== ""),
           image: null,
-          postID: postID,
         };
 
-        const communityCollection =
-          communityStatus === "Private"
-            ? "private_communities"
-            : "public_communities";
+        const communityDocRef = doc(db, "communities", newCommunity.id);
 
-        const communityDocRef = doc(db, communityCollection, newCommunity.id);
         const DocRef = doc(db, "users", userMail);
-        const postsDocRef = doc(db, "communityPosts", newCommunity.postID);
 
         const docSnapshot = await getDoc(communityDocRef);
         const userDocSnapshot = await getDoc(DocRef);
@@ -121,8 +113,6 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
             newCommunity.id,
           ],
         });
-
-        await setDoc(postsDocRef, { posts: [] });
 
         for (const email of newCommunity.members) {
           const memberDocRef = doc(db, "users", email);
