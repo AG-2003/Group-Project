@@ -1,3 +1,4 @@
+import { Badges } from "./components/Badges";
 import { Route, Routes } from "react-router-dom";
 import { Login } from "./pages/Auth/Login";
 import { EmailLogin } from "./pages/Auth/EmailLogin";
@@ -29,8 +30,17 @@ import TeamsChat from "./components/Teams/TeamsChat";
 import Call from "./pages/Call";
 import Communities from "./pages/Communities";
 import CDetails from "./components/communities/CDetails";
+import { reportWebVitals } from "./utils/WebVitals";
+import { useEffect } from "react";
+import { BadgesPage } from "./pages/BadgesPage";
 
 function App() {
+  useEffect(() => {
+    reportWebVitals((metric) => {
+      console.log(metric);
+    });
+  }, []);
+
   return (
     <Routes>
       <Route index element={<Landing />} />
@@ -46,13 +56,14 @@ function App() {
         <Route path="/Settings" element={<Settings />} />
         <Route path="/chat" element={<QuickChat />} />
         <Route path="/doc/*" element={<Doc />} />
-        <Route path="/Board" element={<Whiteboard />} />
-        <Route path="/Sheet" element={<Spreadsheet />} />
+        <Route path="/board/*" element={<Whiteboard />} />
+        <Route path="/sheet/*" element={<Spreadsheet />} />
         {/* ---- */}
         <Route path="/Projects" element={<Projects />} />
         <Route path="/Home" element={<Profile />} />
         <Route path="/Teams" element={<Teams />} />
         <Route path="/Social" element={<Social />} />
+        <Route path="/badges" element={<BadgesPage />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
