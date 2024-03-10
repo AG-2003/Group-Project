@@ -12,7 +12,10 @@ import { SuiteData } from "../../interfaces/SuiteData";
 
 import { doc, setDoc, collection, getDoc, DocumentData, DocumentReference, onSnapshot } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "../../firebase-config";
+import { auth, db, app as firebaseApp } from "../../firebase-config";
+
+import * as Y from 'yjs'
+import { FireProvider } from "y-fire";
 
 
 type Tool = "pen" | "eraser" | "text" | "clear" | "pointer" | "shape";
@@ -160,6 +163,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
   const [showShapeMenu, setShowShapeMenu] = useState(false);
 
+  const [user] = useAuthState(auth)
+
 
 
   //---------------Store the serialized data-----------------
@@ -173,6 +178,78 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
   const isSharePage = window.location.pathname.includes('/board/share')
   const [isLoading, setIsLoading] = useState(true)
+  const [ydoc, setYdoc] = useState<Y.Doc | null>(null); // Step 1: Define a state variable for ydoc
+
+  useEffect(() => {
+    if(isSharePage && !isLoading){
+      const ydoc = new Y.Doc();
+
+      const lineOrder = ydoc.getMap('orderMap')
+      const toolsArray = ydoc.getMap('toolsMap')
+      const pointsArray = ydoc.getMap('pointsMap')
+      const colorArray = ydoc.getMap('colorMap')
+      const strokeWidth = ydoc.getMap('sWMap')
+
+      const yUndo = ydoc.getMap('undoMap')
+
+      // const yLines = ydoc.getMap('lines')
+
+      const yprovider = new FireProvider({ firebaseApp, ydoc: ydoc, path: `sharedBoards/${suiteId}` });
+
+      const updateLocalState = (event: any) => {
+        if(user?.email){
+          const username = user.email
+          const currentLine = lineOrder.get(username);
+
+          if(typeof currentLine === 'number'){
+            if(currentLine=== -1) {
+              setLines([])
+              setTexts([]);
+              setRectangles([]);
+              setCurrentRectangle(null);
+            } else if(currentLine>=0) {
+              const newLine = {
+                tool: toolsArray.get(username) as Tool,
+                points: pointsArray.get(username) as number[],
+                color: colorArray.get(username) as string,
+                strokeWidth: strokeWidth.get(username) as number
+              }
+
+              console.log(newLine)
+
+              setLines((prevLines) => {
+                // Create a copy of the array to mutate
+                let newLines = [...prevLines];
+
+                // 'Modify' the line at currentLine index
+                // In this case, we're not changing the data, just reassigning it to trigger state update
+                newLines[currentLine] = newLine;
+
+                // Return the new array to update state
+                return newLines;
+              });
+
+              setUndoStack([...undoStack, [...lines]]);
+              setRedoStack([]);
+            }
+          }
+        }
+      }
+
+      lineOrder.observe(updateLocalState)
+      pointsArray.observe(updateLocalState)
+
+      setYdoc(ydoc);
+
+      // Cleanup function
+      return () => {
+          lineOrder.unobserve(updateLocalState)
+          pointsArray.unobserve(updateLocalState)
+          ydoc.destroy();
+          yprovider.destroy();
+      }
+    }
+  }, [isSharePage, isLoading]);
 
     //---------------------------Function to render the saved whiteboard--------------
     useEffect(() => {
@@ -183,21 +260,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       } else if(isSharePage){
         fetchSharedBoardFromFirestore(doc(collection(db, "sharedBoards"), suiteId))
         setIsLoading(false)
-
-        const unsubscribe = onSnapshot(doc(db, "sharedBoards", suiteId), (doc) => {
-
-          const board = doc.data() as SuiteData;
-
-          if(board && board.content){
-            const boardContent = JSON.parse(board.content)
-            setLines(JSON.parse(boardContent[0]))
-            setTexts(JSON.parse(boardContent[1]))
-            setRectangles(JSON.parse(boardContent[2]))
-            setSuiteTitle(board.title)
-          }
-        })
-
-        return () => unsubscribe()
       }
     }, []);
 
@@ -229,9 +291,10 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           const docSnapshot = await getDoc(sharedBoardRef);
           if (docSnapshot.exists()) {
             const board = docSnapshot.data() as SuiteData;
-            if (board && board.content) {
-              const boardContent = JSON.parse(board.content)
-              setLines(JSON.parse(boardContent[0]))
+            if (board && board.boardContent) {
+              console.log(board)
+              const boardContent = JSON.parse(board.boardContent)
+              setLines(boardContent[0]? JSON.parse(boardContent[0]): [])
               setTexts(JSON.parse(boardContent[1]))
               setRectangles(JSON.parse(boardContent[2]))
               setSuiteTitle(board.title)
@@ -244,6 +307,11 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     };
     //____________________________________________________________
 
+    useEffect(()=> {
+      if(isSharePage){
+        console.log(lines)
+      }
+    }, [lines])
 
   useEffect(() => {
     /*
@@ -264,7 +332,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
 
   //---------------Function to save the document to the database----------------
-  const [user] = useAuthState(auth)
 
   useEffect(() => {
     const username = user?.email
@@ -279,12 +346,9 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           dataArray
         )
       } else if (isSharePage) {
-        saveSharedBoardToFirestore(
-          username,
-          suiteId,
-          suiteTitle,
-          dataArray as [string, string, string]
-        )
+
+        saveSharedBoardToFirestore(dataArray as [string, string, string]);
+
       }
     }
   }, [serializedLinesData, serializedTextsData, serializedRectanglesData, suiteTitle])
@@ -355,35 +419,46 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
    */
 
   const saveSharedBoardToFirestore = async (
-    username: string,
-    boardId: string,
-    boardTitle: string,
     data: [string, string, string]
-  ) => {
+  ): Promise<void> => {
     try {
+      if (isSharePage) {
+        // Retrieve the existing document
+        const sharedBoardRef = doc(db, "sharedBoards", suiteId);
+        const boardSnapshot = await getDoc(sharedBoardRef);
+        let sharedBoard: SuiteData;
 
-      const sharedBoard: SuiteData = {
-        id: boardId,
-        title: boardTitle,
-        lastEdited: new Date().toISOString(),
-        content: JSON.stringify(data),
-        type: 'board',
-        isTrash: false,
-        isShared: false,
-      };
+        if (boardSnapshot.exists() && user?.email) {
+          // If the document exists, update only the comments and latestLastEdited fields
+          sharedBoard = boardSnapshot.data() as SuiteData;
+          sharedBoard.boardContent = JSON.stringify(data);
+          sharedBoard.lastEdited = new Date().toISOString();
+          sharedBoard.title=suiteTitle
 
-      if (sharedBoard.user && !sharedBoard.user.includes(username)) {
-        sharedBoard.user.push(username);
-      } else if (!sharedBoard.user) {
-        sharedBoard.user = [username];
+          if (sharedBoard.user && !sharedBoard.user.includes(user?.email)) {
+            sharedBoard.user.push(user?.email);
+          } else if (!sharedBoard.user) {
+            sharedBoard.user = [user?.email];
+          }
+        } else {
+          // If the document does not exist, construct a new SuiteData object
+          sharedBoard = {
+            id: suiteId,
+            title: suiteTitle,
+            lastEdited: new Date().toISOString(),
+            type: 'board',
+            boardContent: JSON.stringify(data),
+            isTrash: false,
+            isShared: isSharePage
+          };
+        }
+
+        // Save the document with the updated fields
+        await setDoc(sharedBoardRef, sharedBoard, { merge: true });
+        console.log("Shared document saved successfully");
       }
-
-      const sharedBoardRef = doc(collection(db, "sharedBoards"), boardId);
-      await setDoc(sharedBoardRef, sharedBoard);
-      // Get the current document to see if there are existing documents
     } catch (error) {
-      console.error("Error saving board:", error);
-
+      console.error("Error saving shared document:", error);
     }
   };
 
@@ -391,6 +466,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     saveBoardToFirestore,
     2000 // Delay in milliseconds
   );
+
   //____________________________________________________________
 
 
@@ -451,6 +527,20 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
             strokeWidth: size,
           },
         ]);
+
+        if(ydoc && user?.email){
+          const lineOrder = ydoc.getMap('orderMap')
+          const toolsArray = ydoc.getMap('toolsMap')
+          const pointsArray = ydoc.getMap('pointsMap')
+          const colorArray = ydoc.getMap('colorMap')
+          const strokeWidth = ydoc.getMap('sWMap')
+
+          lineOrder.set(user.email, lines.length as number)
+          toolsArray.set(user.email, tool as string)
+          pointsArray.set(user.email, [pos.x, pos.y] as number[])
+          colorArray.set(user.email, penColor as string)
+          strokeWidth.set(user.email, size as number)
+        }
       }
       if (tool === "eraser") {
         setLines([
@@ -462,6 +552,20 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
             strokeWidth: size,
           },
         ]);
+
+        if(ydoc && user?.email){
+          const lineOrder = ydoc.getMap('orderMap')
+          const toolsArray = ydoc.getMap('toolsMap')
+          const pointsArray = ydoc.getMap('pointsMap')
+          const colorArray = ydoc.getMap('colorMap')
+          const strokeWidth = ydoc.getMap('sWMap')
+
+          lineOrder.set(user.email, lines.length as number)
+          toolsArray.set(user.email, tool as string)
+          pointsArray.set(user.email, [pos.x, pos.y] as number[])
+          colorArray.set(user.email, penColor as string)
+          strokeWidth.set(user.email, size as number)
+        }
       }
 
       if (tool === "text") {
@@ -510,6 +614,11 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
             index === lines.length - 1 ? { ...line, points: newPoints } : line
           )
         );
+
+        if(ydoc && user?.email){
+          const pointsArray = ydoc.getMap('pointsMap')
+          pointsArray.set(user.email, newPoints);
+        }
       }
     }
 
@@ -521,6 +630,11 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           index === lines.length - 1 ? { ...line, points: newPoints } : line
         )
       );
+
+      if(ydoc && user?.email){
+        const pointsArray = ydoc.getMap('pointsMap')
+        pointsArray.set(user.email, newPoints);
+      }
     }
 
     // Handle drawing for shapes
@@ -562,6 +676,14 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       setTexts([]);
       setRectangles([]);
       setCurrentRectangle(null);
+
+      if(ydoc && user?.email){
+        const lineOrder = ydoc.getMap('orderMap')
+
+        lineOrder.forEach((value, key) => {
+          lineOrder.set(key, -1);
+         });
+      }
     } else {
       // If the selected tool is a shape, we update the selectedShape state.
       if (selectedTool !== "shape") {
@@ -688,7 +810,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         undoStack={undoStack}
         redoStack={redoStack}
         handleToolChange={handleToolChange}
-        handleUndo={handleUndo}
+        handleUndo={() => handleUndo}
         handleRedo={handleRedo}
         toggleColorPicker={toggleColorPicker}
         handleSizeClick={handleSizeClick}
