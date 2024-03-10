@@ -20,8 +20,10 @@ import { setDoc, doc, collection, DocumentData } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import "./passwordForm.scss";
 import { UseToastNotification } from "../../utils/UseToastNotification";
+import { initialBadges } from "../../utils/Tasks";
 
 export function SignUpPasswordForm() {
+
   const navigate = useNavigate();
   const location = useLocation();
   const showToast = UseToastNotification();
@@ -53,7 +55,8 @@ export function SignUpPasswordForm() {
           userType: "",
           userTheme: "light",
           photoURL: user.photoURL,
-          sheets: []
+          sheets: [],
+          Badges: initialBadges
         } as DocumentData);
         showToast('success', `you have successfully created an account`)
         setTimeout(() => { navigate("/index") }, 1000)

@@ -17,10 +17,11 @@ import EditableTextField from "./sub-components/EditableTextField";
 import { auth, db } from '../../firebase-config'
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider, signOut, getRedirectResult, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
 import { UseToastNotification } from "../../utils/UseToastNotification";
+import { BadgesType } from "../../interfaces/BadgesType";
 
 
 const Security = () => {
@@ -141,9 +142,26 @@ const Security = () => {
     const updateUserVerificationStatus = async () => {
       if (auth.currentUser && auth.currentUser.emailVerified) {
         const userRef = doc(db, "users", auth.currentUser.email as string);
+
         await updateDoc(userRef, {
           emailVerified: auth.currentUser.emailVerified,
         });
+
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const badges: BadgesType[] = userData.Badges || [];
+          const emailVerifiedBadegIndex: number = badges.findIndex(badge => badge.name === 'Verify email');
+
+          if (emailVerifiedBadegIndex !== -1 && !badges[emailVerifiedBadegIndex].status) {
+            badges[emailVerifiedBadegIndex].status = true;
+            await updateDoc(userRef, {
+              Badges: badges
+            })
+          }
+
+        }
       }
     };
 
