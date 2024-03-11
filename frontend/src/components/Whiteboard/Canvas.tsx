@@ -50,6 +50,25 @@ interface RectangleType {
   fill: string;
 }
 
+interface TriangleType {
+  x: number;
+  y: number;
+  fill: string;
+}
+
+type CursorPosition = {
+  x: number;
+  y: number;
+  color: string;
+ };
+
+ interface CursorProps {
+  x: number;
+  y: number;
+  fill?: string;
+  radius?: number;
+}
+
 const colors = [
   "#000000",
   "#434343",
@@ -144,6 +163,17 @@ function isShape(tool: string): tool is Shape {
   return ["rectangle", "circle", "line"].includes(tool);
 }
 
+function getRandomHexColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i =  0; i <  6; i++) {
+    color += letters[Math.floor(Math.random() *  16)];
+  }
+  return color;
+}
+
+const randHexColor = getRandomHexColor()
+
 const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
   const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
@@ -178,7 +208,9 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
   const isSharePage = window.location.pathname.includes('/board/share')
   const [isLoading, setIsLoading] = useState(true)
-  const [ydoc, setYdoc] = useState<Y.Doc | null>(null); // Step 1: Define a state variable for ydoc
+  const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
+  const [currentCursorPosition, setCurrentCursorPosition] = useState<CursorPosition | null>(null);
+  const [cursors, setCursors] = useState<CursorProps[] | null > (null)
 
   useEffect(() => {
     if(isSharePage && !isLoading){
@@ -190,9 +222,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       const colorArray = ydoc.getMap('colorMap')
       const strokeWidth = ydoc.getMap('sWMap')
 
-      const yUndo = ydoc.getMap('undoMap')
-
-      // const yLines = ydoc.getMap('lines')
+      const yCursors = ydoc.getMap('cursors')
 
       const yprovider = new FireProvider({ firebaseApp, ydoc: ydoc, path: `sharedBoards/${suiteId}` });
 
@@ -215,17 +245,9 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
                 strokeWidth: strokeWidth.get(username) as number
               }
 
-              console.log(newLine)
-
               setLines((prevLines) => {
-                // Create a copy of the array to mutate
                 let newLines = [...prevLines];
-
-                // 'Modify' the line at currentLine index
-                // In this case, we're not changing the data, just reassigning it to trigger state update
                 newLines[currentLine] = newLine;
-
-                // Return the new array to update state
                 return newLines;
               });
 
@@ -250,6 +272,13 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       }
     }
   }, [isSharePage, isLoading]);
+
+    useEffect(() => {
+      if (currentCursorPosition && user?.email && ydoc) {
+        const cursorPositions = ydoc.getMap('cursorPositions');
+        cursorPositions.set(user.email, currentCursorPosition);
+      }
+    }, [currentCursorPosition, user?.email, ydoc]);
 
     //---------------------------Function to render the saved whiteboard--------------
     useEffect(() => {
@@ -292,7 +321,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           if (docSnapshot.exists()) {
             const board = docSnapshot.data() as SuiteData;
             if (board && board.boardContent) {
-              console.log(board)
               const boardContent = JSON.parse(board.boardContent)
               setLines(boardContent[0]? JSON.parse(boardContent[0]): [])
               setTexts(JSON.parse(boardContent[1]))
@@ -306,12 +334,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       }
     };
     //____________________________________________________________
-
-    useEffect(()=> {
-      if(isSharePage){
-        console.log(lines)
-      }
-    }, [lines])
 
   useEffect(() => {
     /*
@@ -528,7 +550,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           },
         ]);
 
-        if(ydoc && user?.email){
+        if(ydoc && user?.email && isSharePage){
           const lineOrder = ydoc.getMap('orderMap')
           const toolsArray = ydoc.getMap('toolsMap')
           const pointsArray = ydoc.getMap('pointsMap')
@@ -553,7 +575,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           },
         ]);
 
-        if(ydoc && user?.email){
+        if(ydoc && user?.email && isSharePage){
           const lineOrder = ydoc.getMap('orderMap')
           const toolsArray = ydoc.getMap('toolsMap')
           const pointsArray = ydoc.getMap('pointsMap')
@@ -599,6 +621,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
     const stage = e.target.getStage();
     const point = stage?.getPointerPosition();
+    setCurrentCursorPosition({ x: point?.x as number, y: point?.y as number, color: randHexColor});
 
     if (!point) {
       return;
@@ -615,7 +638,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           )
         );
 
-        if(ydoc && user?.email){
+        if(ydoc && user?.email && isSharePage){
           const pointsArray = ydoc.getMap('pointsMap')
           pointsArray.set(user.email, newPoints);
         }
@@ -631,7 +654,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         )
       );
 
-      if(ydoc && user?.email){
+      if(ydoc && user?.email && isSharePage){
         const pointsArray = ydoc.getMap('pointsMap')
         pointsArray.set(user.email, newPoints);
       }
@@ -867,12 +890,12 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           >
             <FaSlash />
           </button>
-          <button
+          {/* <button
             className="tool-button"
             onClick={() => handleToolChange("triangle")}
           >
             <FiTriangle />
-          </button>
+          </button> */}
           <button
             className="tool-button"
             onClick={() => handleToolChange("star")}
