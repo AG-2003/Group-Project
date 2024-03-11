@@ -19,8 +19,8 @@ import Navbar from "./Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "./sidebar";
 import { doc, getDoc } from "firebase/firestore";
-import { Link as ReactRouterLink } from 'react-router-dom'
-import { Link as ChakraLink, LinkProps } from '@chakra-ui/react'
+import { Link as ReactRouterLink } from "react-router-dom";
+import { Link as ChakraLink, LinkProps } from "@chakra-ui/react";
 import { SuiteData } from "../../interfaces/SuiteData";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FiAward } from "react-icons/fi";
@@ -32,7 +32,7 @@ const Profile: React.FC = () => {
   const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(true);
 
   const [user] = useAuthState(auth);
-  const [totalNoOfProjects, setTotalNoOfProjects] = useState<number>(0)
+  const [totalNoOfProjects, setTotalNoOfProjects] = useState<number>(0);
   const [totalNoOfAwards, setTotalNoOfAwards] = useState<number>(0);
 
   const sidebarVariants = {
@@ -71,7 +71,6 @@ const Profile: React.FC = () => {
     getTotalNoOfAwards();
   }, []);
 
-
   //---------------------Calculate no. of projects---------------
 
   const getTotalNoOfProjects = async () => {
@@ -89,16 +88,14 @@ const Profile: React.FC = () => {
         let combinedProjects: SuiteData[] = [
           ...userDocuments,
           ...userSheets,
-          ...userWhiteboards
+          ...userWhiteboards,
         ];
 
         combinedProjects = combinedProjects.filter(
           (project: SuiteData) => !project.isTrash
         );
 
-
-
-        setTotalNoOfProjects(combinedProjects.length)
+        setTotalNoOfProjects(combinedProjects.length);
       }
     }
   };
@@ -108,17 +105,18 @@ const Profile: React.FC = () => {
 
   const getTotalNoOfAwards = async () => {
     if (user?.email) {
-      const docRef = doc(db, 'users', user?.email);
+      const docRef = doc(db, "users", user?.email);
       const docSnapshot = await getDoc(docRef);
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
         const badges: BadgesType[] = userData.Badges || [];
-        const awards: BadgesType[] = badges.filter(badge => badge.status === true);
+        const awards: BadgesType[] = badges.filter(
+          (badge) => badge.status === true
+        );
         setTotalNoOfAwards(awards.length);
       }
     }
-  }
-
+  };
 
   return (
     <>
@@ -174,16 +172,28 @@ const Profile: React.FC = () => {
                   name={userProfile.displayName}
                   borderRadius="10%" // Adjust this value as needed
                 />
-                {isLoadingDesc ? (<Spinner ml='2rem' />) :
+                {isLoadingDesc ? (
+                  <Spinner ml="2rem" />
+                ) : (
                   <Box className="profile-text">
-                    <ChakraLink as={ReactRouterLink} to='/settings' className="profile-name">
-                      {(userProfile.displayName || auth.currentUser?.displayName) || 'Set username here'}
+                    <ChakraLink
+                      as={ReactRouterLink}
+                      to="/settings"
+                      className="profile-name"
+                    >
+                      {userProfile.displayName ||
+                        auth.currentUser?.displayName ||
+                        "Set username here"}
                     </ChakraLink>
-                    <ChakraLink as={ReactRouterLink} to='/settings' className="profile-description">
+                    <ChakraLink
+                      as={ReactRouterLink}
+                      to="/settings"
+                      className="profile-description"
+                    >
                       {userDescription}
                     </ChakraLink>
-                  </Box>}
-
+                  </Box>
+                )}
               </Flex>
 
               <Stack className="profile-stats">

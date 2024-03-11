@@ -28,20 +28,18 @@ import QuickChat from "./pages/Chat";
 import TeamDetails from "./components/Teams/TeamDetails";
 import TeamsChat from "./components/Teams/TeamsChat";
 import Call from "./pages/Call";
+import Communities from "./pages/Communities";
+import CDetails from "./components/communities/CDetails";
 import { reportWebVitals } from "./utils/WebVitals";
 import { useEffect } from "react";
 import { BadgesPage } from "./pages/BadgesPage";
 
-import Test from "./testFolder/Test";
-
 function App() {
-
   useEffect(() => {
-    reportWebVitals(metric => {
+    reportWebVitals((metric) => {
       console.log(metric);
     });
   }, []);
-
 
   return (
     <Routes>
@@ -73,13 +71,14 @@ function App() {
         <Route path="/Teams/In_teams/:team_id" element={<TeamDetails />} />
         <Route path="/In_teams/chat/:team_id" element={<TeamsChat />} />
         <Route path="/meeting" element={<Call />} />
-        <Route path="/test" element={<Test />} />
+        <Route path="/communities" element={<Communities />} />
+        <Route
+          path="/Communities/In_communities/:community_id"
+          element={<CDetails />}
+        />
       </Route>
     </Routes>
   );
 }
-
-
-
 
 export default App;
