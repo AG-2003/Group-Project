@@ -189,11 +189,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       const textArray = ydoc.getArray<TextType>('texts')
       //Update Texts
       const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
-      //Condition set up for Clearing
-      const clearCanvas = ydoc.getMap('clear')
 
       const yprovider = new FireProvider({ firebaseApp, ydoc, path: `sharedBoards/${suiteId}` })
-      console.log(yprovider)
 
       const updateLines = () => {
         if(user?.email){
@@ -238,15 +235,10 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         setRectangles(rectanglesArray.toArray())
       }
 
-      const clearTheCanvas = () => {
-
-      }
-
       //Set up observers
       linesMap.observe(updateLines)
       textArray.observe(updateTexts)
       rectanglesArray.observe(updateRectangles)
-      clearCanvas.observe(clearTheCanvas)
 
       setYdoc(ydoc)
 
@@ -254,7 +246,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         linesMap.unobserve(updateLines)
         textArray.unobserve(updateTexts)
         rectanglesArray.unobserve(updateRectangles)
-        clearCanvas.unobserve(clearTheCanvas)
         lineOrder.clear()
         linesMap.clear()
         yprovider.destroy()
@@ -262,10 +253,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       }
     }
   }, [])
-
-  useEffect(() => {
-    console.log('Lines state updated:', lines);
-   }, [lines]);
 
     //---------------------------Function to render the saved whiteboard--------------
     useEffect(() => {
