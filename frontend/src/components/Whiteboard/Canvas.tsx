@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Stage, Layer, Line, Text, StageProps, Rect } from "react-konva";
+import { Stage, Layer, Line, Text, StageProps, Rect, Circle } from "react-konva";
 import Toolbar from "./Toolbar";
 import "./Canvas.scss";
 import { FaRegSquare, FaRegCircle, FaSlash, FaRegStar } from "react-icons/fa";
@@ -48,6 +48,12 @@ interface RectangleType {
   width: number;
   height: number;
   fill: string;
+}
+
+interface CursorType {
+  x: number;
+  y: number;
+  color: string;
 }
 
 const colors = [
@@ -144,6 +150,17 @@ function isShape(tool: string): tool is Shape {
   return ["rectangle", "circle", "line"].includes(tool);
 }
 
+function getRandomHexColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+const randHexColor = getRandomHexColor()
+
 const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
   const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
@@ -177,6 +194,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
   const isSharePage = window.location.pathname.includes('/board/share')
   const [isLoading, setIsLoading] = useState(true)
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
+  const [cursors, setCursors] = useState<CursorType[]>([])
 
   useEffect(() => {
     if(isSharePage){
@@ -189,6 +207,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       const textArray = ydoc.getArray<TextType>('texts')
       //Update Texts
       const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
+      //Update cursor positions
+      const cursorPos = ydoc.getMap<CursorType>('cursors')
 
       const yprovider = new FireProvider({ firebaseApp, ydoc, path: `sharedBoards/${suiteId}` })
 
@@ -203,6 +223,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
               setTexts([])
               setRectangles([])
               setCurrentRectangle(null)
+              setCursors([])
               lineOrder.set(username, 0)
             } else if (newLine && newLine.points.length !== 0){
 
@@ -235,10 +256,24 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         setRectangles(rectanglesArray.toArray())
       }
 
+      const updateCursors = () => {
+
+        let newCursorsArray: (CursorType)[]= []
+
+        cursorPos.forEach((value, key) => {
+          if(key!==user?.email && value.x!==-1){
+            newCursorsArray.push(value)
+          }
+        })
+
+        setCursors(newCursorsArray as CursorType[])
+      }
+
       //Set up observers
       linesMap.observe(updateLines)
       textArray.observe(updateTexts)
       rectanglesArray.observe(updateRectangles)
+      cursorPos.observe(updateCursors)
 
       setYdoc(ydoc)
 
@@ -246,8 +281,10 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         linesMap.unobserve(updateLines)
         textArray.unobserve(updateTexts)
         rectanglesArray.unobserve(updateRectangles)
+        cursorPos.unobserve(updateCursors)
         lineOrder.clear()
         linesMap.clear()
+        cursorPos.clear()
         yprovider.destroy()
         ydoc.destroy()
       }
@@ -594,6 +631,17 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
   const handleMouseMove: StageProps["onMouseMove"] = (e) => {
     if (!isDrawing.current) {
+
+      if(ydoc && isSharePage && user?.email){
+        const stage = e.target.getStage();
+        const point = stage?.getPointerPosition();
+
+        const cursorPos = ydoc.getMap<CursorType>('cursors')
+        if(point){
+          cursorPos.set(user?.email, {x: point?.x, y: point?.y, color: randHexColor})
+        }
+      }
+
       return;
     }
 
@@ -685,11 +733,20 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     isDrawing.current = false;
   };
 
+  const handleMouseLeave: StageProps["onMouseLeave"] = () => {
+    setCursors([])
+    if(ydoc && isSharePage && user?.email){
+      const cursorPos = ydoc.getMap<CursorType>('cursors')
+      cursorPos.set(user?.email, {x: -1, y: -1, color: ""})
+    }
+  }
+
   const handleToolChange = (selectedTool: Tool | Shape) => {
     if (selectedTool === "pointer") {
       setTool("pointer");
     }
     if (selectedTool === "clear") {
+      setCursors([])
       setLines([]);
       setTexts([]);
       setRectangles([]);
@@ -700,6 +757,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         const linesMap = ydoc.getMap<LineType>('lines')
         const textArray = ydoc.getArray<TextType>('texts')
         const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
+        const cursorPos = ydoc.getMap<CursorType>('cursors')
 
         lineOrder.forEach((value, key) => {
           lineOrder.set(key, -1)
@@ -707,6 +765,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         linesMap.clear()
         textArray.delete(0, textArray.length)
         rectanglesArray.delete(0, rectanglesArray.length)
+        cursorPos.set(user?.email, {x: -1, y: -1, color: ""})
       }
     } else {
       // If the selected tool is a shape, we update the selectedShape state.
@@ -780,7 +839,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Layer>
+        <Layer onMouseLeave={handleMouseLeave}>
           {lines && lines.map((line, i) => (
             <Line
               key={i}
@@ -827,6 +886,17 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
               draggable={tool === "pointer"}
             />
           )}
+          {cursors && cursors.map((curs, i) => (
+            <Circle
+              key = {i}
+              x={curs.x}
+              y={curs.y}
+              radius={15}
+              fill={randHexColor}
+              stroke="black"
+              strokeWidth={2}
+            />
+          ))}
         </Layer>
       </Stage>
       <Toolbar
