@@ -189,16 +189,25 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       const textArray = ydoc.getArray<TextType>('texts')
       //Update Texts
       const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
+      //Condition set up for Clearing
+      const clearCanvas = ydoc.getMap('clear')
 
       const yprovider = new FireProvider({ firebaseApp, ydoc, path: `sharedBoards/${suiteId}` })
       console.log(yprovider)
 
       const updateLines = () => {
         if(user?.email){
+          let username = user?.email
           lineOrder.forEach((value, key) => {
             const newLine = linesMap.get(key) as LineType
 
-            if (newLine.points.length !== 0){
+            if(value===-1) {
+              setLines([])
+              setTexts([])
+              setRectangles([])
+              setCurrentRectangle(null)
+              lineOrder.set(username, 0)
+            } else if (newLine && newLine.points.length !== 0){
 
               setLines(prevLines => {
                 let newLines = [...prevLines];
@@ -229,10 +238,15 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         setRectangles(rectanglesArray.toArray())
       }
 
+      const clearTheCanvas = () => {
+
+      }
+
       //Set up observers
       linesMap.observe(updateLines)
       textArray.observe(updateTexts)
       rectanglesArray.observe(updateRectangles)
+      clearCanvas.observe(clearTheCanvas)
 
       setYdoc(ydoc)
 
@@ -240,6 +254,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         linesMap.unobserve(updateLines)
         textArray.unobserve(updateTexts)
         rectanglesArray.unobserve(updateRectangles)
+        clearCanvas.unobserve(clearTheCanvas)
         lineOrder.clear()
         linesMap.clear()
         yprovider.destroy()
@@ -619,7 +634,7 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           linesMap.set(user?.email, {
             tool,
             points: newPoints,
-            color: "rgba(0,0,0,1)",
+            color: penColor,
             strokeWidth: size,
           })
         }
@@ -694,7 +709,17 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       setCurrentRectangle(null);
 
       if(ydoc && isSharePage && user?.email){
+        const lineOrder = ydoc.getMap<number>('lineOrder')
+        const linesMap = ydoc.getMap<LineType>('lines')
+        const textArray = ydoc.getArray<TextType>('texts')
+        const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
 
+        lineOrder.forEach((value, key) => {
+          lineOrder.set(key, -1)
+        })
+        linesMap.clear()
+        textArray.delete(0, textArray.length)
+        rectanglesArray.delete(0, rectanglesArray.length)
       }
     } else {
       // If the selected tool is a shape, we update the selectedShape state.
@@ -769,12 +794,12 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         onMouseUp={handleMouseUp}
       >
         <Layer>
-          {lines.map((line, i) => (
+          {lines && lines.map((line, i) => (
             <Line
               key={i}
-              points={line.points}
+              points={line.points || []}
               stroke={line.color}
-              strokeWidth={line.strokeWidth}
+              strokeWidth={line.strokeWidth || 5}
               tension={0.5}
               lineCap="round"
               lineJoin="round"
