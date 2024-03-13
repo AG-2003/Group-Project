@@ -57,6 +57,7 @@ const SideBar = ({ onNavigate }: Props) => {
       </Button>
       className="sidebar-button" // Added className for SCSS targeting
       <Button
+      className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaPeopleGroup />}
