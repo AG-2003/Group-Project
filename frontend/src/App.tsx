@@ -33,6 +33,7 @@ import CDetails from "./components/communities/CDetails";
 import { reportWebVitals } from "./utils/WebVitals";
 import { useEffect } from "react";
 import { BadgesPage } from "./pages/BadgesPage";
+import Calendar from "./pages/Calendar";
 
 function App() {
   useEffect(() => {
@@ -64,6 +65,7 @@ function App() {
         <Route path="/Teams" element={<Teams />} />
         <Route path="/Social" element={<Social />} />
         <Route path="/badges" element={<BadgesPage />} />
+        <Route path="/calendar" element={<Calendar />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;
