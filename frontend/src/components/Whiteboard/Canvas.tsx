@@ -177,7 +177,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
   const isSharePage = window.location.pathname.includes('/board/share')
   const [isLoading, setIsLoading] = useState(true)
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
-  const [currentSharedLineNumber, setCurrentSharedLineNumber] = useState<number>(0)
 
   useEffect(() => {
     if(isSharePage){
@@ -198,17 +197,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         if(user?.email){
           lineOrder.forEach((value, key) => {
             const newLine = linesMap.get(key) as LineType
-            console.log("From yjs useEffect")
-            console.log(newLine)
 
             if (newLine.points.length !== 0){
-              // console.log("It goes into the if statement")
-              // console.log('Here are the lines before assigning to newLines', lines)
-              // let newLines = [...lines]
-              // console.log("NewLines before", newLines)
-              // newLines[value]=newLine
-              // console.log("NewLines after",newLines)
-              // setLines(newLines)
 
               setLines(prevLines => {
                 let newLines = [...prevLines];
@@ -232,11 +222,11 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       }
 
       const updateTexts = () => {
-
+        setTexts(textArray.toArray())
       }
 
       const updateRectangles = () => {
-
+        setRectangles(rectanglesArray.toArray())
       }
 
       //Set up observers
@@ -538,7 +528,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           const linesMap = ydoc.getMap<LineType>('lines')
 
           lineOrder.set(user?.email, lines.length)
-          setCurrentSharedLineNumber(lines.length)
           linesMap.set(user?.email, {
             tool,
             points: [pos.x, pos.y],
@@ -563,7 +552,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           const linesMap = ydoc.getMap<LineType>('lines')
 
           lineOrder.set(user?.email, lines.length)
-          setCurrentSharedLineNumber(lines.length)
           linesMap.set(user?.email, {
             tool,
             points: [pos.x, pos.y],
@@ -577,6 +565,11 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         const text = prompt("Enter the text:");
         if (text) {
           setTexts([...texts, { tool, x: pos.x, y: pos.y, text }]);
+
+          if(ydoc && isSharePage){
+            const textArray = ydoc.getArray<TextType>('texts')
+            textArray.push([{ tool, x: pos.x, y: pos.y, text } as TextType]);
+          }
         }
       }
 
@@ -678,6 +671,12 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       if (currentRectangle.width !== 0 && currentRectangle.height !== 0) {
         setRectangles([...rectangles, currentRectangle]);
         console.log("Rectangle drawing finished", currentRectangle);
+
+        if(ydoc && isSharePage){
+          const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
+          // textArray.push([{ tool, x: pos.x, y: pos.y, text } as TextType]);
+          rectanglesArray.push([currentRectangle as RectangleType])
+        }
       }
       setCurrentRectangle(null);
     }
