@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from "firebase/storage";
-
+import { getPerformance } from "firebase/performance"
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -25,6 +25,9 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 // initialize firestore database
 export const db = getFirestore(app);
+
+// Initialize Performance Monitoring and get a reference to the service
+export const perf = getPerformance(app);
 
 export const storage = getStorage(app);
 // Microsoft OAuth provider configuration

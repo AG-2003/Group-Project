@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, collection, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 import ReactQuill from "react-quill";
 import ToolBar from "./Toolbar";
@@ -12,30 +12,100 @@ import { debounce } from "../../utils/Time";
 import { CommentType } from "../../interfaces/CommentType";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 
+import { app as firebaseApp } from "../../firebase-config";
+import { QuillBinding } from "y-quill";
+import QuillCursors from "quill-cursors";
+import * as Y from "yjs";
+import { FireProvider } from "y-fire";
 
+ReactQuill.Quill.register("modules/cursors", QuillCursors);
 
+function getRandomHexColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
 
-// Define an interface for the document objects
-
-
-//Define a Props interface
-
-
-const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
+const Document: React.FC<SuiteProps> = ({
+  suiteId,
+  suiteTitle,
+  setSuiteTitle,
+}: SuiteProps) => {
+  //Set the current value of the text editor or the react-quill component
   const [value, setValue] = useState<string>("");
+  //Reference the react-quill component
   const quillRef = useRef<ReactQuill>(null);
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isSpellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(true);
+  const isSharePage = window.location.pathname.includes("/doc/share");
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [latestLastEdited, setLatestLastEdited] = useState<string | null>(null);
 
   const [user] = useAuthState(auth);
 
+  const documentPath = `/sharedDocs/${suiteId}`;
+
+  useEffect(() => {
+    if (isSharePage && !isLoading) {
+      // A Yjs document holds the shared data
+      const ydoc = new Y.Doc();
+
+      const yprovider = new FireProvider({
+        firebaseApp,
+        ydoc,
+        path: documentPath,
+      });
+
+      if (yprovider.awareness) {
+        yprovider.awareness.setLocalStateField("user", {
+          user: user?.email,
+          color: getRandomHexColor(),
+        });
+
+        yprovider.awareness.setLocalState({
+          user: {
+            name: user?.email,
+            color: getRandomHexColor(),
+          },
+        });
+
+        // Define a shared text type on the document
+        const ytext = ydoc.getText("quill");
+
+        // "Bind" the quill editor to a Yjs text type.
+        const binding = new QuillBinding(
+          ytext,
+          quillRef.current?.getEditor(),
+          yprovider.awareness
+        );
+
+        return () => {
+          yprovider.destroy();
+          binding.destroy();
+          ydoc.destroy();
+        };
+      }
+
+      return () => {
+        yprovider.destroy();
+        ydoc.destroy();
+      };
+    }
+  }, [isSharePage, isLoading]);
 
   //---------------Function to render the document in the database----------------
   useEffect(() => {
-    const userEmail = user?.email
-    if (userEmail) {
-      fetchDocumentFromFirestore(userEmail)
+    const userEmail = user?.email;
+    if (userEmail && !isSharePage) {
+      fetchDocumentFromFirestore(userEmail);
+    } else if (userEmail && isSharePage) {
+      fetchSharedDocumentFromFirestore();
+      setIsLoading(false);
     }
   }, []);
 
@@ -45,13 +115,32 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
         const userDocRef = doc(db, "users", userEmail);
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
-          const documentsArray: SuiteData[] = docSnapshot.data().documents || [];
-          const document = documentsArray.find((doc: SuiteData) => doc.id === suiteId);
-          if (document) {
+          const documentsArray: SuiteData[] =
+            docSnapshot.data().documents || [];
+          const document = documentsArray.find(
+            (doc: SuiteData) => doc.id === suiteId
+          );
+          if (document && document.content) {
             setValue(document.content);
-            setSuiteTitle(document.title)
+            setSuiteTitle(document.title);
             setComments(document.comments || []);
           }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+  };
+
+  const fetchSharedDocumentFromFirestore = async () => {
+    try {
+      const sharedDocRef = doc(db, "sharedDocs", suiteId);
+      const docSnapshot = await getDoc(sharedDocRef);
+      if (docSnapshot.exists()) {
+        const { title, comments } = docSnapshot.data() as SuiteData;
+        if (title && comments) {
+          setSuiteTitle(title);
+          setComments(comments || []);
         }
       }
     } catch (error) {
@@ -63,8 +152,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
   // Use useEffect to call saveDocumentToFirestore whenever the value changes
   useEffect(() => {
     const userEmail = user?.email;
-    if (userEmail) {
-
+    if (userEmail && !isSharePage) {
       debouncedSaveDocumentToFirestore(
         userEmail,
         suiteId,
@@ -74,6 +162,14 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
       );
     }
   }, [value, suiteTitle, comments]); // Only re-run the effect if 'value' changes
+
+  useEffect(() => {
+    const userEmail = user?.email;
+
+    if (userEmail && isSharePage && !isLoading) {
+      saveSharedDocumentToFirestore(suiteId, suiteTitle, value, comments);
+    }
+  }, [latestLastEdited, suiteTitle]);
 
   const saveDocumentToFirestore = async (
     userEmail: string,
@@ -94,7 +190,9 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
       const now = new Date().toISOString(); // Get current time as ISO string
 
       // Check if the document with the given ID already exists
-      const existingDocIndex = documentsArray.findIndex(doc => doc.id === suiteId);
+      const existingDocIndex = documentsArray.findIndex(
+        (doc) => doc.id === suiteId
+      );
 
       if (existingDocIndex !== -1) {
         // Update the existing document's title, content, and last edited time
@@ -103,7 +201,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           title: suiteTitle,
           content: text,
           lastEdited: now, // Update last edited time
-          comments
+          comments,
         };
       } else {
         // Add a new document with a unique ID and current last edited time
@@ -112,32 +210,79 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           title: suiteTitle,
           content: text,
           lastEdited: now, // Set last edited time for new document
-          type: 'document',
+          type: "document",
           isTrash: false,
-          comments
+          isShared: false,
+          comments,
         });
       }
 
       // Update the user's document with the new or updated documents array
-      await setDoc(
-        userDocRef,
-        { documents: documentsArray },
-        { merge: true }
-
-      );
+      await setDoc(userDocRef, { documents: documentsArray }, { merge: true });
       console.log("Document saved successfully");
     } catch (error) {
       console.error("Error saving document:", error);
     }
   };
 
-  // If you are using debouncing, remember to apply it here as well
+  //Save a shared document to firestore
+  const saveSharedDocumentToFirestore = async (
+    suiteId: string,
+    suiteTitle: string,
+    text: string,
+    comments: CommentType[]
+  ): Promise<void> => {
+    try {
+      if (isSharePage) {
+        // Retrieve the existing document
+        const sharedDocRef = doc(db, "sharedDocs", `${suiteId}`);
+        const docSnapshot = await getDoc(sharedDocRef);
+        let sharedDocument: SuiteData;
 
+        if (docSnapshot.exists() && user?.email) {
+          // If the document exists, update only the comments and latestLastEdited fields
+          sharedDocument = docSnapshot.data() as SuiteData;
+          sharedDocument.comments = comments;
+          sharedDocument.lastEdited = latestLastEdited || "";
+          sharedDocument.title = suiteTitle;
+
+          if (
+            sharedDocument.user &&
+            !sharedDocument.user.includes(user?.email)
+          ) {
+            sharedDocument.user.push(user?.email);
+          } else if (!sharedDocument.user) {
+            sharedDocument.user = [user?.email];
+          }
+        } else {
+          // If the document does not exist, construct a new SuiteData object
+          sharedDocument = {
+            id: suiteId,
+            title: suiteTitle,
+            lastEdited: latestLastEdited || "",
+            type: "document",
+            isTrash: false,
+            isShared: isSharePage,
+            comments: comments,
+          };
+        }
+
+        // Save the document with the updated fields
+        await setDoc(sharedDocRef, sharedDocument, { merge: true });
+        console.log("Shared document saved successfully");
+      } else {
+        // Handle the case where isSharePage is false (if needed)
+      }
+    } catch (error) {
+      console.error("Error saving shared document:", error);
+    }
+  };
 
   const debouncedSaveDocumentToFirestore = debounce(
     saveDocumentToFirestore,
     2000 // Delay in milliseconds
   );
+
   //____________________________________________________________
 
   const toggleSearchVisibility = () => {
@@ -387,6 +532,7 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
   const modules = useMemo(
     () => ({
       toolbar: false, // Keep this false if you are using a custom toolbar
+      cursors: true,
       history: {
         delay: 500,
         maxStack: 100,
@@ -430,7 +576,10 @@ const Document: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: 
           className="editable-area"
           ref={quillRef}
           value={value}
-          onChange={setValue}
+          onChange={(newValue) => {
+            setValue(newValue);
+            setLatestLastEdited(new Date().toISOString());
+          }}
           modules={modules}
         />
         <div className="comments-section">

@@ -3,7 +3,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import {
-  Flex,
   Heading,
   Button,
   Modal,
@@ -29,10 +28,9 @@ interface CommunityData {
   id: string;
   name: string;
   description: string;
-  role: string;
+  status: string;
   members: string[];
   image: string | null;
-  chatId: string;
 }
 
 interface Props {
@@ -43,7 +41,7 @@ interface Props {
 const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const [communityName, setCommunityName] = useState("");
   const [communityDescription, setCommunityDescription] = useState("");
-  const [communityRole, setCommunityRole] = useState("");
+  const [communityStatus, setCommunityStatus] = useState("Public");
   const [emailInputs, setEmailInputs] = useState([""]);
   const [image, setImage] = useState<File | null>(null);
   const [user] = useAuthState(auth);
@@ -60,10 +58,10 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
     setCommunityDescription(event.target.value);
   };
 
-  const handleCommunityRoleChange = (
+  const handleCommunityStatusChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setCommunityRole(event.target.value);
+    setCommunityStatus(event.target.value);
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,27 +82,20 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const saveCommunityToFirestore = async () => {
     try {
       const userMail = user?.email;
-      const chatID = communityName.toLowerCase().replace(/\s+/g, "-163146");
 
       if (userMail) {
         const newCommunity: CommunityData = {
           id: communityName.toLowerCase().replace(/\s+/g, "-93217"),
           name: communityName,
           description: communityDescription,
-          role: communityRole,
+          status: communityStatus,
           members: emailInputs.filter((email) => email.trim() !== ""),
           image: null,
-          chatId: chatID,
         };
 
-        const communityCollection =
-          communityRole === "Private"
-            ? "private_communities"
-            : "public_communities";
+        const communityDocRef = doc(db, "communities", newCommunity.id);
 
-        const communityDocRef = doc(db, communityCollection, newCommunity.id);
         const DocRef = doc(db, "users", userMail);
-        const chatDocRef = doc(db, "communityChat", newCommunity.chatId);
 
         const docSnapshot = await getDoc(communityDocRef);
         const userDocSnapshot = await getDoc(DocRef);
@@ -122,8 +113,6 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
             newCommunity.id,
           ],
         });
-
-        await setDoc(chatDocRef, { messages: [] });
 
         for (const email of newCommunity.members) {
           const memberDocRef = doc(db, "users", email);
@@ -186,8 +175,8 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
         <Text mb={4}>Status</Text>
         <Select
           mb={4}
-          value={communityRole}
-          onChange={handleCommunityRoleChange}
+          value={communityStatus}
+          onChange={handleCommunityStatusChange}
         >
           <option value="Public">Public</option>
           <option value="Private">Private</option>

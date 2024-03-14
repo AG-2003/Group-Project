@@ -16,10 +16,13 @@ import { setDoc, doc, DocumentData, getDoc } from "firebase/firestore";
 import { User } from "firebase/auth"; // Import the User type from your Firebase authentication library
 import "./loginForm.scss";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { BadgesType } from "../../interfaces/BadgesType";
+import { initialBadges } from "../../utils/Tasks";
 
 export function LoginForm() {
   const navigate = useNavigate(); // Initialize the navigate function
   const [user] = useAuthState(auth);
+
 
   //Remove the line if you want to test out log In page
   if (user != null) {
@@ -51,9 +54,16 @@ export function LoginForm() {
   const saveUser = async (user: User) => {
     if (user != null) {
       const userRef = doc(db, "users", user.email as string);
-      // Check if the user document already exists
       const docSnapshot = await getDoc(userRef);
       if (!docSnapshot.exists()) {
+        // setting the status for email verified here when creating an account through google/microsoft
+        const emailVerifiedBadge = {
+          name: 'Verify email',
+          status: user.emailVerified
+        };
+        const otherBadges = initialBadges.filter(badge => badge.name !== 'Verify email');
+        const allBadges = [emailVerifiedBadge, ...otherBadges];
+
         // User document does not exist, create a new one
         await setDoc(userRef, {
           email: user.email,
@@ -63,12 +73,14 @@ export function LoginForm() {
           userType: "",
           userTheme: "light",
           photoURL: user.photoURL,
-          sheets: []
+          sheets: [],
+          Badges: allBadges
         } as DocumentData);
       }
       // If the document exists, the user is already in the database, so you can proceed with the login
     }
   };
+
 
   const handleRedirectSignIn = async () => {
     try {

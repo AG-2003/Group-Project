@@ -1,6 +1,5 @@
 import { Box, Divider, Flex } from "@chakra-ui/react";
 import React, { useState } from "react";
-import JoinedTeams from "../components/Teams/JoinedTeams";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../components/Social/sideBar";
 import Navbar from "../components/Dashboard/Navbar";

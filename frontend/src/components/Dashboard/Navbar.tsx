@@ -10,12 +10,13 @@ import {
   MenuItem,
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { FiFileText, FiGrid, FiClipboard } from "react-icons/fi";
+import { FiFileText, FiGrid, FiClipboard, FiAward } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
 import { FaUserFriends } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Modal from "./sub-components/Modal";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   isSidebarOpen: boolean;
@@ -30,6 +31,8 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
 
   // State to control the visibility and type of the modal
   const [modalType, setModalType] = useState("");
+
+  const navigate = useNavigate();
 
   // Function to open the modal
   const openModal = (type: string) => setModalType(type);
@@ -80,6 +83,15 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             aria-label={""}
           />
         </Link> */}
+
+        <IconButton
+          size="sm"
+          mr={4}
+          aria-label="badge"
+          colorScheme="purple"
+          icon={<FiAward />}
+          onClick={() => { navigate('/Badges') }}
+        />
 
         <Menu>
           <MenuButton as={Button} colorScheme="purple" mr={4} size="sm">
