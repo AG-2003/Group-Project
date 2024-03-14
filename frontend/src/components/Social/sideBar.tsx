@@ -31,7 +31,7 @@ const SideBar = ({ onNavigate }: Props) => {
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaHouse />}
-        // onClick={() => onNavigate("account")}
+        onClick={() => navigate("/Social")}
       >
         All posts
       </Button>
