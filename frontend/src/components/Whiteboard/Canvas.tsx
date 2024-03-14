@@ -724,7 +724,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
 
         if(ydoc && isSharePage){
           const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
-          // textArray.push([{ tool, x: pos.x, y: pos.y, text } as TextType]);
           rectanglesArray.push([currentRectangle as RectangleType])
         }
       }
