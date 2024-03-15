@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Box, Text, Button, Flex } from "@chakra-ui/react"; // Import Chakra UI components for styling
+import {
+  Box,
+  Text,
+  Button,
+  Flex,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
 
 interface Props {
   comment: DocumentData;
-  userId: string; // User ID
+  userId: string;
   onLike: (commentId: string, userId: string) => void; // Callback function to handle liking
   onDislike: (commentId: string, userId: string) => void; // Callback function to handle disliking
 }
+
+// Initialize Firestore outside the component
 
 const Comments = ({ comment, userId, onLike, onDislike }: Props) => {
   const [likeCount, setLikeCount] = useState(
@@ -97,7 +109,22 @@ const Comments = ({ comment, userId, onLike, onDislike }: Props) => {
 
   return (
     <Box>
-      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
+      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4" position="relative">
+        <Flex justify="space-between" align="center" mb="2">
+          <Flex align="center">
+            <Avatar size="sm" name={comment.Uname} src={comment.Upic} mr="2" />
+            <Text fontSize="sm">{comment.Uname}</Text>
+          </Flex>
+          <Menu>
+            <MenuButton as={Button} size="sm" variant="ghost" color="gray.500">
+              ...
+            </MenuButton>
+            <MenuList>
+              <MenuItem>Edit</MenuItem>
+              <MenuItem>Delete</MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
         <Text fontSize="sm" color="gray.500" mb="2">
           {timeAgo}
         </Text>

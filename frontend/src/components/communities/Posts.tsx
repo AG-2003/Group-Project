@@ -75,7 +75,6 @@ const Posts = ({ post, userId, onLike, onDislike }: Props) => {
   return (
     <Box>
       <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
-        {/* Display post image if available, otherwise display a placeholder */}
         {post.image ? (
           <img
             src={post.image}

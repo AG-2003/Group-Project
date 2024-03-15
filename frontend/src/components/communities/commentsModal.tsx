@@ -29,6 +29,8 @@ import Comment from "./Comment";
 interface CommentData {
   id: string;
   Uid: string;
+  Uname: string;
+  Upic: string;
   description: string;
   Pid: string;
   date: string;
@@ -92,7 +94,9 @@ const CommentModal: React.FC<Props> = ({ Pid, isOpen, onClose }: Props) => {
             commentDescription.slice(0, 7).toLowerCase().replace(/\s+/g, "-") +
             Math.floor(Math.random() * (9999 - 0 + 1)) +
             0,
-          Uid: user?.uid,
+          Uid: userMail,
+          Uname: user?.displayName || "",
+          Upic: user?.photoURL || "",
           Pid: Pid,
           date: new Date().toISOString(),
           likedBy: [],
@@ -128,6 +132,7 @@ const CommentModal: React.FC<Props> = ({ Pid, isOpen, onClose }: Props) => {
         });
 
         console.log("Comment saved successfully");
+        setCommentDescription("");
       }
     } catch (error) {
       console.error("Error saving comment:", error);
