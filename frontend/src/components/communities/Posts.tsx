@@ -1,42 +1,61 @@
 import React, { useState } from "react";
 import { Box, Text, Button, Flex } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
+import CommentsModal from "./commentsModal";
 
 interface Props {
   post: DocumentData;
-  onLike: (postId: string) => void; // Callback function to handle liking
-  onDislike: (postId: string) => void; // Callback function to handle disliking
+  userId: string; // User ID
+  onLike: (postId: string, userId: string) => void; // Callback function to handle liking
+  onDislike: (postId: string, userId: string) => void; // Callback function to handle disliking
 }
 
-const Posts = ({ post, onLike, onDislike }: Props) => {
-  const [likeClicked, setLikeClicked] = useState(false);
-  const [dislikeClicked, setDislikeClicked] = useState(false);
+const Posts = ({ post, userId, onLike, onDislike }: Props) => {
+  const [likeCount, setLikeCount] = useState(
+    post.likedBy ? post.likedBy.length : 0
+  );
+  const [dislikeCount, setDislikeCount] = useState(
+    post.dislikedBy ? post.dislikedBy.length : 0
+  );
+  const [likeClicked, setLikeClicked] = useState(
+    post.likedBy && post.likedBy.includes(userId)
+  );
+  const [dislikeClicked, setDislikeClicked] = useState(
+    post.dislikedBy && post.dislikedBy.includes(userId)
+  );
+  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
 
-  const handleLikeClick = () => {
+  const handleLikeClick = async () => {
     if (!likeClicked) {
-      onLike(post.id); // Call the onLike callback with the post id
+      await onLike(post.id, userId); // Pass userId to the onLike callback
       setLikeClicked(true);
+      setLikeCount(likeCount + 1);
       if (dislikeClicked) {
-        onDislike(post.id); // Call the onDislike callback to remove dislike
+        await onDislike(post.id, userId); // Pass userId to the onDislike callback
         setDislikeClicked(false);
+        setDislikeCount(dislikeCount - 1);
       }
     } else {
-      onDislike(post.id); // Call the onDislike callback to remove like
+      await onLike(post.id, userId); // Pass userId to the onDislike callback
       setLikeClicked(false);
+      setLikeCount(likeCount - 1);
     }
   };
 
-  const handleDislikeClick = () => {
+  const handleDislikeClick = async () => {
     if (!dislikeClicked) {
-      onDislike(post.id); // Call the onDislike callback with the post id
+      await onDislike(post.id, userId); // Pass userId to the onDislike callback
       setDislikeClicked(true);
+      setDislikeCount(dislikeCount + 1);
       if (likeClicked) {
-        onLike(post.id); // Call the onLike callback to remove like
+        await onLike(post.id, userId); // Pass userId to the onLike callback
         setLikeClicked(false);
+        setLikeCount(likeCount - 1);
       }
     } else {
-      onLike(post.id); // Call the onDislike callback to remove dislike
+      await onDislike(post.id, userId); // Pass userId to the onLike callback
       setDislikeClicked(false);
+      setDislikeCount(dislikeCount - 1);
     }
   };
 
@@ -46,8 +65,11 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
   };
 
   const handleCommentsClick = () => {
-    // Logic to navigate to full screen post view with comments
-    console.log("Comments clicked");
+    setIsCommentsModalOpen(true);
+  };
+
+  const handleCloseCommentModal = () => {
+    setIsCommentsModalOpen(false);
   };
 
   return (
@@ -59,19 +81,14 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
             src={post.image}
             alt=""
             style={{
-              width: "100%",
+              width: "400px",
               height: "300px",
               objectFit: "cover",
               marginBottom: "1rem",
             }}
           />
         ) : (
-          <Box
-            bg="gray.200"
-            w="100%"
-            h="300px" // Adjust the height of the square as needed
-            mb="4"
-          />
+          <Box bg="gray.200" w="100%" h="300px" mb="4" />
         )}
         <Text fontSize="lg" fontWeight="bold" mb="2">
           {post.title}
@@ -80,7 +97,7 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
           Date Posted: {post.date}
         </Text>
         <Text>{post.description}</Text>
-        {/* Like and Dislike buttons with counters */}
+        {/* Like and Dislike buttons */}
         <Flex align="center" mt="2">
           <Button
             colorScheme={likeClicked ? "green" : "gray"}
@@ -92,7 +109,7 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
             Like
           </Button>
           <Text fontSize="sm" mr="2">
-            {post.like}
+            {likeCount - dislikeCount}
           </Text>
           <Button
             colorScheme={dislikeClicked ? "red" : "gray"}
@@ -121,6 +138,11 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
           </Button>
         </Flex>
       </Box>
+      <CommentsModal
+        Pid={post.id}
+        isOpen={isCommentsModalOpen}
+        onClose={handleCloseCommentModal}
+      />
     </Box>
   );
 };

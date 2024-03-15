@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
-import { RxCross2 } from "react-icons/rx";
 import {
-  Flex,
   Heading,
   Button,
   Modal,
@@ -17,9 +15,6 @@ import {
   Text,
   Input,
   Textarea,
-  Select,
-  Link,
-  Box,
 } from "@chakra-ui/react";
 import {
   getStorage,
@@ -36,16 +31,17 @@ interface PostData {
   type: string;
   image: string | null;
   Cid: string;
-  like: number;
+  Uid: string;
 }
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   Cid: string;
+  Uid: string;
 }
 
-const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid }: Props) => {
+const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
   const [postTitle, setPostTitle] = useState("");
   const [postDescription, setPostDescription] = useState("");
   const [postType, setPostType] = useState("");
@@ -98,7 +94,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid }: Props) => {
           type: postType,
           image: null, // Initialize with null value
           Cid: Cid,
-          like: 0,
+          Uid: Uid,
         };
 
         // go to the firestore and into the collection communityPosts

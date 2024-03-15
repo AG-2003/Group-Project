@@ -9,7 +9,7 @@ import {
   Divider,
   Button,
 } from "@chakra-ui/react";
-import { db } from "../../firebase-config";
+import { auth, db } from "../../firebase-config";
 import {
   doc,
   getDoc,
@@ -21,6 +21,7 @@ import {
   query,
   where,
   getDocs,
+  updateDoc,
 } from "firebase/firestore";
 import "./CDetails.scss"; // Import the SCSS file
 import { IoChatbubblesSharp } from "react-icons/io5";
@@ -38,6 +39,7 @@ const CommunityDetails: React.FC = () => {
   );
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
   const [communityPosts, setCommunityPosts] = useState<any[]>([]);
+  const [userId, setUserId] = useState<string>("");
 
   const handleCreatePostClick = () => {
     setCreatePostModalOpen(true);
@@ -69,6 +71,19 @@ const CommunityDetails: React.FC = () => {
     navigate(`/In_communities/chat/${encodeURIComponent(communityId)}`);
   };
 
+  // Fetch userID
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const user = await auth.currentUser;
+      if (user) {
+        setUserId(user.uid);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  // Fetch community
   useEffect(() => {
     const fetchCommunityDetails = async () => {
       try {
@@ -113,48 +128,79 @@ const CommunityDetails: React.FC = () => {
 
     fetchCommunityPosts();
   }, [community_id]);
-
   // Function to handle liking a post
-  const handleLike = async (postId: string) => {
-    const updatedPosts = communityPosts.map((post) => {
-      if (post.id === postId) {
-        return { ...post, like: post.like + 1 };
-      }
-      return post;
-    });
-    setCommunityPosts(updatedPosts);
-
+  const handleLike = async (postId: string, userId: string) => {
     try {
       const postRef = doc(db, "communityPosts", postId);
-      await setDoc(
-        postRef,
-        { like: updatedPosts.find((post) => post.id === postId)?.like },
-        { merge: true }
-      );
+      const postDoc = await getDoc(postRef);
+
+      if (postDoc.exists()) {
+        let likedBy = postDoc.data()?.likedBy || [];
+        let dislikedBy = postDoc.data()?.dislikedBy || [];
+
+        // Check if user already liked the post
+        if (!likedBy.includes(userId)) {
+          // Add user to likedBy array
+          likedBy.push(userId);
+
+          // Remove user from dislikedBy array if already disliked
+          dislikedBy = dislikedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            likedBy,
+            dislikedBy,
+          });
+        } else {
+          // Remove user from likedBy array
+          likedBy = likedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            likedBy,
+          });
+        }
+      }
     } catch (error) {
-      console.error("Error updating like count:", error);
+      console.error("Error updating like:", error);
     }
   };
 
   // Function to handle disliking a post
-  const handleDislike = async (postId: string) => {
-    const updatedPosts = communityPosts.map((post) => {
-      if (post.id === postId) {
-        return { ...post, like: post.like - 1 };
-      }
-      return post;
-    });
-    setCommunityPosts(updatedPosts);
-
+  const handleDislike = async (postId: string, userId: string) => {
     try {
       const postRef = doc(db, "communityPosts", postId);
-      await setDoc(
-        postRef,
-        { like: updatedPosts.find((post) => post.id === postId)?.like },
-        { merge: true }
-      );
+      const postDoc = await getDoc(postRef);
+
+      if (postDoc.exists()) {
+        let likedBy = postDoc.data()?.likedBy || [];
+        let dislikedBy = postDoc.data()?.dislikedBy || [];
+
+        // Check if user already disliked the post
+        if (!dislikedBy.includes(userId)) {
+          // Add user to dislikedBy array
+          dislikedBy.push(userId);
+
+          // Remove user from likedBy array if already liked
+          likedBy = likedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            likedBy,
+            dislikedBy,
+          });
+        } else {
+          // Remove user from dislikedBy array
+          dislikedBy = dislikedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            dislikedBy,
+          });
+        }
+      }
     } catch (error) {
-      console.error("Error updating like count:", error);
+      console.error("Error updating dislike:", error);
     }
   };
 
@@ -259,6 +305,7 @@ const CommunityDetails: React.FC = () => {
                     isOpen={isCreatePostModalOpen}
                     onClose={handleCloseCreatePostModal}
                     Cid={community_id ? community_id : "null"}
+                    Uid={userId}
                   />
 
                   <div className="posts-container">
@@ -269,6 +316,7 @@ const CommunityDetails: React.FC = () => {
                         <Posts
                           key={index}
                           post={post}
+                          userId={userId}
                           onLike={handleLike} // Pass onLike function to Posts component
                           onDislike={handleDislike} // Pass onDislike function to Posts component
                         />
