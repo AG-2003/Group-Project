@@ -301,6 +301,10 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
               setRectangles(JSON.parse(boardContent[2]))
               setSuiteTitle(board.title)
             }
+          } else {
+            if(user?.email){
+              fetchDocumentFromFirestore(user?.email)
+            }
           }
         }
       } catch (error) {

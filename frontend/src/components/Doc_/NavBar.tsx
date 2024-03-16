@@ -1,4 +1,12 @@
 import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  Button,
+  Input,
   IconButton,
   useDisclosure,
   Tooltip,
@@ -28,6 +36,7 @@ interface Props {
 
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isShareModalOpen, onOpen: onShareModalOpen, onClose: onShareModalClose } = useDisclosure();
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const iconStyle = {
@@ -88,6 +97,22 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
   };
 
+  // Function to modify the URL
+  const getShareableLink = () => {
+    const currentUrl = window.location.href;
+    // Replace /doc/ with /doc/share/ in the URL
+    return currentUrl.replace("/doc/", "/doc/share/");
+  };
+
+  // Function to copy the current URL to the clipboard
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(getShareableLink()).then(() => {
+      // You can add a notification or feedback to the user here
+      console.log("Copied to clipboard");
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
 
   return (
     <div className="navbar">
@@ -157,10 +182,26 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             className="action-icon share"
             aria-label="share"
             icon={<IoShareOutline />}
-            onClick={onOpen}
+            onClick={onShareModalOpen}
           />
         </Tooltip>
       </div>
+      <Modal isOpen={isShareModalOpen} onClose={onShareModalClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Share this Document</ModalHeader>
+          <ModalBody>
+            <p>Would you like to share the document?</p>
+            <Input value={getShareableLink()} isReadOnly my={4} />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={copyToClipboard}>
+              Copy Link
+            </Button>
+            <Button variant="ghost" onClick={onShareModalClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

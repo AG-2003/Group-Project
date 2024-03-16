@@ -105,7 +105,6 @@ const Document: React.FC<SuiteProps> = ({
       fetchDocumentFromFirestore(userEmail);
     } else if (userEmail && isSharePage) {
       fetchSharedDocumentFromFirestore();
-      setIsLoading(false);
     }
   }, []);
 
@@ -142,7 +141,13 @@ const Document: React.FC<SuiteProps> = ({
           setSuiteTitle(title);
           setComments(comments || []);
         }
+      } else {
+        if(user?.email){
+          fetchDocumentFromFirestore(user?.email)
+        }
       }
+
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching document:", error);
     }
@@ -161,7 +166,7 @@ const Document: React.FC<SuiteProps> = ({
         comments
       );
     }
-  }, [value, suiteTitle, comments]); // Only re-run the effect if 'value' changes
+  }, [value, suiteTitle, comments, suiteId, user?.email, isSharePage]); // Only re-run the effect if 'value' changes
 
   useEffect(() => {
     const userEmail = user?.email;
