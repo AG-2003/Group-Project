@@ -30,6 +30,7 @@
     "es6-shim": "^0.35.8",
     "firebase": "^10.8.1",
     "framer-motion": "^10.17.12",
+    "fullcalendar": "^6.1.11",
     "i": "^0.3.7",
     "konva": "^9.3.0",
     "quill": "^1.3.7",
