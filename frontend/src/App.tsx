@@ -35,6 +35,7 @@ import { useEffect } from "react";
 import { BadgesPage } from "./pages/BadgesPage";
 import SavedPosts from "./components/communities/SavedPosts";
 import AllPosts from "./components/communities/AllPosts";
+import YourPosts from "./components/communities/YourPosts";
 
 function App() {
   useEffect(() => {
@@ -80,6 +81,7 @@ function App() {
         />
         <Route path="/communities/saved_posts" element={<SavedPosts />} />
         <Route path="/communities/all_posts" element={<AllPosts />} />
+        <Route path="/communities/your_posts" element={<YourPosts />} />
       </Route>
     </Routes>
   );

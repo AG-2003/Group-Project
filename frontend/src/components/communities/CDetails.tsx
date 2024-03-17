@@ -219,7 +219,24 @@ const CommunityDetails: React.FC = () => {
         // Check if current user is the owner of the post
         const postRef = doc(db, "communityPosts", postId);
         await deleteDoc(postRef);
-        setCommunityPosts(communityPosts.filter((post) => post.id !== postId)); // Remove the deleted post from state
+
+        // Remove the deleted post from state
+        setCommunityPosts(communityPosts.filter((post) => post.id !== postId));
+
+        // Update the user document to remove the deleted post from the posts array
+        const userDocRef = doc(db, "users", user.email || "");
+        const userDocSnapshot = await getDoc(userDocRef);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          if (userData) {
+            const updatedCommunityPosts = userData.posts.filter(
+              (id: string) => id !== postId
+            );
+            await updateDoc(userDocRef, {
+              posts: updatedCommunityPosts,
+            });
+          }
+        }
       } else {
         console.error("User is not authorized to delete this post.");
       }

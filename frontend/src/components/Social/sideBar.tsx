@@ -39,7 +39,7 @@ const SideBar = ({ onNavigate }: Props) => {
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaCircleUser />}
-        // onClick={() => onNavigate("preferences")}
+        onClick={() => navigate("/communities/your_posts")}
       >
         Your posts
       </Button>

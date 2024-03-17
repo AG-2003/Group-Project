@@ -13,6 +13,7 @@ import {
   doc,
   deleteDoc,
   getDoc,
+  where,
 } from "firebase/firestore";
 import Posts from "./Posts";
 import "./Posts.scss";
@@ -34,31 +35,48 @@ interface Post {
   timeAgo: string;
 }
 
-const AllPosts = () => {
+const YourPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [yourPosts, setYourPosts] = useState<Post[]>([]);
+
+  // Function to fetch user's posts
+  const fetchUserPosts = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+
+      // Fetch user document
+      const userDocRef = doc(db, "users", user.email || "");
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (!userDocSnapshot.exists()) throw new Error("User document not found");
+
+      const userData = userDocSnapshot.data();
+      if (!userData || !userData.posts) return;
+
+      const userPostsIds = userData.posts; // Array of post IDs
+
+      // Fetch each post document using post IDs
+      const userPostsData: Post[] = [];
+      for (const postId of userPostsIds) {
+        const postRef = doc(db, "communityPosts", postId);
+        const postDocSnapshot = await getDoc(postRef);
+        if (postDocSnapshot.exists()) {
+          const postData = {
+            id: postDocSnapshot.id,
+            ...postDocSnapshot.data(),
+          } as Post;
+          userPostsData.push(postData);
+        }
+      }
+
+      setYourPosts(userPostsData);
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchAllPosts = async () => {
-      try {
-        // Fetch all community posts
-        const communityPostsQuery = query(
-          collection(db, "communityPosts"),
-          orderBy("date", "desc")
-        );
-        const communityPostsSnapshot = await getDocs(communityPostsQuery);
-        const communityPostsData = communityPostsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Post[];
-
-        setAllPosts(communityPostsData);
-      } catch (error) {
-        console.error("Error fetching all posts:", error);
-      }
-    };
-
-    fetchAllPosts();
+    fetchUserPosts();
   }, []);
 
   const sidebarVariants = {
@@ -154,7 +172,7 @@ const AllPosts = () => {
         await deleteDoc(postRef);
 
         // Remove the deleted post from state
-        setAllPosts(allPosts.filter((post) => post.id !== postId));
+        setYourPosts(yourPosts.filter((post) => post.id !== postId));
 
         // Update the user document to remove the deleted post from the posts array
         const userDocRef = doc(db, "users", user.email || "");
@@ -177,6 +195,7 @@ const AllPosts = () => {
       console.error("Error deleting post:", error);
     }
   };
+
   // Function to save a post
   const savePost = async (postId: string) => {
     try {
@@ -278,7 +297,7 @@ const AllPosts = () => {
           >
             <Flex className="profile-body" justify="center">
               <div className="posts-container">
-                {allPosts.map((post, index) => (
+                {yourPosts.map((post, index) => (
                   <Posts
                     key={index}
                     post={post}
@@ -298,4 +317,4 @@ const AllPosts = () => {
   );
 };
 
-export default AllPosts;
+export default YourPosts;
