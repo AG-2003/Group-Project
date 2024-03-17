@@ -108,6 +108,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
     navigator.clipboard.writeText(getShareableLink()).then(() => {
       // You can add a notification or feedback to the user here
       console.log("Copied to clipboard");
+      onShareModalClose()
     }).catch(err => {
       console.error('Failed to copy: ', err);
     });

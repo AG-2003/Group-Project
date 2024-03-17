@@ -304,14 +304,36 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           } else {
             if(user?.email){
               fetchDocumentFromFirestore(user?.email)
+              const userDocRef = doc(db, "users", user?.email);
+              const userDocSnapshot = await getDoc(userDocRef);
+              if(userDocSnapshot.exists()){
+                const boardsArray = userDocSnapshot.data().boards as SuiteData[] || []
+                const boardIndex = boardsArray.findIndex((board: SuiteData) => board.id === suiteId)
+                if(boardIndex!==-1){
+                  const board = boardsArray[boardIndex]
+                  if (board && board.content) {
+                    const boardContent = JSON.parse(board.content)
+                    setLines(JSON.parse(boardContent[0]))
+                    setTexts(JSON.parse(boardContent[1]))
+                    setRectangles(JSON.parse(boardContent[2]))
+                    setSuiteTitle(board.title)
+
+                    saveSharedBoardToFirestore(boardContent)
+                  }
+                }
+
+                boardsArray.splice(boardIndex, 1)
+                await setDoc(userDocRef, {boards: boardsArray}, { merge: true})
+              }
             }
           }
+
+          setIsLoading(false)
         }
       } catch (error) {
         console.error("Error fetching document:", error);
       }
 
-      setIsLoading(false)
     };
     //____________________________________________________________
 
