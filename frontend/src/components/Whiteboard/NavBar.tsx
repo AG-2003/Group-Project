@@ -32,6 +32,7 @@ interface Props {
 }
 
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
+  const isSharePage = window.location.pathname.includes('/board/share')
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isShareModalOpen, onOpen: onShareModalOpen, onClose: onShareModalClose } = useDisclosure();
   const navigate = useNavigate();
@@ -123,7 +124,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
         colorScheme="purple.100"
       />
       <div className="nav-items">
-        <button className="nav-item" onClick={() => { navigate(-1) }}>Home</button>
+        <button className="nav-item" onClick={() => {isSharePage? navigate('/projects') : navigate(-1) }}>Home</button>
         <div className="nav-item">File</div>
         <div className="nav-item">Edit</div>
         <div className="nav-item">View</div>
@@ -194,7 +195,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             <Input value={getShareableLink()} isReadOnly my={4} />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={copyToClipboard}>
+            <Button colorScheme="purple" mr={3} onClick={copyToClipboard}>
               Copy Link
             </Button>
             <Button variant="ghost" onClick={onShareModalClose}>Cancel</Button>

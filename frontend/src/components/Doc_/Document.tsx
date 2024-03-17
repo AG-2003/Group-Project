@@ -49,6 +49,7 @@ const Document: React.FC<SuiteProps> = ({
   const [user] = useAuthState(auth);
 
   const documentPath = `/sharedDocs/${suiteId}`;
+  const [yDoc, setYDoc]  = useState<Y.Doc | null>(null)
 
   useEffect(() => {
     if (isSharePage && !isLoading) {
@@ -76,6 +77,8 @@ const Document: React.FC<SuiteProps> = ({
 
         // Define a shared text type on the document
         const ytext = ydoc.getText("quill");
+        // Define a shared Comment type on the document
+        const yComments = ydoc.getArray<CommentType>('comments')
 
         // "Bind" the quill editor to a Yjs text type.
         const binding = new QuillBinding(
@@ -84,10 +87,20 @@ const Document: React.FC<SuiteProps> = ({
           yprovider.awareness
         );
 
+        const updateComments = () => {
+          setComments(yComments.toArray())
+        }
+
+        yComments.observe(updateComments)
+
+        setYDoc(ydoc)
+
         return () => {
           yprovider.destroy();
           binding.destroy();
+          yComments.unobserve(updateComments)
           ydoc.destroy();
+          yDoc?.destroy()
         };
       }
 
@@ -143,7 +156,29 @@ const Document: React.FC<SuiteProps> = ({
         }
       } else {
         if(user?.email){
-          fetchDocumentFromFirestore(user?.email)
+          const userDocRef = doc(db, "users", user?.email);
+          const userDocSnapshot = await getDoc(userDocRef);
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            const documentsArray = userData.documents || [];
+            const documentIndex = documentsArray.findIndex((doc: SuiteData) => doc.id === suiteId);
+            if (documentIndex !== -1) {
+              // Display the shared content
+              const document = documentsArray[documentIndex];
+              if(document as SuiteData){
+                setTimeout(() => {
+                  setValue(document.content)
+                  saveSharedDocumentToFirestore(suiteId, suiteTitle, value, comments)
+                }, 2800)
+                setSuiteTitle(document.title || "Untitled")
+                setComments(document.comments || []);
+              }
+              // Remove the document from the array
+              documentsArray.splice(documentIndex, 1);
+              // Update the user's document with the new documents array
+              await setDoc(userDocRef, { documents: documentsArray }, { merge: true });
+            }
+          }
         }
       }
 
@@ -426,6 +461,11 @@ const Document: React.FC<SuiteProps> = ({
           };
           setComments((prevComments) => [...prevComments, comment]);
 
+          if(yDoc && isSharePage){
+            const yComments = yDoc.getArray<CommentType>('comments')
+            yComments.push([comment])
+          }
+
           // Apply custom formatting for commented text
           editor.formatText(range.index, range.length, {
             "comment-id": comment.id,
@@ -460,6 +500,14 @@ const Document: React.FC<SuiteProps> = ({
 
       // Remove the comment from the state
       setComments(comments.filter((c) => c.id !== commentId));
+
+      if (yDoc && isSharePage) {
+        const yComments = yDoc.getArray<CommentType>('comments');
+        const commentIndex = yComments.toArray().findIndex((c) => c.id === commentId);
+        if (commentIndex !== -1) {
+          yComments.delete(commentIndex, 1); // Remove the comment from yComments
+        }
+      }
     }
   };
 
