@@ -117,23 +117,8 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
   return (
     <div className="navbar">
-      <IconButton
-        className="menu-icon-button"
-        aria-label="Menu"
-        icon={<HamburgerIcon style={iconStyle} />}
-        onClick={onToggle}
-        colorScheme="purple.100"
-      />
       <div className="nav-items">
         <button className="nav-item" onClick={() => {isSharePage? navigate('/projects') : navigate(-1) }}>Home</button>
-        <div className="nav-item">File</div>
-        <div className="nav-item">Edit</div>
-        <div className="nav-item">View</div>
-        <div className="nav-item">Insert</div>
-        <div className="nav-item">Format</div>
-        <div className="nav-item">Tools</div>
-        <div className="nav-item">Extensions</div>
-        <div className="nav-item">Help</div>
       </div>
       <div className="title-area">
         <input
@@ -160,7 +145,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             onClick={handleStartCall}
           />
         </Tooltip>
-        <Tooltip
+        {/* <Tooltip
           label="Get Analytics"
           className="tooltip-label"
           placement="top"
@@ -172,7 +157,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             icon={<IoBarChartOutline />}
             onClick={onOpen}
           />
-        </Tooltip>
+        </Tooltip> */}
         <Tooltip
           label="Share"
           className="tooltip-label"
@@ -190,9 +175,9 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       <Modal isOpen={isShareModalOpen} onClose={onShareModalClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Share this Document</ModalHeader>
+          <ModalHeader>Share this WhiteBoard</ModalHeader>
           <ModalBody>
-            <p>Would you like to share the whiteboard?</p>
+            <p>Anyone who has the following link will have access to the board.</p>
             <Input value={getShareableLink()} isReadOnly my={4} />
           </ModalBody>
           <ModalFooter>
