@@ -55,6 +55,7 @@ export const Badges: React.FC = () => {
         }
     }
 
+
     useEffect(() => {
         fetchUserTasks();
     }, [fetchUserTasks])
@@ -157,6 +158,21 @@ export const Badges: React.FC = () => {
     }, [updateJoinTeamTask])
 
 
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setIsSidebarOpen(false);
+            }
+        };
+    
+        window.addEventListener('resize', handleResize);
+    
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+
     return (
         <>
             <div style={{ padding: '10px', background: '#484c6c' }}>
@@ -227,3 +243,4 @@ export const Badges: React.FC = () => {
         </>
     );
 };
+
