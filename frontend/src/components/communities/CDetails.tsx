@@ -22,6 +22,8 @@ import {
   where,
   getDocs,
   updateDoc,
+  deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 import "./CDetails.scss"; // Import the SCSS file
 import { IoChatbubblesSharp } from "react-icons/io5";
@@ -115,11 +117,15 @@ const CommunityDetails: React.FC = () => {
           const firestoreDB = db as Firestore;
 
           const communityPostsRef = collection(firestoreDB, "communityPosts");
-          const q = query(communityPostsRef, where("Cid", "==", community_id));
+          const q = query(
+            communityPostsRef,
+            where("Cid", "==", community_id),
+            orderBy("date", "desc") // Order posts by date in descending order
+          );
           const snapshot = await getDocs(q);
 
           const postsData = snapshot.docs.map((doc) => doc.data());
-          setCommunityPosts(postsData);
+          setCommunityPosts(postsData.reverse()); // Reverse the order of the posts
         }
       } catch (error) {
         console.error("Error fetching community posts:", error);
@@ -128,6 +134,7 @@ const CommunityDetails: React.FC = () => {
 
     fetchCommunityPosts();
   }, [community_id]);
+
   // Function to handle liking a post
   const handleLike = async (postId: string, userId: string) => {
     try {
@@ -204,6 +211,62 @@ const CommunityDetails: React.FC = () => {
     }
   };
 
+  // Function to handle deleting a post
+  const handleDeletePost = async (postId: string, postUid: string) => {
+    try {
+      const user = auth.currentUser;
+      if (user && user.uid === postUid) {
+        // Check if current user is the owner of the post
+        const postRef = doc(db, "communityPosts", postId);
+        await deleteDoc(postRef);
+        setCommunityPosts(communityPosts.filter((post) => post.id !== postId)); // Remove the deleted post from state
+      } else {
+        console.error("User is not authorized to delete this post.");
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
+  // Function to save a post
+  const savePost = async (postId: string) => {
+    try {
+      // Ensure user is authenticated
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Retrieve user document from Firestore
+      const userDocRef = doc(db, "users", user.email || "");
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        // Get user's saved posts array or initialize empty array
+        const savedPosts = userDocSnapshot.data()?.savedPosts || [];
+
+        // Check if post is already saved
+        if (savedPosts.includes(postId)) {
+          console.log("Post already saved");
+          return;
+        }
+
+        // Add postId to saved posts array
+        savedPosts.push(postId);
+
+        // Update user document in Firestore with updated saved posts array
+        await updateDoc(userDocRef, {
+          savedPosts: savedPosts,
+        });
+
+        console.log("Post saved successfully");
+      } else {
+        throw new Error("User document not found");
+      }
+    } catch (error) {
+      console.error("Error saving post:", error);
+    }
+  };
   return (
     <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
@@ -319,6 +382,8 @@ const CommunityDetails: React.FC = () => {
                           userId={userId}
                           onLike={handleLike} // Pass onLike function to Posts component
                           onDislike={handleDislike} // Pass onDislike function to Posts component
+                          deletePost={handleDeletePost}
+                          savePost={savePost}
                         />
                       ))}
                   </div>

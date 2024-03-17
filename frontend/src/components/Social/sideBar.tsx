@@ -31,7 +31,7 @@ const SideBar = ({ onNavigate }: Props) => {
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaHouse />}
-        // onClick={() => onNavigate("account")}
+        onClick={() => navigate("/communities/all_posts")}
       >
         All posts
       </Button>
@@ -47,7 +47,7 @@ const SideBar = ({ onNavigate }: Props) => {
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaBookmark />}
-        // onClick={() => onNavigate("privacy")}
+        onClick={() => navigate("/communities/saved_posts")}
       >
         Saved posts
       </Button>

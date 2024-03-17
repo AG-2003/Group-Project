@@ -33,6 +33,8 @@ import CDetails from "./components/communities/CDetails";
 import { reportWebVitals } from "./utils/WebVitals";
 import { useEffect } from "react";
 import { BadgesPage } from "./pages/BadgesPage";
+import SavedPosts from "./components/communities/SavedPosts";
+import AllPosts from "./components/communities/AllPosts";
 
 function App() {
   useEffect(() => {
@@ -73,9 +75,11 @@ function App() {
         <Route path="/meeting" element={<Call />} />
         <Route path="/communities" element={<Communities />} />
         <Route
-          path="/Communities/In_communities/:community_id"
+          path="/communities/in_communities/:community_id"
           element={<CDetails />}
         />
+        <Route path="/communities/saved_posts" element={<SavedPosts />} />
+        <Route path="/communities/all_posts" element={<AllPosts />} />
       </Route>
     </Routes>
   );

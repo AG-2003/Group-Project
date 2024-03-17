@@ -32,6 +32,9 @@ interface PostData {
   image: string | null;
   Cid: string;
   Uid: string;
+  Uname: string;
+  Upic: string;
+  date: string;
 }
 
 interface Props {
@@ -95,6 +98,9 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
           image: null, // Initialize with null value
           Cid: Cid,
           Uid: Uid,
+          Uname: user?.displayName || "",
+          Upic: user?.photoURL || "",
+          date: new Date().toISOString(),
         };
 
         // go to the firestore and into the collection communityPosts

@@ -10,6 +10,9 @@ import {
   collection,
   where,
   query,
+  DocumentData,
+  arrayRemove,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   Flex,
@@ -205,6 +208,37 @@ const CommentModal: React.FC<Props> = ({ Pid, isOpen, onClose }: Props) => {
     }
   };
 
+  const deleteComment = async (commentToDelete: CommentData) => {
+    try {
+      // Check if the currently logged-in user is the owner of the comment
+      if (commentToDelete.Uid === user?.email) {
+        // Delete the comment document from Firestore
+        await deleteDoc(doc(db, "postComments", commentToDelete.id));
+
+        // Remove the comment ID from the user's comments array
+        await updateDoc(doc(db, "users", commentToDelete.Uid), {
+          comments: arrayRemove(commentToDelete.id),
+        });
+
+        // Remove the comment ID from the post's comments array
+        await updateDoc(doc(db, "communityPosts", commentToDelete.Pid), {
+          comments: arrayRemove(commentToDelete.id),
+        });
+
+        // Update the comments state to remove the deleted comment
+        setComments(
+          comments.filter((comment) => comment.id !== commentToDelete.id)
+        );
+
+        console.log("Comment deleted successfully");
+      } else {
+        console.log("Only the owner of the comment can delete it.");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
   const renderModalContent = () => {
     // Sort comments based on the number of likes in descending order
     const sortedComments = comments.slice().sort((a, b) => {
@@ -228,9 +262,11 @@ const CommentModal: React.FC<Props> = ({ Pid, isOpen, onClose }: Props) => {
             <Comment
               key={index}
               comment={comment}
+              currentUser={user?.email || ""}
               userId={comment.Uid}
               onLike={handleLike}
               onDislike={handleDislike}
+              deleteComment={deleteComment}
             />
           ))
         )}

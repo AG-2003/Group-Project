@@ -17,11 +17,20 @@ interface Props {
   userId: string;
   onLike: (commentId: string, userId: string) => void; // Callback function to handle liking
   onDislike: (commentId: string, userId: string) => void; // Callback function to handle disliking
+  deleteComment: (comment: any) => void;
+  currentUser: string;
 }
 
 // Initialize Firestore outside the component
 
-const Comments = ({ comment, userId, onLike, onDislike }: Props) => {
+const Comments = ({
+  comment,
+  userId,
+  onLike,
+  onDislike,
+  deleteComment,
+  currentUser,
+}: Props) => {
   const [likeCount, setLikeCount] = useState(
     comment.likedBy ? comment.likedBy.length : 0
   );
@@ -107,6 +116,10 @@ const Comments = ({ comment, userId, onLike, onDislike }: Props) => {
     }
   };
 
+  const handleCommentDelete = async () => {
+    deleteComment(comment);
+  };
+
   return (
     <Box>
       <Box borderWidth="1px" borderRadius="lg" p="4" mb="4" position="relative">
@@ -115,15 +128,21 @@ const Comments = ({ comment, userId, onLike, onDislike }: Props) => {
             <Avatar size="sm" name={comment.Uname} src={comment.Upic} mr="2" />
             <Text fontSize="sm">{comment.Uname}</Text>
           </Flex>
-          <Menu>
-            <MenuButton as={Button} size="sm" variant="ghost" color="gray.500">
-              ...
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Edit</MenuItem>
-              <MenuItem>Delete</MenuItem>
-            </MenuList>
-          </Menu>
+          {comment.Uid === currentUser && ( // Conditionally render delete button
+            <Menu>
+              <MenuButton
+                as={Button}
+                size="sm"
+                variant="ghost"
+                color="gray.500"
+              >
+                ...
+              </MenuButton>
+              <MenuList>
+                <MenuItem onClick={handleCommentDelete}>Delete</MenuItem>
+              </MenuList>
+            </Menu>
+          )}
         </Flex>
         <Text fontSize="sm" color="gray.500" mb="2">
           {timeAgo}
