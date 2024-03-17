@@ -13,7 +13,7 @@
 // Add z-index to elements that should appear above the background image
 .centered-rectangle,
 .header {
-  z-index: 1; // Above the background image
+  z-index: auto; // Above the background image
   position: relative; // Required to apply z-index
 }
 
