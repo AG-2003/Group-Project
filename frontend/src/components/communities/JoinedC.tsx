@@ -76,9 +76,10 @@ const JoinedCommunities: React.FC = () => {
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        if (!userData?.communities.includes(communityId)) {
+        const userCommunities = userData?.communities ?? [];
+        if (!userCommunities.includes(communityId)) {
           await updateDoc(userRef, {
-            communities: [...userData?.communities, communityId],
+            communities: [...userCommunities, communityId],
           });
         }
       }
@@ -91,7 +92,7 @@ const JoinedCommunities: React.FC = () => {
     // Use the onCommunityClick prop to notify the parent component
     // onCommunityClick(communityId);
 
-    navigate(`/Communities/In_communities/${encodeURIComponent(communityId)}`);
+    navigate(`/communities/in_communities/${encodeURIComponent(communityId)}`);
   };
 
   // Function to handle search input change

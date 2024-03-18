@@ -98,7 +98,7 @@ const Sidebar = () => {
         leftIcon={<ChatIcon />}
         paddingLeft={5}
         onClick={() => {
-          nav("/Social");
+          nav("/communities/all_posts");
         }}
       >
         Social

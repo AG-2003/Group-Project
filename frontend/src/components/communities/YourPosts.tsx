@@ -1,139 +1,90 @@
-import React, { useEffect, useState } from "react";
-import {
-  Avatar,
-  Flex,
-  Box,
-  Text,
-  Stack,
-  Badge,
-  Divider,
-  Button,
-} from "@chakra-ui/react";
-import { auth, db } from "../../firebase-config";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  DocumentData,
-  DocumentReference,
-  Firestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  orderBy,
-} from "firebase/firestore";
-import "./CDetails.scss"; // Import the SCSS file
-import { IoChatbubblesSharp } from "react-icons/io5";
-import { useNavigate, useParams } from "react-router-dom";
-import Navbar from "../Dashboard/Navbar";
+import React, { useState, useEffect } from "react";
+import { Box, Divider, Flex } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Social/sideBar";
-import Posts from "./Posts"; // Import the Posts component
-import "./Posts.scss"; // Import the CSS file for post styling
-import PostModal from "./PostModal";
+import Navbar from "../Dashboard/Navbar";
+import { auth, db } from "../../firebase-config"; // Import Firebase Firestore instance
+import {
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  updateDoc,
+  doc,
+  deleteDoc,
+  getDoc,
+  where,
+} from "firebase/firestore";
+import Posts from "./Posts";
+import "./Posts.scss";
+import "./CDetails.scss";
 
-const CommunityDetails: React.FC = () => {
-  const [communityDetails, setCommunityDetails] = useState<DocumentData | null>(
-    null
-  );
-  const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
-  const [communityPosts, setCommunityPosts] = useState<any[]>([]);
-  const [userId, setUserId] = useState<string>("");
+interface Post {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  image: string | null;
+  Cid: string;
+  Uid: string;
+  Uname: string;
+  Upic: string;
+  date: string;
+  communityName: string;
+  communityImage: string;
+  timeAgo: string;
+}
 
-  const handleCreatePostClick = () => {
-    setCreatePostModalOpen(true);
-  };
-
-  const handleCloseCreatePostModal = () => {
-    setCreatePostModalOpen(false);
-  };
-
-  let { community_id } = useParams();
-  const navigate = useNavigate();
-
-  // Dashboard routing
+const YourPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [yourPosts, setYourPosts] = useState<Post[]>([]);
+
+  // Function to fetch user's posts
+  const fetchUserPosts = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+
+      // Fetch user document
+      const userDocRef = doc(db, "users", user.email || "");
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (!userDocSnapshot.exists()) throw new Error("User document not found");
+
+      const userData = userDocSnapshot.data();
+      if (!userData || !userData.posts) return;
+
+      const userPostsIds = userData.posts; // Array of post IDs
+
+      // Fetch each post document using post IDs
+      const userPostsData: Post[] = [];
+      for (const postId of userPostsIds) {
+        const postRef = doc(db, "communityPosts", postId);
+        const postDocSnapshot = await getDoc(postRef);
+        if (postDocSnapshot.exists()) {
+          const postData = {
+            id: postDocSnapshot.id,
+            ...postDocSnapshot.data(),
+          } as Post;
+          userPostsData.push(postData);
+        }
+      }
+
+      setYourPosts(userPostsData);
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserPosts();
+  }, []);
 
   const sidebarVariants = {
     open: { width: "200px" },
     closed: { width: "0px" },
   };
 
-  // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-  if (community_id) {
-    community_id = decodeURIComponent(community_id);
-  }
-
-  const handleChatClick = (communityId: string) => {
-    navigate(`/In_communities/chat/${encodeURIComponent(communityId)}`);
-  };
-
-  // Fetch userID
-  useEffect(() => {
-    const fetchUserId = async () => {
-      const user = await auth.currentUser;
-      if (user) {
-        setUserId(user.uid);
-      }
-    };
-
-    fetchUserId();
-  }, []);
-
-  // Fetch community
-  useEffect(() => {
-    const fetchCommunityDetails = async () => {
-      try {
-        if (community_id) {
-          const communityDocRef: DocumentReference<DocumentData> = doc(
-            db,
-            "communities",
-            community_id
-          );
-          const communityDocSnapshot = await getDoc(communityDocRef);
-
-          if (communityDocSnapshot.exists()) {
-            setCommunityDetails(communityDocSnapshot.data());
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching community details:", error);
-      }
-    };
-
-    fetchCommunityDetails();
-  }, [community_id]);
-
-  // Fetch community posts
-  useEffect(() => {
-    const fetchCommunityPosts = async () => {
-      try {
-        if (community_id) {
-          const firestoreDB = db as Firestore;
-
-          const communityPostsRef = collection(firestoreDB, "communityPosts");
-          const q = query(
-            communityPostsRef,
-            where("Cid", "==", community_id),
-            orderBy("date", "desc") // Order posts by date in descending order
-          );
-          const snapshot = await getDocs(q);
-
-          const postsData = snapshot.docs.map((doc) => doc.data());
-          setCommunityPosts(postsData.reverse()); // Reverse the order of the posts
-        }
-      } catch (error) {
-        console.error("Error fetching community posts:", error);
-      }
-    };
-
-    fetchCommunityPosts();
-  }, [community_id]);
 
   // Function to handle liking a post
   const handleLike = async (postId: string, userId: string) => {
@@ -221,7 +172,7 @@ const CommunityDetails: React.FC = () => {
         await deleteDoc(postRef);
 
         // Remove the deleted post from state
-        setCommunityPosts(communityPosts.filter((post) => post.id !== postId));
+        setYourPosts(yourPosts.filter((post) => post.id !== postId));
 
         // Update the user document to remove the deleted post from the posts array
         const userDocRef = doc(db, "users", user.email || "");
@@ -284,6 +235,7 @@ const CommunityDetails: React.FC = () => {
       console.error("Error saving post:", error);
     }
   };
+
   return (
     <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
@@ -316,7 +268,7 @@ const CommunityDetails: React.FC = () => {
           ) : (
             <motion.div
               initial="closed"
-              animate="clsoed"
+              animate="closed"
               exit="open"
               variants={sidebarVariants}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -337,83 +289,32 @@ const CommunityDetails: React.FC = () => {
           )}
         </AnimatePresence>
         <Box flexGrow={1} padding="10px" marginLeft={5}>
-          <div className="community-details-container">
-            {communityDetails ? (
-              <div className="profile-container">
-                <Flex className="profile-header">
-                  <Flex className="profile-info">
-                    <Avatar
-                      className="profile-avatar"
-                      src={communityDetails.image || "fallback_image_url"}
-                      name={communityDetails.name}
-                      borderRadius="10%" // Adjust this value as needed
-                    />
-                    <Box className="profile-text">
-                      <Text className="profile-name">
-                        {communityDetails.name}
-                      </Text>
-                      <Text className="profile-description">
-                        {communityDetails.description || "Your Description"}
-                      </Text>
-                    </Box>
-                  </Flex>
-
-                  <Stack className="profile-stats">
-                    <Badge className="badge">0 Posts</Badge>
-                    <Badge className="badge">
-                      {communityDetails.members.length + 1} Members
-                    </Badge>
-                    <Badge className="badge">0 Awards</Badge>
-                  </Stack>
-                </Flex>
-                <Flex className="profile-body">
-                  <Flex className="top-titles">
-                    <Text fontSize="xl" fontWeight="bold" mb="4" mt="2">
-                      Latest Posts
-                    </Text>
-                    <Button
-                      colorScheme="blue"
-                      size="sm"
-                      ml="2"
-                      onClick={handleCreatePostClick}
-                    >
-                      Create a Post
-                    </Button>
-                  </Flex>
-
-                  <PostModal
-                    isOpen={isCreatePostModalOpen}
-                    onClose={handleCloseCreatePostModal}
-                    Cid={community_id ? community_id : "null"}
-                    Uid={userId}
+          <Flex
+            className="containerTeams"
+            direction="column"
+            marginLeft={5}
+            marginTop={3}
+          >
+            <Flex className="profile-body" justify="center">
+              <div className="posts-container">
+                {yourPosts.map((post, index) => (
+                  <Posts
+                    key={index}
+                    post={post}
+                    userId={post.Uid}
+                    onLike={handleLike}
+                    onDislike={handleDislike}
+                    deletePost={handleDeletePost}
+                    savePost={savePost}
                   />
-
-                  <div className="posts-container">
-                    {communityPosts
-                      .slice()
-                      .reverse()
-                      .map((post, index) => (
-                        <Posts
-                          key={index}
-                          post={post}
-                          userId={userId}
-                          onLike={handleLike} // Pass onLike function to Posts component
-                          onDislike={handleDislike} // Pass onDislike function to Posts component
-                          deletePost={handleDeletePost}
-                          savePost={savePost}
-                        />
-                      ))}
-                  </div>
-                </Flex>
+                ))}
               </div>
-            ) : (
-              <p>Loading community details..</p>
-            )}
-          </div>
+            </Flex>
+          </Flex>
         </Box>
       </Box>
     </>
   );
 };
 
-export default CommunityDetails;
+export default YourPosts;
