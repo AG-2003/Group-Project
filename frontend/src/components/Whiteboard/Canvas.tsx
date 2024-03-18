@@ -301,13 +301,39 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
               setRectangles(JSON.parse(boardContent[2]))
               setSuiteTitle(board.title)
             }
+          } else {
+            if(user?.email){
+              fetchDocumentFromFirestore(user?.email)
+              const userDocRef = doc(db, "users", user?.email);
+              const userDocSnapshot = await getDoc(userDocRef);
+              if(userDocSnapshot.exists()){
+                const boardsArray = userDocSnapshot.data().boards as SuiteData[] || []
+                const boardIndex = boardsArray.findIndex((board: SuiteData) => board.id === suiteId)
+                if(boardIndex!==-1){
+                  const board = boardsArray[boardIndex]
+                  if (board && board.content) {
+                    const boardContent = JSON.parse(board.content)
+                    setLines(JSON.parse(boardContent[0]))
+                    setTexts(JSON.parse(boardContent[1]))
+                    setRectangles(JSON.parse(boardContent[2]))
+                    setSuiteTitle(board.title)
+
+                    saveSharedBoardToFirestore(boardContent)
+                  }
+                }
+
+                boardsArray.splice(boardIndex, 1)
+                await setDoc(userDocRef, {boards: boardsArray}, { merge: true})
+              }
+            }
           }
+
+          setIsLoading(false)
         }
       } catch (error) {
         console.error("Error fetching document:", error);
       }
 
-      setIsLoading(false)
     };
     //____________________________________________________________
 
@@ -447,7 +473,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
             type: 'board',
             boardContent: JSON.stringify(data),
             isTrash: false,
-            isShared: isSharePage
+            isShared: isSharePage,
+            owner: user?.email || ""
           };
         }
 
