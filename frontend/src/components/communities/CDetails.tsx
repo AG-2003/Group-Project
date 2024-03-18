@@ -9,7 +9,7 @@ import {
   Divider,
   Button,
 } from "@chakra-ui/react";
-import { db } from "../../firebase-config";
+import { auth, db } from "../../firebase-config";
 import {
   doc,
   getDoc,
@@ -21,6 +21,9 @@ import {
   query,
   where,
   getDocs,
+  updateDoc,
+  deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 import "./CDetails.scss"; // Import the SCSS file
 import { IoChatbubblesSharp } from "react-icons/io5";
@@ -38,6 +41,7 @@ const CommunityDetails: React.FC = () => {
   );
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
   const [communityPosts, setCommunityPosts] = useState<any[]>([]);
+  const [userId, setUserId] = useState<string>("");
 
   const handleCreatePostClick = () => {
     setCreatePostModalOpen(true);
@@ -69,6 +73,19 @@ const CommunityDetails: React.FC = () => {
     navigate(`/In_communities/chat/${encodeURIComponent(communityId)}`);
   };
 
+  // Fetch userID
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const user = await auth.currentUser;
+      if (user) {
+        setUserId(user.uid);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  // Fetch community
   useEffect(() => {
     const fetchCommunityDetails = async () => {
       try {
@@ -100,11 +117,15 @@ const CommunityDetails: React.FC = () => {
           const firestoreDB = db as Firestore;
 
           const communityPostsRef = collection(firestoreDB, "communityPosts");
-          const q = query(communityPostsRef, where("Cid", "==", community_id));
+          const q = query(
+            communityPostsRef,
+            where("Cid", "==", community_id),
+            orderBy("date", "desc") // Order posts by date in descending order
+          );
           const snapshot = await getDocs(q);
 
           const postsData = snapshot.docs.map((doc) => doc.data());
-          setCommunityPosts(postsData);
+          setCommunityPosts(postsData.reverse()); // Reverse the order of the posts
         }
       } catch (error) {
         console.error("Error fetching community posts:", error);
@@ -115,49 +136,154 @@ const CommunityDetails: React.FC = () => {
   }, [community_id]);
 
   // Function to handle liking a post
-  const handleLike = async (postId: string) => {
-    const updatedPosts = communityPosts.map((post) => {
-      if (post.id === postId) {
-        return { ...post, like: post.like + 1 };
-      }
-      return post;
-    });
-    setCommunityPosts(updatedPosts);
-
+  const handleLike = async (postId: string, userId: string) => {
     try {
       const postRef = doc(db, "communityPosts", postId);
-      await setDoc(
-        postRef,
-        { like: updatedPosts.find((post) => post.id === postId)?.like },
-        { merge: true }
-      );
+      const postDoc = await getDoc(postRef);
+
+      if (postDoc.exists()) {
+        let likedBy = postDoc.data()?.likedBy || [];
+        let dislikedBy = postDoc.data()?.dislikedBy || [];
+
+        // Check if user already liked the post
+        if (!likedBy.includes(userId)) {
+          // Add user to likedBy array
+          likedBy.push(userId);
+
+          // Remove user from dislikedBy array if already disliked
+          dislikedBy = dislikedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            likedBy,
+            dislikedBy,
+          });
+        } else {
+          // Remove user from likedBy array
+          likedBy = likedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            likedBy,
+          });
+        }
+      }
     } catch (error) {
-      console.error("Error updating like count:", error);
+      console.error("Error updating like:", error);
     }
   };
 
   // Function to handle disliking a post
-  const handleDislike = async (postId: string) => {
-    const updatedPosts = communityPosts.map((post) => {
-      if (post.id === postId) {
-        return { ...post, like: post.like - 1 };
-      }
-      return post;
-    });
-    setCommunityPosts(updatedPosts);
-
+  const handleDislike = async (postId: string, userId: string) => {
     try {
       const postRef = doc(db, "communityPosts", postId);
-      await setDoc(
-        postRef,
-        { like: updatedPosts.find((post) => post.id === postId)?.like },
-        { merge: true }
-      );
+      const postDoc = await getDoc(postRef);
+
+      if (postDoc.exists()) {
+        let likedBy = postDoc.data()?.likedBy || [];
+        let dislikedBy = postDoc.data()?.dislikedBy || [];
+
+        // Check if user already disliked the post
+        if (!dislikedBy.includes(userId)) {
+          // Add user to dislikedBy array
+          dislikedBy.push(userId);
+
+          // Remove user from likedBy array if already liked
+          likedBy = likedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            likedBy,
+            dislikedBy,
+          });
+        } else {
+          // Remove user from dislikedBy array
+          dislikedBy = dislikedBy.filter((id: string) => id !== userId);
+
+          // Update post document
+          await updateDoc(postRef, {
+            dislikedBy,
+          });
+        }
+      }
     } catch (error) {
-      console.error("Error updating like count:", error);
+      console.error("Error updating dislike:", error);
     }
   };
 
+  // Function to handle deleting a post
+  const handleDeletePost = async (postId: string, postUid: string) => {
+    try {
+      const user = auth.currentUser;
+      if (user && user.uid === postUid) {
+        // Check if current user is the owner of the post
+        const postRef = doc(db, "communityPosts", postId);
+        await deleteDoc(postRef);
+
+        // Remove the deleted post from state
+        setCommunityPosts(communityPosts.filter((post) => post.id !== postId));
+
+        // Update the user document to remove the deleted post from the posts array
+        const userDocRef = doc(db, "users", user.email || "");
+        const userDocSnapshot = await getDoc(userDocRef);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          if (userData) {
+            const updatedCommunityPosts = userData.posts.filter(
+              (id: string) => id !== postId
+            );
+            await updateDoc(userDocRef, {
+              posts: updatedCommunityPosts,
+            });
+          }
+        }
+      } else {
+        console.error("User is not authorized to delete this post.");
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
+  // Function to save a post
+  const savePost = async (postId: string) => {
+    try {
+      // Ensure user is authenticated
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Retrieve user document from Firestore
+      const userDocRef = doc(db, "users", user.email || "");
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        // Get user's saved posts array or initialize empty array
+        const savedPosts = userDocSnapshot.data()?.savedPosts || [];
+
+        // Check if post is already saved
+        if (savedPosts.includes(postId)) {
+          console.log("Post already saved");
+          return;
+        }
+
+        // Add postId to saved posts array
+        savedPosts.push(postId);
+
+        // Update user document in Firestore with updated saved posts array
+        await updateDoc(userDocRef, {
+          savedPosts: savedPosts,
+        });
+
+        console.log("Post saved successfully");
+      } else {
+        throw new Error("User document not found");
+      }
+    } catch (error) {
+      console.error("Error saving post:", error);
+    }
+  };
   return (
     <>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
@@ -257,6 +383,7 @@ const CommunityDetails: React.FC = () => {
                     isOpen={isCreatePostModalOpen}
                     onClose={handleCloseCreatePostModal}
                     Cid={community_id ? community_id : "null"}
+                    Uid={userId}
                   />
 
                   <div className="posts-container">
@@ -267,8 +394,11 @@ const CommunityDetails: React.FC = () => {
                         <Posts
                           key={index}
                           post={post}
+                          userId={userId}
                           onLike={handleLike} // Pass onLike function to Posts component
                           onDislike={handleDislike} // Pass onDislike function to Posts component
+                          deletePost={handleDeletePost}
+                          savePost={savePost}
                         />
                       ))}
                   </div>

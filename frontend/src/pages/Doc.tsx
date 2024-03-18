@@ -6,8 +6,6 @@ import Footer from "../components/Doc_/Footer";
 import "./Doc.scss"; // Make sure you import Doc.scss here
 import { useLocation } from "react-router-dom";
 
-import { v4 as uuidv4 } from 'uuid';
-
 const Doc: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);

@@ -87,7 +87,7 @@
     "@jridgewell/trace-mapping" "^0.3.17"
     jsesc "^2.5.1"
 
-"@babel/helper-annotate-as-pure@^7.22.5":
+"@babel/helper-annotate-as-pure@^7.18.6", "@babel/helper-annotate-as-pure@^7.22.5":
   version "7.22.5"
   resolved "https://registry.npmjs.org/@babel/helper-annotate-as-pure/-/helper-annotate-as-pure-7.22.5.tgz"
   integrity sha512-LvBTxu8bQSQkcyKOU+a1btnNFQ1dMAd0R6PyW3arXes06F6QLWLIrd681bxRPIXlrMGR3XYnW9JyML7dP3qgxg==
@@ -116,6 +116,21 @@
   version "7.23.7"
   resolved "https://registry.npmjs.org/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.23.7.tgz"
   integrity sha512-xCoqR/8+BoNnXOY7RVSgv6X+o7pmT5q1d+gGcRlXYkI+9B31glE4jeejhKVpA04O1AtzOt7OSQ6VYKP5FcRl9g==
+  dependencies:
+    "@babel/helper-annotate-as-pure" "^7.22.5"
+    "@babel/helper-environment-visitor" "^7.22.20"
+    "@babel/helper-function-name" "^7.23.0"
+    "@babel/helper-member-expression-to-functions" "^7.23.0"
+    "@babel/helper-optimise-call-expression" "^7.22.5"
+    "@babel/helper-replace-supers" "^7.22.20"
+    "@babel/helper-skip-transparent-expression-wrappers" "^7.22.5"
+    "@babel/helper-split-export-declaration" "^7.22.6"
+    semver "^6.3.1"
+
+"@babel/helper-create-class-features-plugin@^7.21.0":
+  version "7.24.0"
+  resolved "https://registry.yarnpkg.com/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.24.0.tgz#fc7554141bdbfa2d17f7b4b80153b9b090e5d158"
+  integrity sha512-QAH+vfvts51BCsNZ2PhY6HAggnlS6omLLFTsIpeqZk/MmJ6cW7tgz5yRv0fMJThcr6FmbMrENh1RgrWPTYA76g==
   dependencies:
     "@babel/helper-annotate-as-pure" "^7.22.5"
     "@babel/helper-environment-visitor" "^7.22.20"
@@ -368,6 +383,16 @@
   version "7.21.0-placeholder-for-preset-env.2"
   resolved "https://registry.npmjs.org/@babel/plugin-proposal-private-property-in-object/-/plugin-proposal-private-property-in-object-7.21.0-placeholder-for-preset-env.2.tgz"
   integrity sha512-SOSkfJDddaM7mak6cPEpswyTRnuRltl429hMraQEglW+OkovnCzsiszTmsrlY//qLFjCpQDFRvjdm2wA5pPm9w==
+
+"@babel/plugin-proposal-private-property-in-object@^7.21.11":
+  version "7.21.11"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-private-property-in-object/-/plugin-proposal-private-property-in-object-7.21.11.tgz#69d597086b6760c4126525cfa154f34631ff272c"
+  integrity sha512-0QZ8qP/3RLDVBwBFoWAwCtgcDZJVwA5LUJRZU8x2YFfKNuFq161wK3cuGrALu5yiPu+vzwTAg/sMWVNeWeNyaw==
+  dependencies:
+    "@babel/helper-annotate-as-pure" "^7.18.6"
+    "@babel/helper-create-class-features-plugin" "^7.21.0"
+    "@babel/helper-plugin-utils" "^7.20.2"
+    "@babel/plugin-syntax-private-property-in-object" "^7.14.5"
 
 "@babel/plugin-syntax-async-generators@^7.8.4":
   version "7.8.4"
@@ -2649,7 +2674,7 @@
     immer "^9.0.12"
     lodash "^4.17.21"
 
-"@fullcalendar/core@^6.1.11":
+"@fullcalendar/core@^6.1.11", "@fullcalendar/core@~6.1.11":
   version "6.1.11"
   resolved "https://registry.yarnpkg.com/@fullcalendar/core/-/core-6.1.11.tgz#f9630e83ae977e774992507635b1e7af4c339d37"
   integrity sha512-TjG7c8sUz+Vkui2FyCNJ+xqyu0nq653Ibe99A66LoW95oBo6tVhhKIaG1Wh0GVKymYiqAQN/OEdYTuj4ay27kA==
@@ -2661,17 +2686,29 @@
   resolved "https://registry.yarnpkg.com/@fullcalendar/daygrid/-/daygrid-6.1.11.tgz#83a5d4a94c314cf3a14b06bebba03b1b40e6d2ba"
   integrity sha512-hF5jJB7cgUIxWD5MVjj8IU407HISyLu7BWXcEIuTytkfr8oolOXeCazqnnjmRbnFOncoJQVstTtq6SIhaT32Xg==
 
-"@fullcalendar/interaction@^6.1.11":
+"@fullcalendar/interaction@^6.1.11", "@fullcalendar/interaction@~6.1.11":
   version "6.1.11"
   resolved "https://registry.yarnpkg.com/@fullcalendar/interaction/-/interaction-6.1.11.tgz#baa3beec8f5c489fb6904973b175a5f4797abdf3"
   integrity sha512-ynOKjzuPwEAMgTQ6R/Z2zvzIIqG4p8/Qmnhi1q0vzPZZxSIYx3rlZuvpEK2WGBZZ1XEafDOP/LGfbWoNZe+qdg==
+
+"@fullcalendar/list@~6.1.11":
+  version "6.1.11"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/list/-/list-6.1.11.tgz#4cd23700ea48b382b37387e29a706f2da692e174"
+  integrity sha512-9Qx8uvik9pXD12u50FiHwNzlHv4wkhfsr+r03ycahW7vEeIAKCsIZGTkUfFP+96I5wHihrfLazu1cFQG4MPiuw==
+
+"@fullcalendar/multimonth@~6.1.11":
+  version "6.1.11"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/multimonth/-/multimonth-6.1.11.tgz#8cca48378c52c1209ed7a45c5e5b37f95497f13b"
+  integrity sha512-7DbPC+AAlaKnquGVdw1Z85Q3nSZ4GZ1NcVIk4k7bLnqDlntwHPPsrDlSIzUWKcN0q5/u7jQHm4PU1m3LAl70Sg==
+  dependencies:
+    "@fullcalendar/daygrid" "~6.1.11"
 
 "@fullcalendar/react@^6.1.11":
   version "6.1.11"
   resolved "https://registry.yarnpkg.com/@fullcalendar/react/-/react-6.1.11.tgz#93c81ace6c0559092112ef90d2e8ceb6d62a9a58"
   integrity sha512-Og0Tv0OiglTFp+b++yRyEhAeWnAmKkMLQ3iS0eJE1KDEov6QqGkoO+dUG4x8zp2w55IJqzik/a9iHi0s3oQDbA==
 
-"@fullcalendar/timegrid@^6.1.11":
+"@fullcalendar/timegrid@^6.1.11", "@fullcalendar/timegrid@~6.1.11":
   version "6.1.11"
   resolved "https://registry.yarnpkg.com/@fullcalendar/timegrid/-/timegrid-6.1.11.tgz#76b2fc4446d1e97819a4395dab4f3a7e44c7a9eb"
   integrity sha512-0seUHK/ferH89IeuCvV4Bib0zWjgK0nsptNdmAc9wDBxD/d9hm5Mdti0URJX6bDoRtsSfRDu5XsRcrzwoc+AUQ==
@@ -6644,6 +6681,18 @@ fsevents@^2.3.2, fsevents@~2.3.2:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
+
+fullcalendar@^6.1.11:
+  version "6.1.11"
+  resolved "https://registry.yarnpkg.com/fullcalendar/-/fullcalendar-6.1.11.tgz#a46ac35dbf1f04047113274f2242198d9a221f52"
+  integrity sha512-OOlx/+yFn9k5LnucRzcDmShONBecOVKNN6HHWe8jl7hGzQBmkxO+iD6eBokO6p24EY1PjATqhZkhJqHiCUgx3A==
+  dependencies:
+    "@fullcalendar/core" "~6.1.11"
+    "@fullcalendar/daygrid" "~6.1.11"
+    "@fullcalendar/interaction" "~6.1.11"
+    "@fullcalendar/list" "~6.1.11"
+    "@fullcalendar/multimonth" "~6.1.11"
+    "@fullcalendar/timegrid" "~6.1.11"
 
 function-bind@^1.1.1, function-bind@^1.1.2:
   version "1.1.2"

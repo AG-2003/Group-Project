@@ -40,7 +40,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
   const closeModal = () => setModalType("");
 
   // Function to handle the confirmation (submit) of the modal
-  const handleConfirm = () => closeModal(); // Close the modal after submission
+  // const handleConfirm = () => closeModal(); // Close the modal after submission
 
   const userProfile = UseUserProfilePic();
 
@@ -69,6 +69,15 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             <MenuItem icon={<FiClipboard />} onClick={() => openModal("Whiteboard")}>Whiteboard</MenuItem>
           </MenuList>
         </Menu>
+
+        <IconButton
+          size="sm"
+          onClick={() => { navigate('/friends') }}
+          mr={4}
+          colorScheme="purple"
+          icon={<FaUserFriends />}
+          aria-label={"friends"}
+        />
 
         <IconButton
           className="badgeIcon-Dash"

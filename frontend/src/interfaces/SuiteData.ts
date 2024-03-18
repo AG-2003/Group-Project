@@ -3,6 +3,7 @@ import { CommentType } from "./CommentType";
 export interface SuiteData {
     id: string;
     content?: string;
+    boardContent?: string;
     title: string;
     lastEdited: string;
     type: 'document' | 'sheet' | 'board' | 'powerpoint';
@@ -10,4 +11,5 @@ export interface SuiteData {
     isShared: boolean,
     comments?: CommentType[],
     user?: string[]
+    owner?: string
 }

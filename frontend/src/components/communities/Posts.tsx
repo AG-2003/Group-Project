@@ -1,45 +1,121 @@
-import React, { useState } from "react";
-import { Box, Text, Button, Flex } from "@chakra-ui/react"; // Import Chakra UI components for styling
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Text,
+  Button,
+  Flex,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+} from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
 import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
-
 import "./Posts.scss"
+import CommentsModal from "./commentsModal";
+
 
 interface Props {
   post: DocumentData;
-  onLike: (postId: string) => void; // Callback function to handle liking
-  onDislike: (postId: string) => void; // Callback function to handle disliking
+  userId: string; // User ID
+  onLike: (postId: string, userId: string) => void; // Callback function to handle liking
+  onDislike: (postId: string, userId: string) => void; // Callback function to handle disliking
+  deletePost: (postId: string, postUid: string) => void;
+  savePost: (post: string) => void;
 }
 
-const Posts = ({ post, onLike, onDislike }: Props) => {
-  const [likeClicked, setLikeClicked] = useState(false);
-  const [dislikeClicked, setDislikeClicked] = useState(false);
+const Posts = ({
+  post,
+  userId,
+  onLike,
+  onDislike,
+  deletePost,
+  savePost,
+}: Props) => {
+  const [timeAgo, setTimeAgo] = useState("");
+  const [likeCount, setLikeCount] = useState(
+    post.likedBy ? post.likedBy.length : 0
+  );
+  const [dislikeCount, setDislikeCount] = useState(
+    post.dislikedBy ? post.dislikedBy.length : 0
+  );
+  const [likeClicked, setLikeClicked] = useState(
+    post.likedBy && post.likedBy.includes(userId)
+  );
+  const [dislikeClicked, setDislikeClicked] = useState(
+    post.dislikedBy && post.dislikedBy.includes(userId)
+  );
+  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
 
-  const handleLikeClick = () => {
+  useEffect(() => {
+    const calculateTimeAgo = () => {
+      const now = new Date();
+      const commentDate = new Date(post.date);
+      const diff = now.getTime() - commentDate.getTime();
+      const seconds = Math.floor(diff / 1000);
+      if (seconds < 60) {
+        setTimeAgo(`${seconds} second${seconds !== 1 ? "s" : ""} ago`);
+      } else {
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) {
+          setTimeAgo(`${minutes} minute${minutes !== 1 ? "s" : ""} ago`);
+        } else {
+          const hours = Math.floor(minutes / 60);
+          if (hours < 24) {
+            setTimeAgo(`${hours} hour${hours !== 1 ? "s" : ""} ago`);
+          } else {
+            const days = Math.floor(hours / 24);
+            if (days < 30) {
+              setTimeAgo(`${days} day${days !== 1 ? "s" : ""} ago`);
+            } else {
+              const months = Math.floor(days / 30);
+              if (months < 12) {
+                setTimeAgo(`${months} month${months !== 1 ? "s" : ""} ago`);
+              } else {
+                const years = Math.floor(months / 12);
+                setTimeAgo(`${years} year${years !== 1 ? "s" : ""} ago`);
+              }
+            }
+          }
+        }
+      }
+    };
+
+    calculateTimeAgo();
+  }, [post.date]);
+
+  const handleLikeClick = async () => {
     if (!likeClicked) {
-      onLike(post.id); // Call the onLike callback with the post id
+      await onLike(post.id, userId); // Pass userId to the onLike callback
       setLikeClicked(true);
+      setLikeCount(likeCount + 1);
       if (dislikeClicked) {
-        onDislike(post.id); // Call the onDislike callback to remove dislike
+        await onDislike(post.id, userId); // Pass userId to the onDislike callback
         setDislikeClicked(false);
+        setDislikeCount(dislikeCount - 1);
       }
     } else {
-      onDislike(post.id); // Call the onDislike callback to remove like
+      await onLike(post.id, userId); // Pass userId to the onDislike callback
       setLikeClicked(false);
+      setLikeCount(likeCount - 1);
     }
   };
 
-  const handleDislikeClick = () => {
+  const handleDislikeClick = async () => {
     if (!dislikeClicked) {
-      onDislike(post.id); // Call the onDislike callback with the post id
+      await onDislike(post.id, userId); // Pass userId to the onDislike callback
       setDislikeClicked(true);
+      setDislikeCount(dislikeCount + 1);
       if (likeClicked) {
-        onLike(post.id); // Call the onLike callback to remove like
+        await onLike(post.id, userId); // Pass userId to the onLike callback
         setLikeClicked(false);
+        setLikeCount(likeCount - 1);
       }
     } else {
-      onLike(post.id); // Call the onDislike callback to remove dislike
+      await onDislike(post.id, userId); // Pass userId to the onLike callback
       setDislikeClicked(false);
+      setDislikeCount(dislikeCount - 1);
     }
   };
 
@@ -49,8 +125,19 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
   };
 
   const handleCommentsClick = () => {
-    // Logic to navigate to full screen post view with comments
-    console.log("Comments clicked");
+    setIsCommentsModalOpen(true);
+  };
+
+  const handleCloseCommentModal = () => {
+    setIsCommentsModalOpen(false);
+  };
+
+  const handlePostDelete = async () => {
+    deletePost(post.id, post.Uid);
+  };
+
+  const handleSave = async () => {
+    savePost(post.id);
   };
 
   // return (
@@ -126,7 +213,7 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
   //     </Box>
   //   </Box>
   // );
-  return (
+ return (
     <Box className="post-container">
       <Box className="post-box" borderWidth="1px" borderRadius="lg" p="4" mb="4">
         {post.image ? (
@@ -199,4 +286,5 @@ const Posts = ({ post, onLike, onDislike }: Props) => {
 };
 
 export default Posts;
+
 
