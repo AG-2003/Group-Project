@@ -41,7 +41,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
   const closeModal = () => setModalType("");
 
   // Function to handle the confirmation (submit) of the modal
-  const handleConfirm = () => closeModal(); // Close the modal after submission
+  // const handleConfirm = () => closeModal(); // Close the modal after submission
 
   const userProfile = UseUserProfilePic();
 
@@ -72,17 +72,16 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
           modalType={modalType}
         />
 
-        {/* <Link to="/chat">
-          <IconButton
-            borderRadius="10%" // To make it a circular button
-            bg="white"
-            p={2}
-            mr={4}
-            icon={<FaUserFriends />}
-            cursor="pointer"
-            aria-label={""}
-          />
-        </Link> */}
+
+        <IconButton
+          size="sm"
+          onClick={() => { navigate('/friends') }}
+          mr={4}
+          colorScheme="purple"
+          icon={<FaUserFriends />}
+          aria-label={"friends"}
+        />
+
 
         <IconButton
           size="sm"

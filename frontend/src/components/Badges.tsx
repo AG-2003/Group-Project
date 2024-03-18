@@ -8,12 +8,7 @@ import carbBg2 from '../assets/carbBg2.png';
 import { BadgesType } from '../interfaces/BadgesType';
 import { db } from '../firebase-config';
 import { auth } from '../firebase-config';
-import { collection, getDocs, query, where, DocumentData, getDoc, doc, updateDoc } from 'firebase/firestore';
-import { SuiteData } from '../interfaces/SuiteData';
-
-
-
-
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
 
 export const Badges: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
