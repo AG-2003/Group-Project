@@ -10,7 +10,7 @@ import {
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { FiFileText, FiGrid, FiClipboard, FiAward } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaUserFriends } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Modal from "./sub-components/Modal";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
