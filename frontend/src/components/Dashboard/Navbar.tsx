@@ -82,6 +82,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             className="userAvatar-Dash"
             src={userProfile.photoURL || "fallback_image_url"}
             name={userProfile.displayName}
+            backgroundColor={"#484c6c"}
           />
         </Link>
       </div>

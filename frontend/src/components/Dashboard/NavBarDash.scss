@@ -2,7 +2,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem; /* Example padding, adjust as needed */
+    // padding: 0.5rem; /* Example padding, adjust as needed */
     background-color: #484c6c; /* Background color for the navbar */
 }
 
@@ -55,20 +55,6 @@
     align-items: center;
 }
 
-// .menuButton {
-//     background-color: #885cd4; /* Set background color for the menu button */
-//     color: white; /* Adjust text color as needed */
-//     margin-right: 1.5rem;
-//     font-size: 24px;
-//     font-weight: 100;
-
-
-    
-//     &:hover {
-//         background-color: #9669e4; /* Lighter shade on hover, adjust as needed */
-//     }
-// }
-
 .menuButton-Dash {
     background-color: #484c6c; /* Set background color for the menu button */
     color: white; /* Adjust text color as needed */
@@ -102,3 +88,94 @@
       transform: scale(1.2); /* Increase the icon size */
     }
   }
+
+  /* 17-inch Laptops */
+  @media screen and (max-width: 1200px) {
+    .badgeIcon-Dash {
+      &.css-22xpxh {
+      font-size: 30px; /* Set the initial icon size */
+      }
+    }
+    .menuIcon-Dash {
+      &.css-22xpxh {
+      font-size: 30px; /* Set the initial icon size */
+      }
+    }
+    .menuButton-Dash {
+      &.css-22xpxh {
+      font-size: 30px; /* Set the initial icon size */
+      }
+    }
+    .userAvatar-Dash {
+      &.css-22xpxh {
+      size: 30px; /* Set the initial icon size */
+      }
+    }
+
+
+  }
+  
+  /* 15-inch Laptops */
+    @media screen and (max-width: 1199px) {
+      .badgeIcon-Dash {
+        &.css-22xpxh {
+        font-size: 25px; /* Set the initial icon size */
+        }
+      }
+      .menuIcon-Dash {
+        &.css-22xpxh {
+        font-size: 25px; /* Set the initial icon size */
+        }
+      }
+      .menuButton-Dash {
+        &.css-22xpxh {
+        font-size: 25px; /* Set the initial icon size */
+        }
+      }
+      .userAvatar-Dash {
+        &.css-22xpxh {
+        size: 25px; /* Set the initial icon size */
+        }
+      }
+  }
+  
+  /* 13-inch Laptops */
+    @media screen and (max-width: 850) {
+      .badgeIcon-Dash {
+        &.css-22xpxh {
+        font-size: 20px; /* Set the initial icon size */
+        }
+      }
+      .menuIcon-Dash {
+        &.css-22xpxh {
+        font-size: 20px; /* Set the initial icon size */
+        }
+      }
+      .menuButton-Dash {
+        &.css-22xpxh {
+        font-size: 20px; /* Set the initial icon size */
+        }
+      }
+      .userAvatar-Dash {
+        &.css-22xpxh {
+        size: 20px; /* Set the initial icon size */
+        }
+      }
+  }
+  
+  /* Large Phones */
+  @media screen and (max-width: 414px) {
+    :root {
+      --card-width: 138px;
+      --card-height: 160px;
+    }
+    .team-card{
+      h3.team-name{
+        font-size: 18px;
+      }
+      p.team-description{
+        font-size: 10px;
+      }
+    }
+  }
+  
