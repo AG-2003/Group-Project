@@ -35,6 +35,7 @@ interface PostData {
   Uname: string;
   Upic: string;
   date: string;
+  cStatus: boolean;
 }
 
 interface Props {
@@ -51,6 +52,11 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
   const [image, setImage] = useState<File | null>(null); // State to store the selected image
   const [page, setPage] = useState(1);
   const [user] = useAuthState(auth);
+  const [commentsEnabled, setCommentsEnabled] = useState(true);
+
+  const toggleComments = () => {
+    setCommentsEnabled(!commentsEnabled);
+  };
 
   const handlePostNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPostTitle(event.target.value);
@@ -101,6 +107,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
           Uname: user?.displayName || "",
           Upic: user?.photoURL || "",
           date: new Date().toISOString(),
+          cStatus: commentsEnabled,
         };
 
         // go to the firestore and into the collection communityPosts
@@ -191,6 +198,13 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
               onChange={handleImageChange}
               mb={4}
             />
+            <Button
+              colorScheme={commentsEnabled ? "gray" : "red"}
+              ml={2}
+              onClick={toggleComments}
+            >
+              Disable Comments
+            </Button>
           </>
         );
       case 2:

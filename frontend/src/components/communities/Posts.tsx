@@ -12,14 +12,16 @@ import {
 } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
 import CommentsModal from "./commentsModal";
+import EditPostModal from "./EditPostModal";
 
 interface Props {
   post: DocumentData;
   userId: string; // User ID
-  onLike: (postId: string, userId: string) => void; // Callback function to handle liking
-  onDislike: (postId: string, userId: string) => void; // Callback function to handle disliking
+  onLike: (postId: string, userId: string) => void;
+  onDislike: (postId: string, userId: string) => void;
   deletePost: (postId: string, postUid: string) => void;
   savePost: (post: string) => void;
+  editPost: (postId: string, newTitle: string, newDescription: string) => void;
 }
 
 const Posts = ({
@@ -29,7 +31,11 @@ const Posts = ({
   onDislike,
   deletePost,
   savePost,
+  editPost,
 }: Props) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
   const [timeAgo, setTimeAgo] = useState("");
   const [likeCount, setLikeCount] = useState(
     post.likedBy ? post.likedBy.length : 0
@@ -44,6 +50,23 @@ const Posts = ({
     post.dislikedBy && post.dislikedBy.includes(userId)
   );
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
+
+  const handleEditModalOpen = () => {
+    setIsEditModalOpen(true);
+    setNewTitle(post.title);
+    setNewDescription(post.description);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const handleEditPost = () => {
+    if (newTitle && newDescription) {
+      editPost(post.id, newTitle, newDescription);
+      handleEditModalClose();
+    }
+  };
 
   useEffect(() => {
     const calculateTimeAgo = () => {
@@ -154,7 +177,10 @@ const Posts = ({
             </MenuButton>
             <MenuList>
               {post.Uid === userId && (
-                <MenuItem onClick={handlePostDelete}>Delete</MenuItem>
+                <>
+                  <MenuItem onClick={handlePostDelete}>Delete</MenuItem>
+                  <MenuItem onClick={handleEditModalOpen}>Edit</MenuItem>
+                </>
               )}
               <MenuItem onClick={handleSave}>Save</MenuItem>
               <MenuItem color="red">Report</MenuItem>
@@ -221,10 +247,21 @@ const Posts = ({
           </Button>
         </Flex>
       </Box>
+      {isEditModalOpen && (
+        <EditPostModal
+          newTitle={newTitle}
+          newDescription={newDescription}
+          setNewTitle={setNewTitle}
+          setNewDescription={setNewDescription}
+          handleEditPost={handleEditPost}
+          handleEditModalClose={handleEditModalClose}
+        />
+      )}
       <CommentsModal
         Pid={post.id}
         isOpen={isCommentsModalOpen}
         onClose={handleCloseCommentModal}
+        commentsEnabled={post.cStatus}
       />
     </Box>
   );
