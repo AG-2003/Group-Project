@@ -1,9 +1,7 @@
 import { useState } from "react";
 import {
   IconButton,
-  Flex,
   Avatar,
-  Button,
   Menu,
   MenuButton,
   MenuList,
