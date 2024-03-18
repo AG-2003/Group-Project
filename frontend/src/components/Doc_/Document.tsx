@@ -79,6 +79,8 @@ const Document: React.FC<SuiteProps> = ({
         const ytext = ydoc.getText("quill");
         // Define a shared Comment type on the document
         const yComments = ydoc.getArray<CommentType>('comments')
+        // Define a shared Title type on the document
+        // const yTitle = ydoc.getText('title')
 
         // "Bind" the quill editor to a Yjs text type.
         const binding = new QuillBinding(
@@ -91,7 +93,12 @@ const Document: React.FC<SuiteProps> = ({
           setComments(yComments.toArray())
         }
 
+        // const updateTitle =  () => {
+        //   setSuiteTitle(yTitle.toString())
+        // }
+
         yComments.observe(updateComments)
+        // yTitle.observe(updateTitle)
 
         setYDoc(ydoc)
 
@@ -99,6 +106,7 @@ const Document: React.FC<SuiteProps> = ({
           yprovider.destroy();
           binding.destroy();
           yComments.unobserve(updateComments)
+          // yTitle.unobserve(updateTitle)
           ydoc.destroy();
           yDoc?.destroy()
         };
@@ -120,6 +128,14 @@ const Document: React.FC<SuiteProps> = ({
       fetchSharedDocumentFromFirestore();
     }
   }, []);
+
+  // useEffect(() => {
+  //   if(yDoc && isSharePage){
+  //     const yTitle = yDoc.getText('title')
+  //     yTitle.delete(0, yTitle.length)
+  //     yTitle.insert(0, suiteTitle)
+  //   }
+  // }, [suiteTitle])
 
   const fetchDocumentFromFirestore = async (userEmail: string) => {
     try {
@@ -168,10 +184,10 @@ const Document: React.FC<SuiteProps> = ({
               if(document as SuiteData){
                 setTimeout(() => {
                   setValue(document.content)
+                  setSuiteTitle(document.title || "Untitled")
+                  setComments(document.comments || []);
                   saveSharedDocumentToFirestore(suiteId, suiteTitle, value, comments)
                 }, 2800)
-                setSuiteTitle(document.title || "Untitled")
-                setComments(document.comments || []);
               }
               // Remove the document from the array
               documentsArray.splice(documentIndex, 1);
