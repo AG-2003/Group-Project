@@ -11,4 +11,5 @@ export interface SuiteData {
     isShared: boolean,
     comments?: CommentType[],
     user?: string[]
+    owner?: string
 }

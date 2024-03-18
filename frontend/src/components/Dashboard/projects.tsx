@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs, DocumentReference, DocumentData } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "./Projects.scss";
 import Navbar from "./Navbar";
@@ -86,10 +86,10 @@ const Projects: React.FC = () => {
 
         // Filter shared documents and shared boards based on the user's email
         const filteredSharedDocs = sharedDocsSnapshot.docs.filter(doc =>
-          doc.data().user?.includes(user.email)
+          doc.data().user?.includes(user.email) && doc.data().isTrash === false
         ).map(doc => doc.data() as SuiteData);
         const filteredSharedBoards = sharedBoardsSnapshot.docs.filter(doc =>
-          doc.data().user?.includes(user.email)
+          doc.data().user?.includes(user.email) && doc.data().isTrash === false
         ).map(doc => doc.data() as SuiteData);
 
         // Use the existing lastEdited field from Firestore data, don't generate a new one
@@ -223,6 +223,40 @@ const Projects: React.FC = () => {
       }
     }
   };
+
+  const handleSharedTrashIconClick = async (id: string, type: string) => {
+    if(user?.email){
+      try{
+        let sharedDocRef: DocumentReference<DocumentData, DocumentData>
+        if(type === 'document') {
+          sharedDocRef = doc(db, "sharedDocs", id)
+        } else {
+          sharedDocRef = doc(db, "sharedBoards", id)
+        }
+
+        if(sharedDocRef) {
+          const docSnapshot = await getDoc(sharedDocRef)
+
+          if(docSnapshot.exists()){
+            // Fetch the document data
+            const docData = docSnapshot.data();
+
+            // Check if the user's email matches the 'owner' property of the document
+            if(docData && docData.owner === user.email) {
+              // If the condition is met, update the isTrash property to true
+              await setDoc(sharedDocRef, { isTrash: true }, { merge: true });
+            } else {
+              console.log("User is not the owner of this document.");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error moving suite to trash:", error);
+      }
+    }
+
+    fetchProjects();
+  }
 
   return (
     <>
@@ -393,10 +427,20 @@ const Projects: React.FC = () => {
                     <h3 className="project-title">{project.title}</h3>
                   </div>
                   <div className="card-bottom">
-                    <p className="last-edited">
-                      Last edited: {formatDate(project.lastEdited)}
-                    </p>
-                  </div>
+                      <p className="last-edited">
+                        Last edited: {formatDate(project.lastEdited)}
+                      </p>
+                      <IconButton
+                        icon={<Icon as={FaTrash} color="#484c6c" />}
+                        size="sm"
+                        aria-label="Delete Project"
+                        className="delete-icon"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleSharedTrashIconClick(project.id, project.type);
+                        }}
+                      />
+                    </div>
                 </div>
               ))}
             </div>

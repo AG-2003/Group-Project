@@ -473,7 +473,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
             type: 'board',
             boardContent: JSON.stringify(data),
             isTrash: false,
-            isShared: isSharePage
+            isShared: isSharePage,
+            owner: user?.email || ""
           };
         }
 

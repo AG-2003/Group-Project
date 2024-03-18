@@ -320,6 +320,7 @@ const Document: React.FC<SuiteProps> = ({
             isTrash: false,
             isShared: isSharePage,
             comments: comments,
+            owner: user?.email || ""
           };
         }
 
