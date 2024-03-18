@@ -62,11 +62,11 @@ const Teams = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        {/* <Box flexGrow={1} padding="10px" marginLeft={5}> */}
           <Flex
             className="containerTeams"
             direction="column"
-            marginLeft={5}
+            marginLeft={10}
             marginTop={3}
           >
             <>
@@ -74,7 +74,7 @@ const Teams = () => {
               <JoinedTeams />
             </>
           </Flex>
-        </Box>
+        {/* </Box> */}
       </Box>
     </>
   );

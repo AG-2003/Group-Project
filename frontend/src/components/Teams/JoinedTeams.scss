@@ -1,83 +1,153 @@
-.css-1n9w51u{
-  
+:root {
+  --card-width: 138px; /* Initial width */
+  --card-height: 160px; /* Initial height */
+  --card-ratio: calc(var(--card-width) / var(--card-height)); /* Width to height ratio */
 }
 
 .teams-container {
-  // Define container layout, spacing, and alignment
   display: flex;
-  flex-direction: column; // for a vertical layout
+  flex-direction: column;
   gap: 20px;
   margin-top: 2rem;
+}
 
-  .heading-container {
-    .heading {
-      font-size: 2rem;
-      // margin-bottom: 1.5rem;
-      font-weight: 600;
-    }
+.heading-container .heading {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.teams-list {
+  display: flex;
+  flex-wrap: wrap;
+  // gap: 20px;
+}
+
+.team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: var(--card-width);
+  height: var(--card-height);
+  padding: 10px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #dcdcf6;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-right: 2rem;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.team-card:hover {
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.team-card img.team-image {
+  width: 100%; /* Ensures image width matches the card width */
+  height: 50%; /* Image height is always half of the card's height */
+  object-fit: cover; /* Ensures the image covers the designated area without distorting its aspect ratio */
+  border-radius: 10px;
+}
+
+  h3.team-name {
+  font-size: 20px; // Adjust font-size to match the image
+    color: inherit; // Use the color from the image text
+    font-weight: 500;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    width: 100%;
   }
 
-  .teams-list {
-    // Use either flexbox or grid depending on your layout needs
-    display: flex; // or display: grid;
-    flex-wrap: wrap;
-    gap: 20px; // consistent space between items
+  p.team-description {
+    font-size: 10.5px;
+    color: #555;
+    margin-bottom: 12px;
+    width: 100%;
 
-    // Add responsive behavior if needed
-    @media (max-width: 600px) {
-      flex-direction: column;
-    }
   }
 
-  .team-card {
-    display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      width: 138px; // Adjust width as needed
-      height: 160px; // Adjust height as needed
-      padding: 10px;
-      border: 1px solid #E2E8F0; // Use the color from the image border
-      border-radius: 8px;
-      cursor: pointer;
-      background-color: #dcdcf6; // Use the color from the image background
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      margin-right: 2rem;
-      transition: box-shadow 0.3s ease, transform 0.3s ease;
+.no-team-message-container {
+  margin-top: 16px;
 
-    &:hover {
-        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15); // Adjust hover shadow
-        transform: translateY(-5px); // Moves the box up by 5 pixels on hover
-      }
+  .message {
+    font-size: 24px;
+    color: silver;
+  }
+}
 
-    img.team-image{
-        width: 138px; // Adjust width as needed
-        height: 70px; // Adjust height as needed
-        border-radius: 10px;
+/* 17-inch Laptops */
+// @media screen and (min-width: 1367px) {
+  @media screen and (min-width: 1200px) {
+  :root {
+    --card-width: 220px; /* Larger card width */
+    --card-height: 240px; /* Adjusted height to maintain image ratio */
+  }
+  .heading-container .heading {
+    font-size: 2.5rem;
+  }
+  .team-card{
+    h3.team-name{
+      font-size: 26px;
     }
-
-    h3.team-name {
-    font-size: 18px; // Adjust font-size to match the image
-      color: inherit; // Use the color from the image text
-      font-weight: 500;
-      margin-top: 8px;
-      margin-bottom: 8px;
-    }
-
-    p.team-description {
-      font-size: 10.5px;
-      color: #555;
-      margin-bottom: 12px;
+    p.team-description{
+      font-size: 17px;
     }
   }
+}
 
-  .no-team-message-container {
-    margin-top: 16px;
+/* 15-inch Laptops */
+// @media screen and (max-width: 1366px) {
+  @media screen and (max-width: 1199px) {
+  :root {
+    --card-width: 180px;
+    --card-height: 196px;
+  }
+  .heading-container .heading {
+    font-size: 2.3rem;
+  }
+  .team-card{
+    h3.team-name{
+      font-size: 20px;
+    }
+    p.team-description{
+      font-size: 12px;
+    }
+  }
+}
 
-    .message {
-      font-size: 24px;
-      color: silver;
+/* 13-inch Laptops */
+// @media screen and (max-width: 1280px) {
+  @media screen and (max-width: 850) {
+  :root {
+    --card-width: 160px;
+    --card-height: 174px;
+  }
+  .heading-container .heading {
+    font-size: 2rem;
+  }
+  .team-card{
+    p.team-description{
+      font-size: 15px;
+    }
+  }
+}
+
+/* Large Phones */
+@media screen and (max-width: 414px) {
+  :root {
+    --card-width: 138px;
+    --card-height: 160px;
+  }
+  .team-card{
+    h3.team-name{
+      font-size: 18px;
+    }
+    p.team-description{
+      font-size: 10px;
     }
   }
 }

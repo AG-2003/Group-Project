@@ -21,7 +21,7 @@ const CreateJoin = () => {
       <div className="containerCreateJoin">
         <div className="team-box" onClick={handleCreateTeamClick}>
           <div className="icon-container">
-            <IoIosCreate size={32} />
+            <IoIosCreate />
           </div>
           <div className="team-info">
             <h2>Create a team</h2>
@@ -31,14 +31,14 @@ const CreateJoin = () => {
 
         <div className="team-box">
           <div className="icon-container">
-            <HiMiniUserGroup size={32} />
+            <HiMiniUserGroup />
           </div>
           <div className="team-info">
             <h2>Join a team</h2>
             <input
               type="text"
               placeholder="Enter code"
-              className="input-field"
+              className="input-field-teams"
             />
           </div>
         </div>
