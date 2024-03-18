@@ -1,13 +1,13 @@
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
+import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
 import { ZegoSuperBoardManager } from "zego-superboard-web";
 import { auth } from "../firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
-import "./Call.scss";
+
 
 function randomID(len: number) {
-  let result = "";
+  let result = '';
   if (result) return result;
-  var chars = "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
+  var chars = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP',
     maxPos = chars.length,
     i;
   len = len || 5;
@@ -17,60 +17,52 @@ function randomID(len: number) {
   return result;
 }
 
-export function getUrlParams(url = window.location.href) {
-  let urlStr = url.split("?")[1];
+export function getUrlParams(
+  url = window.location.href
+) {
+  let urlStr = url.split('?')[1];
   return new URLSearchParams(urlStr);
 }
+
 export default function App() {
-  const [user] = useAuthState(auth);
-  const roomID = getUrlParams().get("roomID") || randomID(5);
+    const [user] = useAuthState(auth);
+    const roomID = getUrlParams().get('roomID') || randomID(5);
+    let myMeeting = async (element: any) => {
+    // generate Kit Token
+    const appID = 694796786;
+    const serverSecret = "481b3eb1bd3c7d3d7da2f04db59dd1e1";
+    const kitToken =  ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, user?.email? user?.email: randomID(5),  randomID(5));
 
-  let myMeeting = async (element: HTMLDivElement) => {
-    // Fetch the username
-    if (user?.displayName) {
-      const username = user?.displayName;
 
-      // generate Kit Token
-      const appID = 100726050;
-      const serverSecret = "be8ae9fa57aae635c0563451be5946cc";
-      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-        appID,
-        serverSecret,
-        roomID,
-        username,
-        randomID(5)
-      );
-
-      // Create instance object from Kit Token.
-      const zp = ZegoUIKitPrebuilt.create(kitToken);
-      // start the call
-      zp.addPlugins({ ZegoSuperBoardManager });
-      zp.joinRoom({
+    // Create instance object from Kit Token.
+    const zp = ZegoUIKitPrebuilt.create(kitToken);
+    // start the call
+    zp.addPlugins({ ZegoSuperBoardManager });
+    zp.joinRoom({
         container: element,
         sharedLinks: [
           {
-            name: "Personal link",
+            name: 'Personal link',
             url:
-              window.location.protocol +
-              "//" +
-              window.location.host +
-              window.location.pathname +
-              "?roomID=" +
+             window.location.protocol + '//' +
+             window.location.host + window.location.pathname +
+              '?roomID=' +
               roomID,
           },
         ],
         scenario: {
-          mode: ZegoUIKitPrebuilt.GroupCall,
+          mode: ZegoUIKitPrebuilt.GroupCall, // To implement 1-on-1 calls, modify the parameter here to [ZegoUIKitPrebuilt.OneONoneCall].
         },
-      });
-    }
+    });
+
+
   };
 
   return (
     <div
       className="myCallContainer"
       ref={myMeeting}
-      style={{ width: "100vw", height: "100vh" }}
+      style={{ width: '100vw', height: '100vh' }}
     ></div>
   );
 }
