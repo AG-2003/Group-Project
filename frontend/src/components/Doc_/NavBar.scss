@@ -2,7 +2,8 @@
   width: 100%;
   display: flex;
   align-items: center;
-  background-color: #484c6c; 
+  background-color: #001eff; 
+  //background-color: #484c6c; 
   color: #e8eaed; 
   padding: 5px;
 
@@ -75,5 +76,16 @@
             }
           }
         }
+      }
+    }
+
+    // Responsive adjustments
+    @media (max-width: 768px) {
+      .nav-items {
+        display: none;
+      }
+    
+      .title-area {
+        margin-left: 1rem;
       }
     }
