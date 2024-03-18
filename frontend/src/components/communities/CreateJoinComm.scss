@@ -1,4 +1,4 @@
-.projects-heading {
+.projects-heading-comm {
     font-size: 2rem;
     margin-bottom: 1.5rem;
     font-weight: 600;
@@ -6,11 +6,11 @@
   }
   
   // Container for the team boxes
-  .containerCreateJoin {
+  .containerCreateJoin-comm {
     display: flex;
   }
   
-  .team-box {
+  .team-box-comm {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -23,6 +23,7 @@
     border-radius: 8px;
     cursor: pointer;
     background-color: #dcdcf6; // Use the color from the image background
+
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     margin-right: 2rem;
     transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease, color 0.3s ease; // Add transition for color and background
@@ -34,11 +35,11 @@
         color: white; 
       }
   
-    .icon-container {
+    .icon-container-comm {
       margin-bottom: 8px;
     }
   
-    .team-info {
+    .team-info-comm {
       h2 {
         font-size: 18px; // Adjust font-size to match the image
         color: inherit; // Use the color from the image text
@@ -52,7 +53,7 @@
         color: inherit; // Use the color from the image text
       }
       
-      .input-field {
+      .input-field-comm {
         font-size: 12px; // Adjust font-size to match the image
         color: #4A5568; // Use the color from the image text
         border: 1px solid #CBD5E0; // Use the color from the image border

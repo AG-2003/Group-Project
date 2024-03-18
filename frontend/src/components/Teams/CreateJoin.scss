@@ -16,8 +16,8 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  width: 138px; // Adjust width as needed
-  height: 160px; // Adjust height as needed
+  width: 138px;
+  height: 160px;
   padding: 10px;
   border: 1px solid #E2E8F0; // Use the color from the image border
   border-radius: 8px;
@@ -31,12 +31,19 @@
       box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15); // Adjust hover shadow
       transform: translateY(-5px); // Moves the box up by 5 pixels on hover
       background-color: #885cd4; // Change background color on hover
+      // background-color: #00ff0d; // Change background color on hover
       color: white; 
     }
 
-  .icon-container {
-    margin-bottom: 8px;
-  }
+    .icon-container {
+      font-size: 2rem; // This increases the icon size
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      // Add any other styles you need for the container
+    }
+    
 
   .team-info {
     h2 {
@@ -52,7 +59,7 @@
       color: inherit; // Use the color from the image text
     }
     
-    .input-field {
+    .input-field-teams {
       font-size: 12px; // Adjust font-size to match the image
       color: #4A5568; // Use the color from the image text
       border: 1px solid #CBD5E0; // Use the color from the image border
@@ -63,6 +70,104 @@
 
       &:focus {
         outline: 2px solid #8742e1; // Change color as needed for focus outline
+      }
+    }
+  }
+}
+
+/* Adjust the size of the team-box based on the viewport width */
+// @media screen and (min-width: 1367px) {
+  @media screen and (min-width: 1200px) {
+  .projects-heading {
+    font-size: 2.5rem;
+  }
+  .team-box {
+    width: 220px;
+    height: 240px;
+
+    .icon-container {
+      font-size: 3rem; // This increases the icon size
+    }
+    .team-info {
+      h2 {
+        font-size: 26px; // Adjust font-size to match the image
+      }
+  
+      p {
+        font-size: 17px; // Adjust font-size to match the image
+      }
+      .input-field-teams {
+        font-size: 20px; // Adjust font-size to match the image
+      }
+  }
+}
+}
+
+// @media screen and (max-width: 1366px) {
+  @media screen and (max-width: 1199px) {
+  .projects-heading {
+    font-size: 2.3rem;
+  }
+  .team-box  {
+    width: 180px;
+    height: 196px;
+
+    .icon-container {
+      font-size: 2.5rem; // This increases the icon size
+    }
+    .team-info {
+      h2 {
+        font-size: 20px; // Adjust font-size to match the image
+      }
+  
+      p {
+        font-size: 12px; // Adjust font-size to match the image
+      }
+      .input-field-teams {
+        font-size: 17px; // Adjust font-size to match the image
+      }
+    }
+  }
+}
+
+// @media screen and (max-width: 1280px) {
+  @media screen and (max-width: 850) {
+
+  .projects-heading {
+    font-size: 2rem;
+  }
+  .team-box  {
+    width: 160px;
+    height: 174px;
+    .team-info{
+      .input-field-teams {
+        font-size: 15px; // Adjust font-size to match the image
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 414px) {
+  .projects-heading {
+    font-size: 1.7rem;
+  }
+  .team-box  {
+    width: 138px;
+    height: 160px;
+
+    .icon-container {
+      font-size: 2rem; // This increases the icon size
+    }
+    .team-info {
+      h2 {
+        font-size: 18px; // Adjust font-size to match the image
+      }
+  
+      p {
+        font-size: 10px; // Adjust font-size to match the image
+      }
+      .input-field-teams {
+        font-size: 12px; // Adjust font-size to match the image
       }
     }
   }
