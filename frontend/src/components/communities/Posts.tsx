@@ -11,7 +11,10 @@ import {
   MenuList,
 } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
+import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
+import "./Posts.scss"
 import CommentsModal from "./commentsModal";
+
 
 interface Props {
   post: DocumentData;
@@ -137,83 +140,140 @@ const Posts = ({
     savePost(post.id);
   };
 
-  return (
-    <Box>
-      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
-        <Flex justify="space-between" align="center" mb="2">
-          <Flex align="center">
-            <Avatar size="sm" name={post.Uname} src={post.Upic} mr="2" />
-            <Text fontSize="sm">{post.Uname}</Text>
-          </Flex>
-          <Text fontSize="sm" color="gray.500" mb="2">
-            {timeAgo}
-          </Text>
-          <Menu>
-            <MenuButton as={Button} size="sm" variant="ghost" color="gray.500">
-              ...
-            </MenuButton>
-            <MenuList>
-              {post.Uid === userId && (
-                <MenuItem onClick={handlePostDelete}>Delete</MenuItem>
-              )}
-              <MenuItem onClick={handleSave}>Save</MenuItem>
-              <MenuItem color="red">Report</MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-        <Text fontSize="lg" fontWeight="bold" mb="2">
-          {post.title}
-        </Text>
+  // return (
+  //   <Box>
+  //     <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
+  //       {/* Display post image if available, otherwise display a placeholder */}
+  //       {post.image ? (
+  //         <img
+  //           src={post.image}
+  //           alt=""
+  //           style={{
+  //             width: "100%",
+  //             height: "300px",
+  //             objectFit: "cover",
+  //             marginBottom: "1rem",
+  //           }}
+  //         />
+  //       ) : (
+  //         <Box
+  //           bg="gray.200"
+  //           w="100%"
+  //           h="300px" // Adjust the height of the square as needed
+  //           mb="4"
+  //         />
+  //       )}
+  //       <Text fontSize="lg" fontWeight="bold" mb="2">
+  //         {post.title}
+  //       </Text>
+  //       <Text fontSize="sm" color="gray.500" mb="2">
+  //         Date Posted: {post.date}
+  //       </Text>
+  //       <Text>{post.description}</Text>
+  //       {/* Like and Dislike buttons with counters */}
+  //       <Flex align="center" mt="2">
+  //         <Button
+  //           colorScheme={likeClicked ? "green" : "gray"}
+  //           size="sm"
+  //           mr="2"
+  //           onClick={handleLikeClick}
+  //           isDisabled={dislikeClicked}
+  //         >
+  //           Like
+  //         </Button>
+  //         <Text fontSize="sm" mr="2">
+  //           {post.like}
+  //         </Text>
+  //         <Button
+  //           colorScheme={dislikeClicked ? "red" : "gray"}
+  //           size="sm"
+  //           mr="2"
+  //           onClick={handleDislikeClick}
+  //           isDisabled={likeClicked}
+  //         >
+  //           Dislike
+  //         </Button>
+  //         <Button
+  //           colorScheme="blue"
+  //           size="sm"
+  //           mr="2"
+  //           onClick={handleShareClick}
+  //         >
+  //           Share
+  //         </Button>
+  //         <Button size="sm" onClick={handleCommentsClick}>
+  //           <Box as="span" mr="1">
+  //             <Text as="span">{post.commentsCount || 0}</Text>{" "}
+  //           </Box>
+  //           <Box as="span">
+  //             <Text as="span">Comments</Text>
+  //           </Box>
+  //         </Button>
+  //       </Flex>
+  //     </Box>
+  //   </Box>
+  // );
+ return (
+    <Box className="post-container">
+      <Box className="post-box" borderWidth="1px" borderRadius="lg" p="4" mb="4">
         {post.image ? (
           <img
             src={post.image}
             alt=""
-            style={{
-              width: "400px",
-              height: "300px",
-              objectFit: "cover",
-              marginBottom: "1rem",
-            }}
+            className="post-image"
           />
         ) : (
-          <Box bg="gray.200" w="100%" h="300px" mb="4" />
+          <Box
+            bg="gray.200"
+            w="100%"
+            h="300px"
+            mb="4"
+            className="post-placeholder"
+          />
         )}
-
-        <Text>{post.description}</Text>
-        {/* Like and Dislike buttons */}
-        <Flex align="center" mt="2">
+        <Text className="post-title" fontSize="lg" fontWeight="bold" mb="2">
+          {post.title}
+        </Text>
+        <Text className="post-date" fontSize="sm" color="gray.500" mb="2">
+          Date Posted: {post.date}
+        </Text>
+        <Text className="post-description">{post.description}</Text>
+        <Flex className="post-actions" align="center" mt="2">
           <Button
-            colorScheme={likeClicked ? "green" : "gray"}
+            className="like-button"
             size="sm"
             mr="2"
             onClick={handleLikeClick}
             isDisabled={dislikeClicked}
+            variant="ghost" // Use the 'ghost' variant or another appropriate one
           >
-            Like
+            <FaRegThumbsUp color={likeClicked ? "green" : "gray"} />
           </Button>
           <Text fontSize="sm" mr="2">
-            {likeCount - dislikeCount}
+            {post.like}
           </Text>
           <Button
-            colorScheme={dislikeClicked ? "red" : "gray"}
+            className="dislike-button"
             size="sm"
             mr="2"
             onClick={handleDislikeClick}
             isDisabled={likeClicked}
+            variant="ghost" // Use the 'ghost' variant or another appropriate one
           >
-            Dislike
+            <FaRegThumbsDown color={dislikeClicked ? "red" : "gray"} />
           </Button>
           <Button
-            colorScheme="blue"
+            className="share-button"
+            // colorScheme="blue"
             size="sm"
             mr="2"
             onClick={handleShareClick}
           >
             Share
           </Button>
-          <Button size="sm" onClick={handleCommentsClick}>
+          <Button className="comments-button" size="sm" onClick={handleCommentsClick}>
             <Box as="span" mr="1">
-              <Text as="span">{post.comments ? post.comments.length : 0}</Text>{" "}
+              <Text as="span">{post.commentsCount || 0}</Text>
             </Box>
             <Box as="span">
               <Text as="span">Comments</Text>
@@ -221,13 +281,10 @@ const Posts = ({
           </Button>
         </Flex>
       </Box>
-      <CommentsModal
-        Pid={post.id}
-        isOpen={isCommentsModalOpen}
-        onClose={handleCloseCommentModal}
-      />
     </Box>
   );
 };
 
 export default Posts;
+
+

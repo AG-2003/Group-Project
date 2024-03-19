@@ -20,9 +20,7 @@ const Teams = () => {
 
   return (
     <>
-      <div style={{ padding: "10px", background: "#484c6c" }}>
-        <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      </div>
+      <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
         <AnimatePresence>
@@ -62,11 +60,11 @@ const Teams = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        {/* <Box flexGrow={1} padding="10px" marginLeft={5}> */}
           <Flex
             className="containerTeams"
             direction="column"
-            marginLeft={5}
+            marginLeft={10}
             marginTop={3}
           >
             <>
@@ -74,7 +72,7 @@ const Teams = () => {
               <JoinedTeams />
             </>
           </Flex>
-        </Box>
+        {/* </Box> */}
       </Box>
     </>
   );
