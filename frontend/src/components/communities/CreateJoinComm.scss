@@ -1,0 +1,70 @@
+.projects-heading-comm {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    // text-align: center;
+  }
+  
+  // Container for the team boxes
+  .containerCreateJoin-comm {
+    display: flex;
+  }
+  
+  .team-box-comm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 138px; // Adjust width as needed
+    height: 160px; // Adjust height as needed
+    padding: 10px;
+    border: 1px solid #E2E8F0; // Use the color from the image border
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #dcdcf6; // Use the color from the image background
+
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-right: 2rem;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease, color 0.3s ease; // Add transition for color and background
+    
+      &:hover {
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15); // Adjust hover shadow
+        transform: translateY(-5px); // Moves the box up by 5 pixels on hover
+        background-color: #885cd4; // Change background color on hover
+        color: white; 
+      }
+  
+    .icon-container-comm {
+      margin-bottom: 8px;
+    }
+  
+    .team-info-comm {
+      h2 {
+        font-size: 18px; // Adjust font-size to match the image
+        color: inherit; // Use the color from the image text
+        font-weight: 500;
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
+  
+      p {
+        font-size: 10.5px; // Adjust font-size to match the image
+        color: inherit; // Use the color from the image text
+      }
+      
+      .input-field-comm {
+        font-size: 12px; // Adjust font-size to match the image
+        color: #4A5568; // Use the color from the image text
+        border: 1px solid #CBD5E0; // Use the color from the image border
+        border-radius: 4px;
+        padding: 4px 8px;
+        width: 80%; // Adjust width as needed
+        margin-top: 8px; // Adjust margin as needed
+  
+        &:focus {
+          outline: 2px solid #8742e1; // Change color as needed for focus outline
+        }
+      }
+    }
+  }
