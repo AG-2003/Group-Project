@@ -217,6 +217,44 @@ const AllPosts = () => {
     }
   };
 
+  const editPost = async (
+    postId: string,
+    newTitle: string,
+    newDescription: string
+  ) => {
+    try {
+      // Ensure user is authenticated
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Retrieve post document from Firestore
+      const postRef = doc(db, "communityPosts", postId);
+      const postDocSnapshot = await getDoc(postRef);
+
+      if (postDocSnapshot.exists()) {
+        // Check if current user is the owner of the post
+
+        if (postDocSnapshot.data()?.Uid === user.uid) {
+          // Update post document in Firestore with new title and description
+          await updateDoc(postRef, {
+            title: newTitle,
+            description: newDescription,
+          });
+
+          console.log("Post updated successfully");
+        } else {
+          console.error("User is not authorized to edit this post.");
+        }
+      } else {
+        console.error("Post document not found");
+      }
+    } catch (error) {
+      console.error("Error editing post:", error);
+    }
+  };
+
   return (
     <>
       <div style={{ padding: "10px", background: "#484c6c" }}>
@@ -287,6 +325,7 @@ const AllPosts = () => {
                     onDislike={handleDislike}
                     deletePost={handleDeletePost}
                     savePost={savePost}
+                    editPost={editPost}
                   />
                 ))}
               </div>
