@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
-import { RxCross2 } from "react-icons/rx";
 import {
-  Flex,
   Heading,
   Button,
   Modal,
@@ -17,9 +15,6 @@ import {
   Text,
   Input,
   Textarea,
-  Select,
-  Link,
-  Box,
 } from "@chakra-ui/react";
 import {
   getStorage,
@@ -36,22 +31,32 @@ interface PostData {
   type: string;
   image: string | null;
   Cid: string;
-  like: number;
+  Uid: string;
+  Uname: string;
+  Upic: string;
+  date: string;
+  cStatus: boolean;
 }
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   Cid: string;
+  Uid: string;
 }
 
-const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid }: Props) => {
+const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
   const [postTitle, setPostTitle] = useState("");
   const [postDescription, setPostDescription] = useState("");
   const [postType, setPostType] = useState("");
   const [image, setImage] = useState<File | null>(null); // State to store the selected image
   const [page, setPage] = useState(1);
   const [user] = useAuthState(auth);
+  const [commentsEnabled, setCommentsEnabled] = useState(true);
+
+  const toggleComments = () => {
+    setCommentsEnabled(!commentsEnabled);
+  };
 
   const handlePostNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPostTitle(event.target.value);
@@ -98,7 +103,11 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid }: Props) => {
           type: postType,
           image: null, // Initialize with null value
           Cid: Cid,
-          like: 0,
+          Uid: Uid,
+          Uname: user?.displayName || "",
+          Upic: user?.photoURL || "",
+          date: new Date().toISOString(),
+          cStatus: commentsEnabled,
         };
 
         // go to the firestore and into the collection communityPosts
@@ -189,6 +198,13 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid }: Props) => {
               onChange={handleImageChange}
               mb={4}
             />
+            <Button
+              colorScheme={commentsEnabled ? "gray" : "red"}
+              ml={2}
+              onClick={toggleComments}
+            >
+              Disable Comments
+            </Button>
           </>
         );
       case 2:

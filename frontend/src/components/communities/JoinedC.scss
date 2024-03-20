@@ -89,6 +89,26 @@
         cursor: default;
         margin-top: 10px;
       }
+
+      .request-join-button {
+        background-color: darkblue;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      
+      .joined-button-private {
+        background-color: darkblue;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: default;
+        margin-top: 10px;
+      }
     }
 
   .no-community-message-container {
