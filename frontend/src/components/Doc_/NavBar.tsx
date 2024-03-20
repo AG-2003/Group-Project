@@ -70,6 +70,34 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
 
   // Function to start the call
+  // const handleStartCall = () => {
+  //   // Generate the roomID and construct the meeting link
+  //   const roomID = randomID(5);
+  //   const meetingLink =
+  //     window.location.protocol +
+  //     "//" +
+  //     window.location.host +
+  //     "/meeting?roomID=" +
+  //     roomID;
+
+  //   // Navigate to the Zoom meeting page
+  //   navigate(`/meeting?roomID=${roomID}`);
+
+  //   // Now you can send the meeting link to the chat or use it as needed
+  //   // For example, you can add a new message to the chat
+  //   const newMessage: Message = {
+  //     id: Date.now().toString(),
+  //     text: meetingLink,
+  //     userId: user?.email,
+  //     timestamp: serverTimestamp(),
+  //     userPic: user?.photoURL,
+  //     userName: user?.displayName,
+  //   };
+
+  //   // Add the new message to the chat
+
+  // };
+
   const handleStartCall = () => {
     // Generate the roomID and construct the meeting link
     const roomID = randomID(5);
@@ -80,8 +108,8 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       "/meeting?roomID=" +
       roomID;
 
-    // Navigate to the Zoom meeting page
-    navigate(`/meeting?roomID=${roomID}`);
+    // Open the meeting link in a new tab
+    window.open(meetingLink, '_blank');
 
     // Now you can send the meeting link to the chat or use it as needed
     // For example, you can add a new message to the chat
