@@ -530,7 +530,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     setSize(newSize);
   };
 
-  const handleMouseDown: StageProps["onMouseDown"] = (e) => {
+  const handleMouseDown: StageProps["onMouseDown"] & StageProps["onTouchStart"] = (e) => {
+    e.evt.preventDefault();
     if (e.target !== e.target.getStage() && tool === "text") {
       return;
     }
@@ -619,7 +620,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     }
   };
 
-  const handleMouseMove: StageProps["onMouseMove"] = (e) => {
+  const handleMouseMove: StageProps["onMouseMove"] & StageProps["onTouchMove"]  = (e) => {
+    e.evt.preventDefault();
     if (!isDrawing.current) {
       return;
     }
@@ -695,7 +697,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     // ...
   };
 
-  const handleMouseUp: StageProps["onMouseUp"] = () => {
+  const handleMouseUp: StageProps["onMouseUp"] & StageProps["onTouchEnd"]  = (e) => {
+    e.evt.preventDefault();
     if (selectedShape === "rectangle" && currentRectangle) {
       if (currentRectangle.width !== 0 && currentRectangle.height !== 0) {
         setRectangles([...rectangles, currentRectangle]);
@@ -806,6 +809,9 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
       >
         <Layer>
           {lines && lines.map((line, i) => (
