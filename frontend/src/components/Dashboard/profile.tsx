@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import "tailwindcss/tailwind.css";
 import {
   Flex,
   Text,
   Badge,
   Stack,
   Avatar,
+  Grid,
+  GridItem,
+  Heading,
+  VStack,
   Button,
   Box,
   Divider,
@@ -26,9 +31,44 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { FiAward } from "react-icons/fi";
 import { BadgesType } from "../../interfaces/BadgesType";
 
+// Define an interface for the props if you're using TypeScript
+interface StatCardProps {
+  title: string;
+  value: number | string;
+}
+
+// Card component for individual stats
+const StatCard: React.FC<StatCardProps> = ({ title, value }) => {
+  return (
+    <Box
+      bg="white"
+      p={3}
+      shadow="xl" // Adding more pronounced shadow
+      borderWidth="1px"
+      borderRadius="2xl" // Making the boxes more rounded
+      width="100%"
+      textAlign="center"
+      transition="transform 0.2s, shadow 0.2s" // Smooth transition for hover effects
+      _hover={{
+        transform: "scale(1.02)", // Slightly scale up the card on hover
+        shadow: "lg", // Increase shadow intensity on hover
+      }}
+    >
+      <Text fontWeight="medium" fontSize="xl">
+        {value}
+      </Text>
+      <Text fontSize="lg" color="gray.500">
+        {title}
+      </Text>
+    </Box>
+  );
+};
+
 const Profile: React.FC = () => {
   const userProfile = UseUserProfilePic();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // State to track whether the sidebar was manually closed by the user
+  const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
   const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(true);
 
   const [user] = useAuthState(auth);
@@ -40,8 +80,12 @@ const Profile: React.FC = () => {
     closed: { width: "0px" },
   };
 
-  // Function to toggle the sidebar
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  // This function is called when the toggle button is clicked
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+    // If toggling the sidebar, we record the action as a manual close/open
+    setWasManuallyClosed(true);
+  };
 
   const [userDescription, setUserDescription] = useState<string>("");
 
@@ -69,7 +113,28 @@ const Profile: React.FC = () => {
     fetchDescription();
     getTotalNoOfProjects();
     getTotalNoOfAwards();
-  }, []);
+
+    // Function to automatically check the sidebar status on window resize
+    const checkSidebar = () => {
+      const mobileBreakpoint = 768;
+      // Close the sidebar if window size is less than the breakpoint and it was not manually closed
+      if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
+        setIsSidebarOpen(false);
+      } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
+        // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
+        setIsSidebarOpen(true);
+      }
+    };
+
+    // Set up the event listener
+    window.addEventListener("resize", checkSidebar);
+
+    // Check the initial size of the window
+    checkSidebar();
+
+    // Clean up the event listener when the component unmounts
+    return () => window.removeEventListener("resize", checkSidebar);
+  }, [wasManuallyClosed]);
 
   //---------------------Calculate no. of projects---------------
 
@@ -162,54 +227,151 @@ const Profile: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
-          <div className="profile-container">
-            <Flex className="profile-header">
-              <Flex className="profile-info">
-                <Avatar
-                  className="profile-avatar"
-                  src={userProfile.photoURL || "fallback_image_url"}
-                  name={userProfile.displayName}
-                  borderRadius="10%" // Adjust this value as needed
-                />
-                {isLoadingDesc ? (
-                  <Spinner ml="2rem" />
-                ) : (
-                  <Box className="profile-text">
-                    <ChakraLink
-                      as={ReactRouterLink}
-                      to="/settings"
-                      className="profile-name"
-                    >
-                      {userProfile.displayName ||
-                        auth.currentUser?.displayName ||
-                        "Set username here"}
-                    </ChakraLink>
-                    <ChakraLink
-                      as={ReactRouterLink}
-                      to="/settings"
-                      className="profile-description"
-                    >
-                      {userDescription}
-                    </ChakraLink>
-                  </Box>
-                )}
-              </Flex>
-
-              <Stack className="profile-stats">
-                <Badge className="badge">{totalNoOfProjects} Projects</Badge>
-                <Badge className="badge">11 Communities</Badge>
-                <Badge className="badge">{totalNoOfAwards} Awards</Badge>
+        <Box width="full" m={4}>
+          {/* User Info Box */}{" "}
+          {/* <Heading size="sm" mb={3} p={4} pl={4}>
+            Dashboard
+          </Heading> */}
+          <Flex justify="center">
+            {" "}
+            {/* Flex container to center the Box */}
+            <Box
+              bg="#dcdcf6"
+              p={3}
+              shadow="xl"
+              borderWidth="1px"
+              borderRadius="2xl"
+              textAlign="center"
+              mb={6}
+              mt={3}
+              mx={4}
+              width="full"
+              transition="transform 0.2s, shadow 0.2s"
+              _hover={{
+                transform: "scale(1.02)",
+                shadow: "lg",
+              }}
+            >
+              <Avatar
+                size="xl"
+                src={userProfile.photoURL || "fallback_image_url"}
+                name={userProfile.displayName}
+                mb={4}
+              />
+              <VStack spacing={2} align="stretch">
+                <ChakraLink
+                  fontWeight="bold"
+                  fontSize="lg"
+                  as={ReactRouterLink}
+                  to="/settings"
+                  className="profile-name"
+                >
+                  {userProfile.displayName ||
+                    auth.currentUser?.displayName ||
+                    "Set username here"}
+                </ChakraLink>
+                <ChakraLink
+                  fontWeight="semibold"
+                  fontSize="md"
+                  as={ReactRouterLink}
+                  to="/settings"
+                  className="profile-description"
+                >
+                  {userDescription || "No description set."}
+                </ChakraLink>
+              </VStack>
+            </Box>
+          </Flex>
+          {/* Content below User Info Box */}
+          <Flex direction={{ base: "column", md: "row" }} mx={4}>
+            {/* Left Section: Stats, Leaderboard, and Recent Designs */}
+            <Flex
+              direction="column"
+              width={{ base: "full", lg: "60%" }}
+              pr={{ lg: 4 }}
+            >
+              {/* Stats Cards */}
+              <Stack
+                direction={{ base: "column", md: "row" }}
+                spacing={{ base: 4, md: 4 }}
+                marginBottom={6}
+                // m={4}
+                p={4}
+                width="100%"
+                align="center" // Aligns items in the center
+                justify="center"
+              >
+                <StatCard title="Projects" value={totalNoOfProjects} />
+                <StatCard title="Communities" value="11" />
+                <StatCard title="Awards" value={totalNoOfAwards} />
               </Stack>
 
-              <Button className="leaderboard-button">Leaderboard</Button>
+              {/* Leaderboard Button */}
+              {/* <Button
+                bg="#845cd4" // Set the button color
+                color="white" // Set the text color to white for contrast
+                size="lg"
+                mt={6}
+                m={4}
+                as={ReactRouterLink}
+                to="/leaderboard"
+                flexShrink={0} // Prevent the button from shrinking
+                minWidth="initial" // Set a minimum width if needed
+                _hover={{
+                  bg: "#6e4ac2", // Slightly darker shade on hover for a subtle effect
+                }}
+                _active={{
+                  bg: "#5c3999", // Even darker shade when the button is clicked
+                }}
+              >
+                Leaderboard
+              </Button> */}
+
+              {/* Recent designs */}
+              <Heading size="sm" mb={3} pl={4} pt={4}>
+                Recent Designs
+              </Heading>
             </Flex>
-            <Flex className="profile-body">
-              {/* The commented out sections can be replaced with your components */}
-              {/* <DashboardSection title="Your Teams" items={teams} />
-        <DashboardSection title="Your Communities" items={communities} /> */}
+
+            {/* Right Section: Calendar and Tasks */}
+            <Flex
+              direction="column"
+              width={{ base: "full", lg: "40%" }}
+              mr={4}
+              // bg="#f6f6f6"
+            >
+              {/* Calendar Component */}
+              <Box
+                bg="blue.100"
+                p={12}
+                shadow="xl"
+                borderWidth="1px"
+                borderRadius="2xl"
+                mb={8}
+                m={4}
+                // my={6}
+                width="full" // Full width of the parent container
+                height="200px"
+              >
+                {/* Calendar content */}
+              </Box>
+
+              {/* Tasks Component */}
+              <Box
+                bg="orange.100"
+                p={12}
+                shadow="xl"
+                borderWidth="1px"
+                borderRadius="2xl"
+                mb={8}
+                m={4}
+                width="full"
+                height="200px"
+              >
+                {/* Tasks content */}
+              </Box>
             </Flex>
-          </div>
+          </Flex>
         </Box>
       </Box>
     </>
