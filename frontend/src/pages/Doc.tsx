@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  Flex,
   Box,
-  Text,
-  SimpleGrid,
-  Badge,
-  Stack,
-  Avatar,
-  Button,
-  Divider,
-  Input,
-  Image,
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import NavBar from "../components/Doc_/NavBar";
