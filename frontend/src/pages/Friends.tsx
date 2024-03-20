@@ -1,21 +1,26 @@
 import SideBar from "../components/Dashboard/sidebar";
 import { useCallback, useEffect, useState } from "react";
-import { Box, Button, Divider, Flex, Input, useColorModeValue, Text, HStack, VStack, IconButton, StackDivider, Container } from "@chakra-ui/react";
+import {
+    Box, Button, Divider, Flex, Input, useColorModeValue, Text, HStack, VStack, IconButton, StackDivider,
+    Container, Menu, MenuButton, MenuList, MenuItem, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
+    ModalBody, ModalCloseButton, useDisclosure, Heading, ButtonGroup
+} from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
 import { db, auth } from "../firebase-config";
-import { doc, getDoc, collection, getDocs, query, where, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { CloseIcon } from "@chakra-ui/icons";
+import { doc, getDoc, collection, getDocs, updateDoc, arrayUnion, arrayRemove, writeBatch } from "firebase/firestore";
 import { debounce } from "../utils/Time";
 import { UseToastNotification } from "../utils/UseToastNotification";
 import cardBg2 from '../assets/carbBg2.png'
-import { url } from "inspector";
+import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
+
 
 
 interface User {
     id: string;
     username?: string;
     email?: string
+    userVisibility?: 'public' | 'private';
     // add other properties as needed
 }
 
@@ -26,9 +31,29 @@ export const Friends: React.FC = () => {
     const [searchResults, setSearchResults] = useState<User[]>([]);
     const [friends, setFriends] = useState<string[]>([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [sentRequests, setSentRequests] = useState<string[]>([]);
+    const [receivedRequests, setReceivedRequests] = useState<string[]>([]);
+
+
+    // State for managing modal visibility and the current selected friend
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
 
     const userEmail = auth.currentUser?.email;
     const showToast = UseToastNotification();
+
+
+    // Function to open modal with the selected friend's details
+    const openModal = (friend: User) => {
+        setSelectedFriend(friend);
+        setIsModalOpen(true);
+    };
+
+    // Function to close the modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedFriend(null);
+    };
 
 
     const sidebarVariants = {
@@ -59,7 +84,9 @@ export const Friends: React.FC = () => {
             const usersColRef = collection(db, 'users');
             try {
                 const usersSnapshot = await getDocs(usersColRef);
-                const usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+                const usersData = usersSnapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() } as User))
+                    .filter(user => user.email !== auth.currentUser?.email);
                 setUsers(usersData);
             } catch (error) {
                 console.error("Error fetching users: ", error);
@@ -68,6 +95,7 @@ export const Friends: React.FC = () => {
 
         fetchUsers();
     }, []);
+
 
 
 
@@ -83,35 +111,179 @@ export const Friends: React.FC = () => {
         }
     }, [searchTerm, users]);
 
-
+    // TODO: use batch
     const addFriend = async (friendEmail: string) => {
-        if (!userEmail) return;
+        if (!userEmail || userEmail === friendEmail) return;
+
         const userDocRef = doc(db, 'users', userEmail);
+
+        // Get the visibility status of the user to be added
+        const friendDocRef = doc(db, 'users', friendEmail);
+        const friendDocSnap = await getDoc(friendDocRef);
+
+        if (friendDocSnap.exists() && friendDocSnap.data()) {
+            const friendData = friendDocSnap.data();
+
+            // If friend's profile is public, add directly as friends
+            if (friendData.userVisibility === 'public') {
+
+                try {
+                    // Transaction or batch could be used here for atomicity, ensuring both operations succeed or fail together
+                    // Add friend to current user's list
+                    await updateDoc(userDocRef, {
+                        userFriends: arrayUnion(friendEmail)
+                    });
+
+                    // Add current user to friend's list
+                    await updateDoc(friendDocRef, {
+                        userFriends: arrayUnion(userEmail)
+                    });
+
+                    setFriends(prev => [...prev, friendEmail]);
+                    showToast('info', 'Added new friend');
+                } catch (error) {
+                    console.error("Error adding friend:", error);
+                    showToast('error', `${error}`);
+                }
+
+            } else if (friendData.userVisibility === 'private') {
+                // Send a friend request instead
+                // For User A (current user sending the request)
+                const userDocRef = doc(db, 'users', userEmail);
+                await updateDoc(userDocRef, {
+                    sentRequests: arrayUnion(friendEmail)
+                });
+                setSentRequests(prev => [...prev, friendEmail]);
+
+                // For User B (receiving the request)
+                await updateDoc(friendDocRef, {
+                    receivedRequests: arrayUnion(userEmail)
+                });
+
+                showToast('info', `Friend request sent to ${friendEmail}`);
+            }
+        } else {
+            showToast('error', `User not found.`);
+        }
+    };
+
+    const fetchRecievedRequests = async () => {
+        if (!userEmail) return;
+
+        const userDocRef = doc(db, 'users', userEmail);
+        const userDocSnapshot = await getDoc(userDocRef);
         try {
+            if (userDocSnapshot.exists() && userDocSnapshot.data()) {
+                setReceivedRequests(userDocSnapshot.data().receivedRequests || []);
+            }
+
+        } catch (err) {
+            showToast('error', `${err}`)
+        }
+    }
+
+
+    // fetch the received requests from Firestore and setReceivedRequests
+    useEffect(() => {
+        fetchRecievedRequests();
+    }, []);
+
+    // TODO: use batch
+    const acceptFriendRequest = async (requesterEmail: string) => {
+        if (!receivedRequests.length) return;
+
+        if (!userEmail) return;
+
+        const userDocRef = doc(db, 'users', userEmail);
+        const friendDocRef = doc(db, 'users', requesterEmail);
+
+        try {
+
+
             await updateDoc(userDocRef, {
-                userFriends: arrayUnion(friendEmail)
+                userFriends: arrayUnion(requesterEmail),
+                receivedRequests: arrayRemove(requesterEmail)
             });
-            setFriends(prev => [...prev, friendEmail]);
+
+            // Add current user to friend's list
+            await updateDoc(friendDocRef, {
+                userFriends: arrayUnion(userEmail),
+                sentRequests: arrayRemove(userEmail)
+
+            });
+
+            setFriends(prev => [...prev, requesterEmail]);
+            setReceivedRequests(prev => prev.filter(req => req !== requesterEmail));
+
             showToast('info', 'Added new friend');
         } catch (error) {
             console.error("Error adding friend:", error);
-            showToast('error', `${error}`);
+            showToast('error', `Error accepting friend request: ${error}`);
+        }
+    }
+
+    // TODO: use batch 
+    const rejectFriendRequest = async (requesterEmail: string) => {
+        if (!userEmail) return;
+
+        const userDocRef = doc(db, 'users', userEmail);
+        const requesterDocRef = doc(db, 'users', requesterEmail);
+
+        try {
+
+            await updateDoc(userDocRef, {
+                receivedRequests: arrayRemove(requesterEmail)
+            });
+
+
+            await updateDoc(requesterDocRef, {
+                sentRequests: arrayRemove(userEmail)
+            });
+
+
+            setReceivedRequests(prev => prev.filter(req => req !== requesterEmail));
+
+            showToast('info', 'Friend request rejected');
+        } catch (error) {
+            console.error("Error rejecting friend request:", error);
+            showToast('error', `Error rejecting friend request: ${error}`);
         }
     };
+
+
     const removeFriend = async (friendEmail: string) => {
-        if (!userEmail) return;
+        if (!userEmail || !friendEmail) return;
+
         const userDocRef = doc(db, 'users', userEmail);
+        const friendDocRef = doc(db, 'users', friendEmail);
+
         try {
-            await updateDoc(userDocRef, {
+
+            const batch = writeBatch(db);
+
+
+            batch.update(userDocRef, {
                 userFriends: arrayRemove(friendEmail)
             });
+
+
+            batch.update(friendDocRef, {
+                userFriends: arrayRemove(userEmail)
+            });
+
+
+            await batch.commit();
+
+
             setFriends(friends => friends.filter(email => email !== friendEmail));
-            showToast('info', 'You have successfully removed a friend');
+
+            showToast('info', `Successfully removed ${friendEmail} from friends.`);
         } catch (error) {
             console.error("Error removing friend:", error);
-            showToast('error', `${error}`);
+            showToast('error', `Error removing friend: ${error}`);
         }
     };
+
 
 
     const fetchUserFriends = async () => {
@@ -140,7 +312,9 @@ export const Friends: React.FC = () => {
         await addFriend(friendEmail);
         await fetchUserFriends();
     };
-
+    const menuBg = useColorModeValue('white', 'gray.700');
+    const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
+    const menuItemHoverColor = useColorModeValue('purple.700', 'purple.100');
     return (
         <>
             <Box padding="10px" background="#484c6c">
@@ -169,6 +343,27 @@ export const Friends: React.FC = () => {
                     ) : null}
                 </AnimatePresence>
                 <Box flex="1" display="flex" flexDirection="column" p="4" bgColor='white'>
+
+                    {receivedRequests.length > 0 && (
+                        <Flex direction="column" mb={6} align="center" >
+                            <Box width="100%" maxWidth="1500px" maxHeight="90vh" borderRadius="lg" overflowY="auto" p={6} bgColor='#f4f1fa'>
+                                <Text fontSize="2xl" my={4}>
+                                    Friend requests
+                                </Text>
+                                <VStack spacing={5} align="stretch">
+                                    {receivedRequests.map((requestEmail) => (
+                                        <Flex key={requestEmail} justifyContent="space-between" alignItems="center" p="4" bgImage={cardBg2} borderRadius="md" shadow="base" >
+                                            <Text>{requestEmail}</Text>
+                                            <ButtonGroup size="sm">
+                                                <Button colorScheme="green" onClick={() => acceptFriendRequest(requestEmail)}>Accept</Button>
+                                                <Button colorScheme="red" onClick={() => rejectFriendRequest(requestEmail)}>Reject</Button>
+                                            </ButtonGroup>
+                                        </Flex>
+                                    ))}
+                                </VStack>
+                            </Box>
+                        </Flex>
+                    )}
                     <Flex direction="column" align="center" h="100vh" >
                         <Box width="100%" maxWidth="1500px" maxHeight="90vh" p={6} boxShadow="xl" borderRadius="lg" overflowY="auto" bgColor='#f4f1fa'>
                             <Text fontSize="2xl" my={4}>
@@ -202,14 +397,23 @@ export const Friends: React.FC = () => {
                                         bgImage={cardBg2}
                                     >
                                         <Text>{result.email ?? result.username ?? result.id}</Text>
-                                        <Button
-                                            onClick={() => addFriend(result.email ?? result.id)}
-                                            bg="purple.400"
-                                            _hover={{ bg: 'purple.500' }}
-                                            color="white"
-                                        >
-                                            Add Friend
-                                        </Button>
+                                        {/* Conditional rendering depending on the friendship and request status */}
+                                        {friends.includes(result.email ?? '') ? (
+                                            // Show a message or a disabled button for existing friends
+                                            <Button isDisabled>Already friends</Button>
+                                        ) : sentRequests.includes(result.email ?? '') ? (
+                                            // Indicate that a friend request has been sent
+                                            <Button isDisabled>Request Sent</Button>
+                                        ) : (
+                                            <Button
+                                                onClick={() => result.email && addFriend(result.email ?? result.id)}
+                                                bg="purple.400"
+                                                _hover={{ bg: 'purple.500' }}
+                                                color="white"
+                                            >
+                                                {result.userVisibility === 'public' ? 'Add Friend' : 'Request to Add'}
+                                            </Button>
+                                        )}
                                     </Flex>
                                 ))}
                             </VStack>
@@ -223,132 +427,58 @@ export const Friends: React.FC = () => {
                                 align="stretch"
                             >
                                 {friends.map((friendEmail) => (
-                                    <Flex
-                                        key={friendEmail}
-                                        justifyContent="space-between"
-                                        alignItems="center"
-                                        p="4"
-                                        bg="white"
-                                        borderRadius="md"
-                                        shadow="base"
-                                        bgImage={cardBg2}
-                                    >
+                                    <Flex key={friendEmail} justifyContent="space-between" alignItems="center" p="4" bg="white" borderRadius="md" shadow="base" bgImage={cardBg2}>
                                         <Text>{friendEmail}</Text>
-                                        <Button
-                                            onClick={() => removeFriend(friendEmail)}
-                                            bg="red.300"
-                                            _hover={{ bg: 'red.500' }}
-                                            color="white"
-                                        >
-                                            remove Friend
-                                        </Button>
+                                        <Menu placement="bottom-start" gutter={4} strategy="fixed">
+
+                                            <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
+                                            <MenuList bg={menuBg} zIndex={10} minW="240px">
+                                                <MenuItem
+                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                    onClick={() => removeFriend(friendEmail)}
+                                                >
+                                                    Remove Friend
+                                                </MenuItem>
+                                                <MenuItem
+                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                    onClick={() => console.log("View Profile")}
+                                                >
+                                                    View User Profile
+                                                </MenuItem>
+                                                <MenuItem
+                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                    onClick={() => console.log("Chat")}
+                                                >
+                                                    Chat
+                                                </MenuItem>
+
+                                            </MenuList>
+                                        </Menu>
                                     </Flex>
                                 ))}
+                                {selectedFriend && (
+                                    <Modal isOpen={isModalOpen} onClose={closeModal} isCentered>
+                                        <ModalOverlay />
+                                        <ModalContent
+                                            // bg={useColorModeValue('white', 'gray.800')} // Background color
+                                            boxShadow="xl" // Shadow for depth
+                                            rounded="lg" // Rounded corners
+                                        >
+                                            <ModalHeader>{selectedFriend.username || selectedFriend.email}</ModalHeader>
+                                            <ModalCloseButton />
+                                            <ModalBody>
+                                                {/* Content here */}
+                                            </ModalBody>
+                                        </ModalContent>
+                                    </Modal>
+                                )}
                             </VStack>
+
                         </Box>
                     </Flex>
-                </Box>
+                </Box >
             </Box >
         </>
     )
 }
 
-
-
-{/* <Box padding="10px" background="#484c6c">
-                <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
-            </Box>
-            <Divider borderColor="lightgrey" borderWidth="1px" maxWidth="98.5vw" />
-            <Box display="flex" height="calc(100vh - 10px)" width="100%">
-                <AnimatePresence>
-                    {isSidebarOpen ? (
-                        <motion.div
-                            initial="closed"
-                            animate="open"
-                            exit="closed"
-                            variants={sidebarVariants}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            style={{
-                                paddingTop: "10px",
-                                height: "inherit",
-                                backgroundColor: "#f6f6f6",
-                                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                                overflow: "hidden",
-                            }}
-                        >
-                            <SideBar />
-                        </motion.div>
-                    ) : null}
-                </AnimatePresence>
-                <Box flex="1" display="flex" flexDirection="column" p="4">
-                    <Input
-                        placeholder="Search by email or username"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        bg="white"
-                        borderColor="purple.200"
-                        _placeholder={{ color: 'gray.500' }}
-                    />
-                    <VStack
-                        spacing="4"
-                        mt="4"
-                        divider={<StackDivider borderColor="gray.200" />}
-                        align="stretch"
-                    >
-                        {searchResults.map((result) => (
-                            <Flex
-                                key={result.id}
-                                justifyContent="space-between"
-                                alignItems="center"
-                                p="4"
-                                bg="white"
-                                borderRadius="md"
-                                shadow="base"
-                                bgImage={cardBg2}
-                            >
-                                <Text>{result.email ?? result.username ?? result.id}</Text>
-                                <Button
-                                    onClick={() => addFriend(result.email ?? result.id)}
-                                    bg="purple.400"
-                                    _hover={{ bg: 'purple.500' }}
-                                    color="white"
-                                >
-                                    Add Friend
-                                </Button>
-                            </Flex>
-                        ))}
-                    </VStack>
-                    <Text mt="8" mb="4" fontSize="xl" fontWeight="bold">
-                        My Friends
-                    </Text>
-                    <VStack
-                        spacing="4"
-                        mt="4"
-                        divider={<StackDivider borderColor="gray.200" />}
-                        align="stretch"
-                    >
-                        {friends.map((friendEmail) => (
-                            <Flex
-                                key={friendEmail}
-                                justifyContent="space-between"
-                                alignItems="center"
-                                p="4"
-                                bg="white"
-                                borderRadius="md"
-                                shadow="base"
-                                bgImage={cardBg2}
-                            >
-                                <Text>{friendEmail}</Text>
-                                <Button
-                                    onClick={() => removeFriend(friendEmail)}
-                                    bg="red.300"
-                                    _hover={{ bg: 'red.500' }}
-                                    color="white"
-                                >
-                                    remove Friend
-                                </Button>
-                            </Flex>
-                        ))}
-                    </VStack>
-                </Box>
-            </Box> */}
