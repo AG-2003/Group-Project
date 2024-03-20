@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import "./JoinedC.scss"; // Update the import as per your CSS file
 import { useNavigate } from "react-router-dom";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
 interface Community {
   id: string;
@@ -30,6 +31,8 @@ const JoinedCommunities: React.FC = () => {
     []
   );
 
+  const showToast = UseToastNotification();
+
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
@@ -38,10 +41,8 @@ const JoinedCommunities: React.FC = () => {
 
         querySnapshot.forEach((doc) => {
           const { id: communityId, ...communityData } = doc.data() as Community;
-          if (communityData.status === "Public") {
-            // Filter communities by status
-            communitiesData.push({ id: communityId, ...communityData });
-          }
+          // Filter communities by status
+          communitiesData.push({ id: communityId, ...communityData });
         });
 
         setCommunities(communitiesData);
@@ -67,32 +68,94 @@ const JoinedCommunities: React.FC = () => {
     fetchCommunities();
   }, []);
 
+  const handleRequestJoinClick = async (communityId: string) => {
+    if (!user) return;
+
+    if (user?.uid) {
+      const communityRef = doc(db, "communities", communityId);
+      const communityDoc = await getDoc(communityRef);
+
+      if (communityDoc.exists()) {
+        const communityData = communityDoc.data();
+        const requestsArray = communityData?.requests ?? [];
+
+        // Check if the user has already requested to join
+        if (!requestsArray.includes(user.uid)) {
+          // Update the community document to add the user's UID to the requests array
+          await updateDoc(communityRef, {
+            requests: [...requestsArray, user.uid],
+          });
+
+          showToast("success", "Request to join sent successfully");
+          // navigate(`/communities/in_communities/${encodeURIComponent(communityId)}`);
+        } else {
+          showToast(
+            "info",
+            "You have already requested to join this community"
+          );
+        }
+      }
+    }
+  };
+
   const handleJoinClick = async (communityId: string) => {
     if (!user) return;
 
-    if (user?.email) {
-      const userRef = doc(db, "users", user.email);
+    if (user?.uid) {
+      const userRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userRef);
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
         const userCommunities = userData?.communities ?? [];
         if (!userCommunities.includes(communityId)) {
+          // Add the user's UID to the community's members list
+          const communityRef = doc(db, "communities", communityId);
+          await updateDoc(communityRef, {
+            members: [...(userData?.communities ?? []), user.uid],
+          });
+
+          // Add the community ID to the user's communities list
           await updateDoc(userRef, {
             communities: [...userCommunities, communityId],
           });
+
+          // Update the local state to reflect the changes
+          setJoinedCommunityIds([...joinedCommunityIds, communityId]);
+
+          showToast("success", "Joined community successfully");
         }
       }
-      setJoinedCommunityIds([...joinedCommunityIds, communityId]);
     }
   };
 
-  // Function to handle click on a community card
-  const handleCardClick = (communityId: string) => {
-    // Use the onCommunityClick prop to notify the parent component
-    // onCommunityClick(communityId);
+  const handleCardClick = async (communityId: string) => {
+    try {
+      const communityRef = doc(db, "communities", communityId);
+      const communityDoc = await getDoc(communityRef);
+      const communityData = communityDoc.data() as Community | undefined;
 
-    navigate(`/communities/in_communities/${encodeURIComponent(communityId)}`);
+      if (communityData?.status === "Private") {
+        // If the community is private, check if the user is a member
+        const userUid = user?.uid;
+        if (!userUid) {
+          console.error("User not logged in.");
+          return;
+        }
+
+        if (!communityData.members.includes(userUid)) {
+          showToast("error", "You are not a member of this community.");
+          return;
+        }
+      }
+
+      // Navigate to the community page
+      navigate(
+        `/communities/in_communities/${encodeURIComponent(communityId)}`
+      );
+    } catch (error) {
+      console.error("Error handling community card click:", error);
+    }
   };
 
   // Function to handle search input change
@@ -134,19 +197,33 @@ const JoinedCommunities: React.FC = () => {
             )}
             <h3 className="community-name">{community.name}</h3>
             <p className="community-description">{community.description}</p>
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleJoinClick(community.id);
+                if (community.status === "Private") {
+                  handleRequestJoinClick(community.id);
+                } else {
+                  handleJoinClick(community.id);
+                }
               }}
               className={
-                joinedCommunityIds.includes(community.id)
+                community.status === "Private"
+                  ? joinedCommunityIds.includes(community.id)
+                    ? "joined-button-private"
+                    : "request-join-button"
+                  : joinedCommunityIds.includes(community.id)
                   ? "joined-button"
                   : "join-button"
               }
-              disabled={joinedCommunityIds.includes(community.id)}
             >
-              {joinedCommunityIds.includes(community.id) ? "Joined" : "Join"}
+              {community.status === "Private"
+                ? joinedCommunityIds.includes(community.id)
+                  ? "Joined"
+                  : "Request Join"
+                : joinedCommunityIds.includes(community.id)
+                ? "Joined"
+                : "Join"}
             </button>
           </div>
         ))}

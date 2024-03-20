@@ -1,8 +1,7 @@
 import { useRef } from "react";
-import Account from "../components/Settings_/account";
-import Security from "../components/Settings_/security";
-import Preference from "../components/Settings_/preference";
+
 import SideBar from "./sidebar";
+import Account from "./Account";
 // import Privacy from './components/privacy';
 
 function CSettings() {
@@ -45,15 +44,15 @@ function CSettings() {
         <div ref={accountRef}>
           <Account />
         </div>
-        <div ref={securityRef}>
+        {/* <div ref={securityRef}>
           <Security />
-        </div>
-        <div ref={preferenceRef}>
+        </div> */}
+        {/* <div ref={preferenceRef}>
           <Preference />
-        </div>
+        </div> */}
       </div>
     </div>
   );
 }
 
-export default CSSContainerRuleSettings;
+export default CSettings;

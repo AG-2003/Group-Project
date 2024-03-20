@@ -36,7 +36,7 @@ import { BadgesPage } from "./pages/BadgesPage";
 import SavedPosts from "./components/communities/SavedPosts";
 import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
-import CSettings from "./components/communities/CSettings/settings";
+import CSettings from "./components/communities/CSettings/CSettings";
 
 function App() {
   useEffect(() => {
