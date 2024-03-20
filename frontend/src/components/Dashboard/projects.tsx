@@ -274,7 +274,7 @@ const Projects: React.FC = () => {
               style={{
                 paddingTop: "10px",
                 height: "inherit",
-                backgroundColor: "#f6f6f6",
+                backgroundColor: "#f4f1fa",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
               }}

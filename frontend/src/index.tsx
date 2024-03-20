@@ -30,6 +30,15 @@ const theme = extendTheme({
       },
     },
   },
+  colors: {
+    purple: {
+      50: '#f2e7fe', // Lighter shade
+      100: '#dbb2ff',
+      200: '#bb86fc', // Primary light shade
+      500: '#6200ea', // Primary dark shade
+      700: '#3700b3', // Darker shade
+    },
+  }
 });
 
 const root = ReactDOM.createRoot(
