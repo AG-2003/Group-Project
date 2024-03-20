@@ -154,15 +154,11 @@ export const Badges: React.FC = () => {
 
     return (
         <>
-            <div style={{ padding: '10px', background: '#484c6c' }}>
-                <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-            </div>
+            <Box padding="10px" background="#484c6c">
+                <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+            </Box>
             <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
-            <Flex
-                height="calc(100vh - 10px)"
-                bg={bgColor}
-                p={5} // Padding inside the main content box
-            >
+            <Box display="flex" height="calc(100vh - 10px)" width="100%">
                 <AnimatePresence>
                     {isSidebarOpen && (
                         <motion.div
@@ -174,7 +170,7 @@ export const Badges: React.FC = () => {
                             style={{
                                 paddingTop: '10px',
                                 height: 'inherit',
-                                backgroundColor: '#f6f6f6',
+                                backgroundColor: '#f4f1fa',
                                 boxShadow: '2px 0 5px rgba(0, 0, 0, 0.1)',
                                 overflow: 'hidden',
                             }}
@@ -218,7 +214,7 @@ export const Badges: React.FC = () => {
                         </Box>
                     ))}
                 </Box>
-            </Flex>
+            </Box>
         </>
     );
 };

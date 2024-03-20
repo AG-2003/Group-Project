@@ -1,6 +1,6 @@
 import SideBar from "../components/Dashboard/sidebar";
 import { useCallback, useEffect, useState } from "react";
-import { Box, Button, Divider, Flex, Input, useColorModeValue, Text, HStack, VStack, IconButton, StackDivider } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Input, useColorModeValue, Text, HStack, VStack, IconButton, StackDivider, Container } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
 import { db, auth } from "../firebase-config";
@@ -8,7 +8,9 @@ import { doc, getDoc, collection, getDocs, query, where, updateDoc, arrayUnion, 
 import { CloseIcon } from "@chakra-ui/icons";
 import { debounce } from "../utils/Time";
 import { UseToastNotification } from "../utils/UseToastNotification";
-import { er } from "@fullcalendar/core/internal-common";
+import cardBg2 from '../assets/carbBg2.png'
+import { url } from "inspector";
+
 
 interface User {
     id: string;
@@ -67,6 +69,8 @@ export const Friends: React.FC = () => {
         fetchUsers();
     }, []);
 
+
+
     useEffect(() => {
         if (searchTerm !== '') {
             const filteredUsers = (users || []).filter(user =>
@@ -109,9 +113,149 @@ export const Friends: React.FC = () => {
         }
     };
 
+
+    const fetchUserFriends = async () => {
+        if (!userEmail) return;
+        const userDocRef = doc(db, 'users', userEmail);
+        try {
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                setFriends(userData.userFriends || []);
+            } else {
+                console.log("No such document!");
+            }
+        } catch (error) {
+            console.error("Error fetching user friends: ", error);
+            showToast('error', `Error fetching friends: ${error}`);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserFriends();
+    }, []);
+
+    // Calls fetchUserFriends whenever you add a friend
+    const addFriendAndUpdate = async (friendEmail: string) => {
+        await addFriend(friendEmail);
+        await fetchUserFriends();
+    };
+
     return (
         <>
             <Box padding="10px" background="#484c6c">
+                <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+            </Box>
+            <Divider borderColor="lightgrey" borderWidth="1px" maxWidth="98.5vw" />
+            <Box display="flex" height="calc(100vh - 10px)" width="100%">
+                <AnimatePresence>
+                    {isSidebarOpen ? (
+                        <motion.div
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            variants={sidebarVariants}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            style={{
+                                paddingTop: "10px",
+                                height: "inherit",
+                                backgroundColor: "#f4f1fa",
+                                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <SideBar />
+                        </motion.div>
+                    ) : null}
+                </AnimatePresence>
+                <Box flex="1" display="flex" flexDirection="column" p="4" bgColor='white'>
+                    <Flex direction="column" align="center" h="100vh" >
+                        <Box width="100%" maxWidth="1500px" maxHeight="90vh" p={6} boxShadow="xl" borderRadius="lg" overflowY="auto" bgColor='#f4f1fa'>
+                            <Text fontSize="2xl" my={4}>
+                                Add Friends
+                            </Text>
+                            <Input
+                                placeholder="Search by email"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                mb={4}
+                                size="lg"
+                                borderColor='purple.400'
+                                _focus={{ borderColor: 'purple.500' }}
+                                _hover={{ borderColor: 'none' }}
+                            />
+
+                            <VStack
+                                divider={<StackDivider borderColor="gray.200" />}
+                                spacing={4}
+                                align="stretch"
+                            >
+                                {searchResults.map((result) => (
+                                    <Flex
+                                        key={result.id}
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                        p="4"
+                                        bg="white"
+                                        borderRadius="md"
+                                        shadow="base"
+                                        bgImage={cardBg2}
+                                    >
+                                        <Text>{result.email ?? result.username ?? result.id}</Text>
+                                        <Button
+                                            onClick={() => addFriend(result.email ?? result.id)}
+                                            bg="purple.400"
+                                            _hover={{ bg: 'purple.500' }}
+                                            color="white"
+                                        >
+                                            Add Friend
+                                        </Button>
+                                    </Flex>
+                                ))}
+                            </VStack>
+                            <Text fontSize="2xl" my={4}>
+                                My Friends
+                            </Text>
+                            <Divider my={4} />
+                            <VStack
+                                divider={<StackDivider borderColor="gray.200" />}
+                                spacing={4}
+                                align="stretch"
+                            >
+                                {friends.map((friendEmail) => (
+                                    <Flex
+                                        key={friendEmail}
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                        p="4"
+                                        bg="white"
+                                        borderRadius="md"
+                                        shadow="base"
+                                        bgImage={cardBg2}
+                                    >
+                                        <Text>{friendEmail}</Text>
+                                        <Button
+                                            onClick={() => removeFriend(friendEmail)}
+                                            bg="red.300"
+                                            _hover={{ bg: 'red.500' }}
+                                            color="white"
+                                        >
+                                            remove Friend
+                                        </Button>
+                                    </Flex>
+                                ))}
+                            </VStack>
+                        </Box>
+                    </Flex>
+                </Box>
+            </Box >
+        </>
+    )
+}
+
+
+
+{/* <Box padding="10px" background="#484c6c">
                 <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
             </Box>
             <Divider borderColor="lightgrey" borderWidth="1px" maxWidth="98.5vw" />
@@ -160,12 +304,13 @@ export const Friends: React.FC = () => {
                                 bg="white"
                                 borderRadius="md"
                                 shadow="base"
+                                bgImage={cardBg2}
                             >
                                 <Text>{result.email ?? result.username ?? result.id}</Text>
                                 <Button
                                     onClick={() => addFriend(result.email ?? result.id)}
-                                    bg="teal.400"
-                                    _hover={{ bg: 'teal.500' }}
+                                    bg="purple.400"
+                                    _hover={{ bg: 'purple.500' }}
                                     color="white"
                                 >
                                     Add Friend
@@ -177,27 +322,33 @@ export const Friends: React.FC = () => {
                         My Friends
                     </Text>
                     <VStack
-                        divider={<StackDivider borderColor="gray.200" />}
                         spacing="4"
+                        mt="4"
+                        divider={<StackDivider borderColor="gray.200" />}
                         align="stretch"
                     >
                         {friends.map((friendEmail) => (
-                            <HStack key={friendEmail}>
-                                <Text flex="1">{friendEmail}</Text>
-                                <IconButton
-                                    aria-label="Remove friend"
-                                    icon={<CloseIcon />}
+                            <Flex
+                                key={friendEmail}
+                                justifyContent="space-between"
+                                alignItems="center"
+                                p="4"
+                                bg="white"
+                                borderRadius="md"
+                                shadow="base"
+                                bgImage={cardBg2}
+                            >
+                                <Text>{friendEmail}</Text>
+                                <Button
                                     onClick={() => removeFriend(friendEmail)}
-                                    variant="ghost"
-                                />
-                            </HStack>
+                                    bg="red.300"
+                                    _hover={{ bg: 'red.500' }}
+                                    color="white"
+                                >
+                                    remove Friend
+                                </Button>
+                            </Flex>
                         ))}
                     </VStack>
                 </Box>
-            </Box>
-        </>
-    )
-}
-
-
-
+            </Box> */}
