@@ -32,15 +32,18 @@ const EditableTextField = ({ b1, initialValue, onSave }: Props) => {
   return (
     <Box>
       {isEditing ? (
-        <>
-          <Input value={textValue} onChange={handleInputChange} />
-          <Button mt={2} onClick={handleSaveClick}>
-            Save
-          </Button>
-        </>
+        <Input value={textValue} onChange={handleInputChange} />
       ) : (
-        <Button ml="5rem" fontWeight="500" onClick={handleEditClick}>
-          {b1}
+        <Box>
+          <span>{textValue}</span>
+          <Button ml="5rem" fontWeight="500" onClick={handleEditClick}>
+            {b1}
+          </Button>
+        </Box>
+      )}
+      {isEditing && (
+        <Button mt={2} onClick={handleSaveClick}>
+          Save
         </Button>
       )}
     </Box>
