@@ -1,6 +1,6 @@
 
 
-
+import { Navbar } from "../components/Landing/navbar";
 import React, { useState } from 'react';
 import './Policies.scss';
 
@@ -27,7 +27,7 @@ interface CollapsibleSectionProps {
             {children}
           </div>
         )}
-      </div>
+      </div> 
     );
   };
 
