@@ -35,6 +35,7 @@ import Posts from "./Posts"; // Import the Posts component
 import "./Posts.scss"; // Import the CSS file for post styling
 import PostModal from "./PostModal";
 import { SettingsIcon } from "@chakra-ui/icons";
+import LeaderboardModal from "./LeaderboardModal";
 
 const CommunityDetails: React.FC = () => {
   const [communityDetails, setCommunityDetails] = useState<DocumentData | null>(
@@ -43,6 +44,11 @@ const CommunityDetails: React.FC = () => {
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
   const [communityPosts, setCommunityPosts] = useState<any[]>([]);
   const [userId, setUserId] = useState<string>("");
+  const [leaderboardData, setLeaderboardData] = useState<
+    { userId: string; displayName: string; likes: number }[]
+  >([]);
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleCreatePostClick = () => {
     setCreatePostModalOpen(true);
@@ -75,7 +81,7 @@ const CommunityDetails: React.FC = () => {
     const fetchUserId = async () => {
       const user = await auth.currentUser;
       if (user) {
-        setUserId(user.uid);
+        setUserId(user?.email || "");
       }
     };
 
@@ -131,6 +137,84 @@ const CommunityDetails: React.FC = () => {
 
     fetchCommunityPosts();
   }, [community_id]);
+
+  useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      try {
+        const postsQuery = query(
+          collection(db, "communityPosts"),
+          where("Cid", "==", community_id)
+        );
+        const postsSnapshot = await getDocs(postsQuery);
+        const repliesQuery = query(
+          collection(db, "communityReplies"),
+          where("Cid", "==", community_id)
+        );
+        const repliesSnapshot = await getDocs(repliesQuery);
+
+        const usersLikes: { [userId: string]: number } = {};
+
+        postsSnapshot.forEach((postDoc) => {
+          const { Uid, likes } = postDoc.data();
+          usersLikes[Uid] = (usersLikes[Uid] || 0) + likes;
+        });
+
+        repliesSnapshot.forEach((replyDoc) => {
+          const { Uid, likes } = replyDoc.data();
+          usersLikes[Uid] = (usersLikes[Uid] || 0) + likes;
+        });
+
+        const leaderboardPromises = Object.keys(usersLikes).map(
+          async (userId) => {
+            try {
+              const userDocRef = doc(db, "users", userId);
+              const userDocSnapshot = await getDoc(userDocRef);
+              if (userDocSnapshot.exists()) {
+                const userData = userDocSnapshot.data();
+                if (userData) {
+                  const displayName = userData.displayName || "Unknown"; // Replace "Unknown" with a default value if display name is not available
+                  return {
+                    userId,
+                    displayName,
+                    likes: usersLikes[userId],
+                  };
+                }
+              }
+            } catch (error) {
+              console.error(
+                `Error fetching user data for userId ${userId}:`,
+                error
+              );
+            }
+            return null;
+          }
+        );
+
+        const leaderboardData = await Promise.all(leaderboardPromises);
+        const filteredLeaderboardData = leaderboardData.filter(
+          (data) => data !== null
+        ) as { userId: string; displayName: string; likes: number }[];
+
+        const sortedLeaderboard = filteredLeaderboardData.sort(
+          (a, b) => b.likes - a.likes
+        );
+
+        setLeaderboardData(sortedLeaderboard);
+      } catch (error) {
+        console.error("Error fetching leaderboard data:", error);
+      }
+    };
+
+    fetchLeaderboardData();
+  }, [community_id]);
+
+  const openLeaderboardModal = () => {
+    setIsOpen(true);
+  };
+
+  const closeLeaderboardModal = () => {
+    setIsOpen(false);
+  };
 
   // Function to handle liking a post
   const handleLike = async (postId: string, userId: string) => {
@@ -301,13 +385,14 @@ const CommunityDetails: React.FC = () => {
       if (postDocSnapshot.exists()) {
         // Check if current user is the owner of the post
 
-        if (postDocSnapshot.data()?.Uid === user.uid) {
+        if (postDocSnapshot.data()?.Uid === user.email) {
           // Update post document in Firestore with new title and description
           await updateDoc(postRef, {
             title: newTitle,
             description: newDescription,
           });
 
+          window.location.reload();
           console.log("Post updated successfully");
         } else {
           console.error("User is not authorized to edit this post.");
@@ -401,18 +486,32 @@ const CommunityDetails: React.FC = () => {
                     <Badge className="badge">
                       {communityDetails.members.length + 1} Members
                     </Badge>
-                    <Badge className="badge">0 Awards</Badge>
                     <Button
-                      colorScheme="gray"
-                      size="sm"
-                      ml="2"
-                      leftIcon={<SettingsIcon />}
-                      onClick={() =>
-                        navigate(
-                          `/communities/in_communities/${community_id}/settings`
-                        )
-                      }
+                      className="leaderboard-button"
+                      onClick={openLeaderboardModal} // Open the leaderboard modal on button click
+                    >
+                      Leaderboard
+                    </Button>
+
+                    <LeaderboardModal
+                      isOpen={isOpen}
+                      onClose={closeLeaderboardModal}
+                      leaderboardData={leaderboardData}
                     />
+
+                    {communityDetails.members.includes(userId) && (
+                      <Button
+                        colorScheme="gray"
+                        size="sm"
+                        ml="2"
+                        leftIcon={<SettingsIcon />}
+                        onClick={() =>
+                          navigate(
+                            `/communities/in_communities/${community_id}/settings`
+                          )
+                        }
+                      />
+                    )}
                   </Stack>
                 </Flex>
                 <Flex className="profile-body">

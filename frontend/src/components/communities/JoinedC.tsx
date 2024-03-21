@@ -66,7 +66,7 @@ const JoinedCommunities: React.FC = () => {
     };
 
     fetchCommunities();
-  }, []);
+  }, [user?.email]);
 
   const handleRequestJoinClick = async (communityId: string) => {
     if (!user) return;
@@ -78,21 +78,26 @@ const JoinedCommunities: React.FC = () => {
       if (communityDoc.exists()) {
         const communityData = communityDoc.data();
         const requestsArray = communityData?.requests ?? [];
+        const membersArray = communityData?.members ?? [];
 
         // Check if the user has already requested to join
-        if (!requestsArray.includes(user.uid)) {
+        if (!requestsArray.includes(user?.email)) {
           // Update the community document to add the user's UID to the requests array
           await updateDoc(communityRef, {
-            requests: [...requestsArray, user.uid],
+            requests: [...requestsArray, user?.email],
           });
 
           showToast("success", "Request to join sent successfully");
           // navigate(`/communities/in_communities/${encodeURIComponent(communityId)}`);
         } else {
-          showToast(
-            "info",
-            "You have already requested to join this community"
-          );
+          if (membersArray.includes(user?.email)) {
+            showToast("info", "You are already in this community");
+          } else {
+            showToast(
+              "info",
+              "You have already requested to join this community"
+            );
+          }
         }
       }
     }
@@ -101,31 +106,46 @@ const JoinedCommunities: React.FC = () => {
   const handleJoinClick = async (communityId: string) => {
     if (!user) return;
 
-    if (user?.uid) {
-      const userRef = doc(db, "users", user.uid);
+    try {
+      const userRef = doc(db, "users", user.email || "");
       const userDoc = await getDoc(userRef);
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
         const userCommunities = userData?.communities ?? [];
-        if (!userCommunities.includes(communityId)) {
-          // Add the user's UID to the community's members list
-          const communityRef = doc(db, "communities", communityId);
-          await updateDoc(communityRef, {
-            members: [...(userData?.communities ?? []), user.uid],
-          });
 
-          // Add the community ID to the user's communities list
+        if (!userCommunities.includes(communityId)) {
+          // Update the user document to add the community ID to the communities array
           await updateDoc(userRef, {
             communities: [...userCommunities, communityId],
           });
+
+          // Update the community document to add the user's UID to the members array
+          const communityRef = doc(db, "communities", communityId);
+          const communityDoc = await getDoc(communityRef);
+
+          if (communityDoc.exists()) {
+            const communityData = communityDoc.data();
+            const communityMembers = communityData?.members ?? [];
+
+            if (!communityMembers.includes(user.email)) {
+              await updateDoc(communityRef, {
+                members: [...communityMembers, user.email],
+              });
+            }
+          }
 
           // Update the local state to reflect the changes
           setJoinedCommunityIds([...joinedCommunityIds, communityId]);
 
           showToast("success", "Joined community successfully");
+        } else {
+          showToast("info", "You are already in this community");
         }
       }
+    } catch (error) {
+      console.error("Error joining community:", error);
+      showToast("error", "Error joining community");
     }
   };
 
@@ -137,13 +157,13 @@ const JoinedCommunities: React.FC = () => {
 
       if (communityData?.status === "Private") {
         // If the community is private, check if the user is a member
-        const userUid = user?.uid;
-        if (!userUid) {
+        const useremail = user?.email;
+        if (!useremail) {
           console.error("User not logged in.");
           return;
         }
 
-        if (!communityData.members.includes(userUid)) {
+        if (!communityData.members.includes(useremail)) {
           showToast("error", "You are not a member of this community.");
           return;
         }
@@ -201,16 +221,16 @@ const JoinedCommunities: React.FC = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (community.status === "Private") {
-                  handleRequestJoinClick(community.id);
-                } else {
+                if (community.status === "Public") {
                   handleJoinClick(community.id);
+                } else {
+                  handleRequestJoinClick(community.id);
                 }
               }}
               className={
                 community.status === "Private"
                   ? joinedCommunityIds.includes(community.id)
-                    ? "joined-button-private"
+                    ? "joined-button"
                     : "request-join-button"
                   : joinedCommunityIds.includes(community.id)
                   ? "joined-button"

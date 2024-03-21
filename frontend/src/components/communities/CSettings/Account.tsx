@@ -37,6 +37,15 @@ interface CommunityData {
   image: string | null;
   admins: string[];
   creator: string;
+  requests: string[];
+}
+
+interface UserData {
+  id: string;
+  displayName: string;
+  email: string;
+  photoURL: string;
+  communities: string[];
 }
 
 const Account = () => {
@@ -52,6 +61,7 @@ const Account = () => {
   const [communityData, setCommunityData] = useState<CommunityData | null>(
     null
   );
+  const [communityMembers, setCommunityMembers] = useState<UserData[]>([]);
 
   // Get community ID from URL params
   let { community_id } = useParams();
@@ -66,16 +76,34 @@ const Account = () => {
           const docSnap = await getDoc(communityRef);
           const communityData = docSnap.data() as CommunityData | undefined;
 
+          // Inside the useEffect hook where you fetch community data and check admin status
           if (communityData) {
             setCommunityData(communityData);
             setAvatarUrl(communityData.image || "");
             setCommunityName(communityData.name);
+
+            // Fetch display names of community members
+            const fetchMemberDisplayNames = async () => {
+              const memberDisplayNames = await Promise.all(
+                communityData.members.map(async (memberId) => {
+                  const userRef = doc(db, "users", memberId);
+                  const userSnap = await getDoc(userRef);
+                  const userData = userSnap.data() as UserData | undefined;
+                  return userData;
+                })
+              );
+              setCommunityMembers(
+                memberDisplayNames.filter(Boolean) as UserData[]
+              );
+            };
+
+            fetchMemberDisplayNames();
           }
 
           if (communityData) {
             if (
-              communityData.creator === userUid ||
-              communityData.admins.includes(userUid)
+              communityData.creator === auth.currentUser.email ||
+              communityData.admins.includes(auth.currentUser.email || "241")
             ) {
               setIsAdmin(true);
             }
@@ -210,6 +238,165 @@ const Account = () => {
     setStatus(event.target.value);
   };
 
+  const handleKickMember = async (memberId: string) => {
+    if (auth.currentUser) {
+      if (isAdmin) {
+        if (memberId === auth.currentUser.email) {
+          showToast("error", "You cannot kick yourself from the community.");
+          return;
+        }
+
+        try {
+          const communityRef = doc(db, "communities", community_id || "");
+          const docSnap = await getDoc(communityRef);
+          if (docSnap.exists()) {
+            const communityData = docSnap.data() as CommunityData;
+            const updatedMembers = communityData.members.filter(
+              (member) => member !== memberId
+            );
+
+            await updateDoc(communityRef, { members: updatedMembers });
+
+            showToast(
+              "success",
+              `${memberId} has been kicked from the community.`
+            );
+
+            // Fetch updated community members list after kicking
+            const memberDisplayNames = await Promise.all(
+              updatedMembers.map(async (memberId) => {
+                const userRef = doc(db, "users", memberId);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.data() as UserData | undefined;
+                return userData;
+              })
+            );
+            setCommunityMembers(
+              memberDisplayNames.filter(Boolean) as UserData[]
+            );
+          } else {
+            showToast("error", "Community not found.");
+          }
+        } catch (error) {
+          console.error("Error kicking member:", error);
+          showToast("error", "Error kicking member.");
+        }
+      } else {
+        showToast("error", "Only admins can kick members from the community.");
+      }
+    }
+  };
+
+  const [requests, setRequests] = useState<UserData[]>([]);
+
+  // Function to fetch requests
+  const fetchRequests = async () => {
+    try {
+      const communityRef = doc(db, "communities", community_id || "");
+      const docSnap = await getDoc(communityRef);
+
+      if (docSnap.exists()) {
+        const communityData = docSnap.data() as CommunityData;
+
+        // Check if the community is private before fetching requests
+        if (communityData.status === "Private") {
+          const requestsData = await Promise.all(
+            communityData.requests.map(async (requestId) => {
+              const userRef = doc(db, "users", requestId);
+              const userSnap = await getDoc(userRef);
+              const userData = userSnap.data() as UserData | undefined;
+              return userData;
+            })
+          );
+
+          setRequests(requestsData.filter(Boolean) as UserData[]);
+        } else {
+          showToast(
+            "error",
+            "Cannot fetch requests. Community is not private."
+          );
+        }
+      } else {
+        showToast("error", "Community not found.");
+      }
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+      showToast("error", "Error fetching requests.");
+    }
+  };
+
+  // useEffect to fetch requests on component mount
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+  // Function to handle accepting a request
+  const handleAcceptRequest = async (userId: string) => {
+    try {
+      const communityRef = doc(db, "communities", community_id || "");
+      const userRef = doc(db, "users", userId); // Reference to the user document
+
+      const [communityDoc, userDoc] = await Promise.all([
+        getDoc(communityRef),
+        getDoc(userRef),
+      ]);
+
+      if (communityDoc.exists() && userDoc.exists()) {
+        const communityData = communityDoc.data() as CommunityData;
+        const userData = userDoc.data() as UserData;
+
+        const updatedMembers = [...communityData.members, userId];
+        const updatedRequests = communityData.requests.filter(
+          (requestId) => requestId !== userId
+        );
+
+        // Update community members
+        await updateDoc(communityRef, { members: updatedMembers });
+        // Update user communities
+        await updateDoc(userRef, {
+          communities: [...userData.communities, community_id],
+        });
+        // Remove the user from the requests list
+        await updateDoc(communityRef, { requests: updatedRequests });
+
+        showToast("success", `${userId}'s request has been accepted.`);
+
+        // Update the state with the updated requests
+        fetchRequests();
+      } else {
+        showToast("error", "Community or user not found.");
+      }
+    } catch (error) {
+      console.error("Error accepting request:", error);
+      showToast("error", "Error accepting request.");
+    }
+  };
+
+  // Function to handle rejecting a request
+  const handleRejectRequest = async (userId: string) => {
+    try {
+      const communityRef = doc(db, "communities", community_id || "");
+      const docSnap = await getDoc(communityRef);
+      if (docSnap.exists()) {
+        const communityData = docSnap.data() as CommunityData;
+        const updatedRequests = communityData.requests.filter(
+          (requestId) => requestId !== userId
+        );
+
+        await updateDoc(communityRef, { requests: updatedRequests });
+
+        showToast("success", `${userId}'s request has been rejected.`);
+
+        // Update the state with the updated requests
+        fetchRequests();
+      } else {
+        showToast("error", "Community not found.");
+      }
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+      showToast("error", "Error rejecting request.");
+    }
+  };
+
   const adminInterface = () => {
     return (
       <>
@@ -304,6 +491,54 @@ const Account = () => {
               </Button>
             </Flex>
           </VStack>
+
+          <Box mt={4}>
+            <Heading size="sm">Requests</Heading>
+            <VStack align="start" mt={2}>
+              {requests.map((request, index) => (
+                <Flex key={index} alignItems="center">
+                  <Avatar size="sm" src={request.photoURL} />
+                  <Text ml={2}>{request.displayName}</Text>
+                  <Button
+                    size="sm"
+                    colorScheme="green"
+                    ml={2}
+                    onClick={() => handleAcceptRequest(request.id)}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    ml={2}
+                    onClick={() => handleRejectRequest(request.id)}
+                  >
+                    Reject
+                  </Button>
+                </Flex>
+              ))}
+            </VStack>
+          </Box>
+
+          <Box mt={4}>
+            <Heading size="sm">Community Members</Heading>
+            <VStack align="start" mt={2}>
+              {communityMembers.map((memberId, index) => (
+                <Flex key={index} alignItems="center">
+                  <Avatar size="sm" name={memberId.photoURL} />
+                  <Text ml={2}>{memberId.displayName}</Text>
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    ml={2}
+                    onClick={() => handleKickMember(memberId.email)}
+                  >
+                    Kick
+                  </Button>
+                </Flex>
+              ))}
+            </VStack>
+          </Box>
         </div>
         {/* <Divider borderColor="lightgrey" borderWidth="1px" maxW="" /> */}
       </>
@@ -359,6 +594,20 @@ const Account = () => {
               </Text>
             </Flex>
           </VStack>
+
+          <Divider borderColor="lightgrey" borderWidth="1px" />
+
+          <Box mt={4}>
+            <Heading size="sm">Community Members</Heading>
+            <VStack align="start" mt={2}>
+              {communityMembers.map((memberId, index) => (
+                <Flex key={index} alignItems="center">
+                  <Avatar size="sm" name={memberId.photoURL} />
+                  <Text ml={2}>{memberId.displayName}</Text>
+                </Flex>
+              ))}
+            </VStack>
+          </Box>
         </div>
       </>
     );
