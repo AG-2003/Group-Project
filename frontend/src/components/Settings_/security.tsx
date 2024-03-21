@@ -14,7 +14,6 @@ import {
   ModalFooter,
   Input,
   FormErrorMessage,
-  Spacer,
 } from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
 import { auth, db } from "../../firebase-config";
@@ -236,19 +235,9 @@ const Security = () => {
           <Heading size="sm" mb={3}>
             Password
           </Heading>
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            justify={{ md: "space-between" }}
-            align="center"
-            width="full"
-          >
-            <Text flex={1} mb={{ base: 4, md: 0 }} textAlign={{ md: "left" }}>
-              ***********
-            </Text>
-            <Spacer />
-            <Button mt={{ base: 4, md: 0 }} onClick={handlePasswordReset}>
-              Reset
-            </Button>
+          <Flex align="center">
+            <Text mr="10rem">***********</Text>
+            <Button onClick={handlePasswordReset}>Reset</Button>
           </Flex>
         </Box>
         <Divider borderColor="lightgrey" borderWidth="1px" />
@@ -257,62 +246,34 @@ const Security = () => {
           <Heading size="sm" mb={3}>
             Verification Status
           </Heading>
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            justify={{ md: "space-between" }}
-            align="center"
-            width="full"
-          >
-            <Text color={auth.currentUser?.emailVerified ? "green" : "red"}>
+          <Flex align="center">
+            <Text
+              color={auth.currentUser?.emailVerified ? "green" : "red"}
+              mr="10rem"
+            >
               {auth.currentUser?.emailVerified ? "Verified" : "Not Verified"}
             </Text>
+
             {!auth.currentUser?.emailVerified && (
-              <Button mt={{ base: 4, md: 0 }} onClick={handleEmailVerification}>
-                Click to verify
-              </Button>
+              <Button onClick={handleEmailVerification}>Click to verify</Button>
             )}
           </Flex>
         </Box>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
         {/* Log out of Account */}
-        <Flex
-          my={5}
-          direction={{ base: "column", md: "row" }}
-          justify={{ md: "space-between" }}
-          align="center"
-        >
-          <Text flex={1} mb={{ base: 4, md: 0 }} textAlign={{ md: "left" }}>
-            Log out of your account
-          </Text>
-          <Button
-            mt={{ base: 4, md: 0 }}
-            colorScheme="purple"
-            size="sm"
-            onClick={logOut}
-          >
+        <Flex my={5} gap={195}>
+          <Text>Log out of your account</Text>
+          <Button colorScheme="purple" size="sm" onClick={logOut}>
             Logout
           </Button>
         </Flex>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
         {/* Delete Account */}
-        <Flex
-          direction={{ base: "column", md: "row" }}
-          justify="space-between"
-          align="center"
-          my={5}
-          wrap="wrap"
-        >
-          <Text flex={{ base: "100%", md: "auto" }} mb={{ base: 2, md: 0 }}>
-            Permanently delete your account
-          </Text>
-          <Button
-            colorScheme="red"
-            size="sm"
-            onClick={openPopup}
-            width={{ base: "full", md: "auto" }}
-          >
+        <Flex my={5} gap={135}>
+          <Text>Permanently delete your account</Text>
+          <Button colorScheme="red" size="sm" onClick={openPopup}>
             Delete
           </Button>
           {/* Pop up for Account deletion confirmation */}

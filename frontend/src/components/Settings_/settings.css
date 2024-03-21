@@ -28,18 +28,10 @@
   color: white;
 }
 
-/* .upload-section {
-  display: flex;
-  align-items: center; 
-  gap: 5rem; 
-} */
-
 .upload-section {
   display: flex;
-  align-items: center;
-  justify-content: space-between; /* This will space out your items evenly */
-  gap: 1rem; /* Adjust gap as needed */
-  width: 100%; /* Ensure the section takes full width */
+  align-items: center; /* Align items vertically */
+  gap: 5rem; /* Add space between text and button */
 }
 
 /* Ensure the button has no left margin */
@@ -62,45 +54,6 @@
 .text {
   align-self: center; /* Vertically center with the avatar */
   margin-right: auto; /* Align text to the left */
-}
-
-/* responsive styles */
-@media screen and (max-width: 768px) {
-  .body .flex {
-    flex-direction: column; 
-    align-items: flex-start; 
-  }
-
-  .button,
-  .button-upload,
-  .button-edit {
-    /* margin-left: 0; 
-    width: 100%;  */
-    white-space: nowrap; /* Prevent text from wrapping */
-    padding: 0.5rem 1rem; /* Adjust padding to ensure buttons are not too large */
-  }
-
-  .upload-section {
-    /* flex-direction: column; 
-    gap: 1rem; 
-    align-items: flex-start;  */
-    flex-wrap: nowrap; /* Prevent wrapping of items */
-  }
-
-  .select {
-    max-width: 100%; 
-  }
-
-  .text {
-    /* margin-bottom: 1rem;  */
-    flex-grow: 1; /* Allow text to take up available space */
-    margin-right: auto; /* Push buttons to the right */
-  }
-
-  .avatar {
-    margin-right: 0; 
-    margin-bottom: 0.5rem; 
-  }
 }
 
 @media screen and (max-width: 480px) {
