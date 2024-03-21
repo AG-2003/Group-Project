@@ -14,9 +14,9 @@ import "./Sidebar.scss";
 
 const Sidebar = () => {
   const nav = useNavigate();
-
+  
   return (
-    <VStack spacing={4} align="stretch" className="body">
+    <VStack spacing={4} align="stretch" className="body" >
       <Button
         variant="ghost"
         justifyContent="flex-start"
