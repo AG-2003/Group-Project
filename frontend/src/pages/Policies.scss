@@ -1,0 +1,69 @@
+
+  
+.policyContainer {
+    padding: 20px;
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; // A more readable font
+    color: #333;
+    
+  
+    h1 {
+        cursor: pointer;
+      border-bottom: 1px solid #eaeaea;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      font-size: 2rem; // Larger font size for the title
+      color: #484c6c; // A color that might match your app theme
+    }
+
+     h1.minimized {
+    border-bottom: none; // This will remove the border when the content is minimized
+    margin-bottom: 0;
+  }
+  
+    .content {
+      line-height: 1.8; // Slightly increased line height for readability
+      padding: 0 15px; // Padding to prevent text from touching the edges
+      transition: max-height 0.3s ease-in-out; // Add a transition effect if desired
+
+  
+      p {
+        margin-bottom: 20px; // Increase space between paragraphs
+        text-indent: 20px; // Indent paragraphs to define separation
+        font-size: 1.4rem; // Ensure the font size is legible
+        color: #333;
+      }
+  
+      .subtitle {
+        font-size: 1.5rem;
+        color: #5e3a8b; // Subdued color for subtitles
+      }
+  
+      ul {
+        margin-left: 20px; // Indent for unordered lists
+        list-style: outside; // Use the default bullet style
+      }
+  
+      li {
+        margin-bottom: 10px; // Space between list items
+      }
+  
+      b, strong {
+        font-weight: bold; // Ensure bold text is rendered bold
+      }
+  
+      a {
+        color: #0066cc; // Hyperlink color
+        text-decoration: none; // No underline
+        &:hover {
+          text-decoration: underline; // Underline on hover for links
+        }
+      }
+    }
+  }
+  

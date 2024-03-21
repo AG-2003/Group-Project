@@ -44,6 +44,8 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
 
   const userProfile = UseUserProfilePic();
 
+  
+
   return (
     <div className="navBar-Dash">
       <IconButton
@@ -71,10 +73,8 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
         </Menu>
 
         <IconButton
-          size="sm"
+          className="friendsIcon-Dash"
           onClick={() => { navigate('/friends') }}
-          mr={4}
-          colorScheme="purple"
           icon={<FaUserFriends />}
           aria-label={"friends"}
         />
@@ -85,15 +85,15 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
           icon={<FiAward />}
           onClick={() => { navigate('/Badges') }}
         />
-
         <Link to="/settings">
           <Avatar
             className="userAvatar-Dash"
             src={userProfile.photoURL || "fallback_image_url"}
             name={userProfile.displayName}
             backgroundColor={"#484c6c"}
+            size={"sm"}
           />
-        </Link>
+        </Link>        
       </div>
     </div>
   );
