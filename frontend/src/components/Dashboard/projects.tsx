@@ -254,24 +254,24 @@ const Projects: React.FC = () => {
   };
 
   const handleSharedTrashIconClick = async (id: string, type: string) => {
-    if(user?.email){
-      try{
+    if (user?.email) {
+      try {
         let sharedDocRef: DocumentReference<DocumentData, DocumentData>
-        if(type === 'document') {
+        if (type === 'document') {
           sharedDocRef = doc(db, "sharedDocs", id)
         } else {
           sharedDocRef = doc(db, "sharedBoards", id)
         }
 
-        if(sharedDocRef) {
+        if (sharedDocRef) {
           const docSnapshot = await getDoc(sharedDocRef)
 
-          if(docSnapshot.exists()){
+          if (docSnapshot.exists()) {
             // Fetch the document data
             const docData = docSnapshot.data();
 
             // Check if the user's email matches the 'owner' property of the document
-            if(docData && docData.owner === user.email) {
+            if (docData && docData.owner === user.email) {
               // If the condition is met, update the isTrash property to true
               await setDoc(sharedDocRef, { isTrash: true }, { merge: true });
             } else {
@@ -449,47 +449,47 @@ const Projects: React.FC = () => {
                 </div>
               </div>
 
-          {sharedProjects.length !==0 &&
-          <div className="projects-container">
-            <h2 className="projects-heading">Shared</h2>
-            <div className="projects-list">
-              {sharedProjects.map((project: SuiteData) => (
-                <div
-                  key={project.id}
-                  className="project-card"
-                  onClick={() =>
-                    handleSharedCardClick(project.id, project.title, project.type)
-                  }
-                >
-                  <div
-                    className="card-top"
-                    style={{
-                      backgroundImage: `url(${getImageForType(project.type)})`,
-                    }}
-                  >
-                    <h3 className="project-title">{project.title}</h3>
+              {sharedProjects.length !== 0 &&
+                <div className="projects-container">
+                  <h2 className="projects-heading">Shared</h2>
+                  <div className="projects-list">
+                    {sharedProjects.map((project: SuiteData) => (
+                      <div
+                        key={project.id}
+                        className="project-card"
+                        onClick={() =>
+                          handleSharedCardClick(project.id, project.title, project.type)
+                        }
+                      >
+                        <div
+                          className="card-top"
+                          style={{
+                            backgroundImage: `url(${getImageForType(project.type)})`,
+                          }}
+                        >
+                          <h3 className="project-title">{project.title}</h3>
+                        </div>
+                        <div className="card-bottom">
+                          <p className="last-edited">
+                            Last edited: {formatDate(project.lastEdited)}
+                          </p>
+                          <IconButton
+                            icon={<Icon as={FaTrash} color="#484c6c" />}
+                            size="sm"
+                            aria-label="Delete Project"
+                            className="delete-icon"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleSharedTrashIconClick(project.id, project.type);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="card-bottom">
-                      <p className="last-edited">
-                        Last edited: {formatDate(project.lastEdited)}
-                      </p>
-                      <IconButton
-                        icon={<Icon as={FaTrash} color="#484c6c" />}
-                        size="sm"
-                        aria-label="Delete Project"
-                        className="delete-icon"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleSharedTrashIconClick(project.id, project.type);
-                        }}
-                      />
-                    </div>
-                </div>
-              ))}
-            </div>
-          </div>}
-          </>
-          }
+                </div>}
+            </>
+          )}
 
         </Box>
       </Box>
