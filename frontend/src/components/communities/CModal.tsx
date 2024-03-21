@@ -78,23 +78,23 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
 
   const saveCommunityToFirestore = async () => {
     try {
-      const userUid = user?.uid;
+      const usermail = user?.email;
 
-      if (userUid) {
+      if (usermail) {
         const newCommunity: CommunityData = {
           id: communityName.toLowerCase().replace(/\s+/g, "-93217"),
           name: communityName,
           description: communityDescription,
           status: communityStatus,
-          members: [userUid],
+          members: [usermail],
           image: null,
-          creator: userUid,
-          admins: [userUid],
+          creator: usermail,
+          admins: [usermail],
         };
 
         const communityDocRef = doc(db, "communities", newCommunity.id);
 
-        const DocRef = doc(db, "users", userUid);
+        const DocRef = doc(db, "users", usermail);
 
         const docSnapshot = await getDoc(communityDocRef);
         const userDocSnapshot = await getDoc(DocRef);

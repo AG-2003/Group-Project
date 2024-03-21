@@ -148,7 +148,7 @@ const AllPosts = () => {
   const handleDeletePost = async (postId: string, postUid: string) => {
     try {
       const user = auth.currentUser;
-      if (user && user.uid === postUid) {
+      if (user && user.email === postUid) {
         // Check if current user is the owner of the post
         const postRef = doc(db, "communityPosts", postId);
         await deleteDoc(postRef);
@@ -236,7 +236,7 @@ const AllPosts = () => {
       if (postDocSnapshot.exists()) {
         // Check if current user is the owner of the post
 
-        if (postDocSnapshot.data()?.Uid === user.uid) {
+        if (postDocSnapshot.data()?.Uid === user.email) {
           // Update post document in Firestore with new title and description
           await updateDoc(postRef, {
             title: newTitle,

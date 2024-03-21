@@ -103,7 +103,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
           type: postType,
           image: null, // Initialize with null value
           Cid: Cid,
-          Uid: Uid,
+          Uid: userMail,
           Uname: user?.displayName || "",
           Upic: user?.photoURL || "",
           date: new Date().toISOString(),
