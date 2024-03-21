@@ -1,5 +1,7 @@
 .projects-container {
   margin-top: 1rem;
+    // Overflow handling for the whole container
+    overflow: hidden;
 
   .projects-heading {
     font-size: 2rem;
@@ -21,6 +23,7 @@
     width: 250px; // Set the card width to be smaller
     // margin: 1rem; // Adjust margin as needed for layout
     overflow: hidden; // Ensure the border-radius is applied to child elements
+    max-width: 100%; // Ensure card is not wider than the screen
 
     .card-top {
       background-size: cover;
@@ -85,19 +88,32 @@
     text-align: center;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.1); // Example shadow
     border-radius: 1rem;
-    padding: 1rem;
-    height: 45%;
+    box-sizing: border-box; /* Include padding and border in the element's width and height */
+    display: flex; /* Use flex layout */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center items on the cross axis */
+    justify-content: center; /* Center items on the main axis */
+    padding: 40px; /* Adjust the padding as needed */
+    margin: auto; /* Center the box */
+    height: auto; // Let the height be as tall as the content
+    // max-width: 90vw; // Prevent the box from being too wide
+    width: 90%; // Flexible width
+    max-width: 500px; // Max width for larger screens
 
     .no-projects-title {
       font-size: 1.25rem;
-      margin-bottom: 0.5rem;
+      margin: 0.5em 0; // Use em for consistent spacing
       font-weight: 600;
+      word-break: break-word;
+
       // margin-top: 1rem;
 
     }
 
     .no-projects-text {
       margin-bottom: 1rem;
+      word-break: break-word;
+
     }
 
     .create-button {
@@ -108,6 +124,8 @@
       border-radius: 0.25rem;
       font-size: 1rem;
       cursor: pointer;
+      align-self: center; // This explicitly aligns the button to the center
+      width: auto; // Allow the button to size according to its content
       // margin-bottom: 1rem;
 
       &:hover {
@@ -118,8 +136,52 @@
 }
 
 .ProjImage {
-  height: 50vh;
+  // height: 60vh;
   position: relative;
-  top: 100px;
+  // top: 100px;
   margin: 2rem;
+  width: auto; // Maintain aspect ratio
+  max-width: 100%; // This ensures that the image is never wider than its container
+  height: auto; // This ensures that the height scales proportionally with the width
+  object-fit: contain; // This tells the browser to display the image as large as possible within its container, without cropping or stretching it
 }
+
+// // Responsive adjustments for smaller screens
+// @media (max-width: 768px) {
+//   .projects-container {
+//     // Adjust grid template for smaller screens
+//     .projects-list {
+//       grid-template-columns: 1fr; // Stack cards on small screens
+//     }
+//   }
+
+//   .no-projects {
+//     padding: 10px; // Less padding on smaller screens
+//     // Other adjustments as needed
+//   }
+
+// }
+
+// Media query for smaller screens
+@media (max-width: 768px) {
+  .no-projects {
+    padding: 1em; // Smaller padding on smaller screens
+    width: 90%; // Increase width for smaller screens
+  }
+
+  .ProjImage {
+    max-height: 70vh; // Smaller height on smaller screens
+  }
+}
+
+// Additional media query for even smaller screens
+@media (max-width: 480px) {
+  .no-projects {
+    padding: 0.5em; // Even smaller padding for very small screens
+  }
+
+  .ProjImage {
+    max-height: 60vh; // Even smaller image for very small screens
+  }
+}
+

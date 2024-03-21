@@ -6,7 +6,11 @@ import {
   Divider,
   Flex,
   Heading,
+  Grid,
+  GridItem,
+  Spacer,
   Input,
+  Text,
   Radio,
   RadioGroup,
   Select,
@@ -20,10 +24,13 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase-config";
 import { updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 import { UseToastNotification } from "../../utils/UseToastNotification";
-
-
 
 const Account = () => {
 
@@ -38,8 +45,7 @@ const Account = () => {
   const showToast = UseToastNotification();
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [avatarUrl, setAvatarUrl] = useState(auth.currentUser?.photoURL || '');
-
+  const [avatarUrl, setAvatarUrl] = useState(auth.currentUser?.photoURL || "");
 
   const handleImageSelection = async (event: any) => {
     const file = event.target.files[0];
@@ -47,7 +53,7 @@ const Account = () => {
       // Use the file to show a preview to the user
       const previewUrl = URL.createObjectURL(file);
       setAvatarUrl(previewUrl); // Update the state variable for preview
-      showToast('success', `updated User profile pic.`)
+      showToast("success", `updated User profile pic.`);
 
       // Define where you want to store the image in Firebase Storage
       const storage = getStorage();
@@ -63,13 +69,13 @@ const Account = () => {
 
         // Update the user's profile with the permanent URL
         await updateProfile(auth.currentUser, {
-          photoURL: permanentUrl
+          photoURL: permanentUrl,
         });
 
         // Update the Firestore document
         const userRef = doc(db, "users", auth.currentUser.email as string);
         await updateDoc(userRef, {
-          photoURL: permanentUrl
+          photoURL: permanentUrl,
         });
 
         console.log("Profile photo updated successfully");
@@ -79,37 +85,32 @@ const Account = () => {
 
         // Clean up the preview URL as it's no longer needed
         URL.revokeObjectURL(previewUrl);
-
       } catch (err) {
         console.error("Error updating profile photo:", err);
-        showToast('error', 'error updating profile photo.');
-
+        showToast("error", "error updating profile photo.");
       }
     }
   };
 
-
-
   const handleUsernameSave = async (newUsername: string) => {
-
     if (auth.currentUser) {
       try {
         await updateProfile(auth.currentUser, {
-          displayName: newUsername
+          displayName: newUsername,
         });
         // TODO: handle database update here
-        const userRef = doc(db, "users", auth.currentUser.email as string)
+        const userRef = doc(db, "users", auth.currentUser.email as string);
         await updateDoc(userRef, {
-          displayName: newUsername
-        })
+          displayName: newUsername,
+        });
 
-        showToast('success', `updated username to ${newUsername}`);
+        showToast("success", `updated username to ${newUsername}`);
       } catch (err) {
         console.error(err);
-        showToast('error', 'error updating username.');
+        showToast("error", "error updating username.");
       }
     }
-  }
+  };
 
 
 
@@ -117,7 +118,7 @@ const Account = () => {
     if (auth.currentUser) {
       const userEmail = auth.currentUser.email;
       if (userEmail) {
-        const userRef = doc(db, 'users', userEmail);
+        const userRef = doc(db, "users", userEmail);
         getDoc(userRef)
           .then((docSnap) => {
             if (docSnap.exists()) {
@@ -125,10 +126,10 @@ const Account = () => {
               if (userData && userData.desc) {
                 setUserDescription(userData.desc);
               } else {
-                setUserDescription('You have not set a description yet.');
+                setUserDescription("You have not set a description yet.");
               }
             } else {
-              setUserDescription('You have not set a description yet.');
+              setUserDescription("You have not set a description yet.");
             }
           })
           .catch((error) => {
@@ -147,22 +148,21 @@ const Account = () => {
     }
   }, []);
 
-
   const handleDescriptionSave = async (description: string) => {
     if (auth.currentUser) {
       try {
-        const userRef = doc(db, "users", auth.currentUser.email as string)
+        const userRef = doc(db, "users", auth.currentUser.email as string);
         await updateDoc(userRef, {
-          desc: description
-        })
+          desc: description,
+        });
         setUserDescription(description);
-        showToast('success', `updated user description.`);
+        showToast("success", `updated user description.`);
       } catch (err) {
         console.log(err);
-        showToast('error', 'error updating user description.');
+        showToast("error", "error updating user description.");
       }
     }
-  }
+  };
 
 
 
@@ -171,7 +171,7 @@ const Account = () => {
       if (auth.currentUser) {
         const userEmail = auth.currentUser.email;
         if (userEmail) {
-          const userRef = doc(db, 'users', userEmail);
+          const userRef = doc(db, "users", userEmail);
           try {
             const docSnap = await getDoc(userRef);
             if (docSnap.exists()) {
@@ -203,20 +203,19 @@ const Account = () => {
     setSelectedRole(event.target.value);
   };
 
-
   const handleUserTypeSave = async () => {
     if (auth.currentUser && selectedRole) {
       try {
         const userRef = doc(db, "users", auth.currentUser.email as string);
         await updateDoc(userRef, {
-          userType: selectedRole
+          userType: selectedRole,
         });
         setUserType(selectedRole);
-        showToast('success', `updated user type to ${selectedRole}`);
+        showToast("success", `updated user type to ${selectedRole}`);
         console.log(`User type updated to ${selectedRole}`);
       } catch (err) {
         console.error("Error updating user type:", err);
-        showToast('error', 'error updating user type');
+        showToast("error", "error updating user type");
       }
     }
   };
@@ -254,81 +253,146 @@ const Account = () => {
       {/* Body */}
       <div className="body">
         {/* Profile Picture */}
-        <Flex>
-          <Avatar src={avatarUrl} referrerPolicy="no-referrer" className="avatar" />
-          <Box className="upload-section">
-            <Box className="text">Update your profile photo</Box>
-            <Input
-              type="file"
-              accept="image/*"
-              hidden
-              id="file-upload"
-              onChange={handleImageSelection}
-            />
+        {/* Profile Picture Section */}
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          align="center"
+          justify="space-between"
+          wrap="wrap"
+          my={4}
+        >
+          {/* Avatar */}
+          <Avatar
+            src={avatarUrl}
+            size="xl"
+            mb={{ base: 4, md: 0 }}
+            mr={{ md: 6 }}
+          />
+
+          {/* Text and Button */}
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            align="center"
+            justify="space-between"
+            flex="1"
+            minW="0" // Prevents flex items from overflowing
+          >
+            <Text fontSize="lg" textAlign="left" my={{ base: 2, md: 0 }}>
+              Update your profile photo
+            </Text>
             <Button
-              className="button button-upload"
-              colorScheme="purple"
               size="sm"
-              onClick={() => document.getElementById('file-upload')?.click()}
+              colorScheme="purple"
+              onClick={() => document.getElementById("file-upload")?.click()}
             >
               Upload
             </Button>
-          </Box>
+          </Flex>
+
+          {/* Hidden Input for File Upload */}
+          <Input
+            type="file"
+            accept="image/*"
+            hidden
+            id="file-upload"
+            onChange={handleImageSelection}
+          />
         </Flex>
         <Divider borderColor="lightgrey" borderWidth="1px" maxW="" />
 
+        {/* edited UI */}
         {/* Display Name */}
-        <Box my={4}>
+        <VStack spacing={4} my={4} align="stretch">
           <Heading size="sm" mb={3}>
             Display Name
           </Heading>
-          <EditableTextField
-            b1="Edit"
-            initialValue={auth.currentUser?.displayName ? auth.currentUser.displayName : 'click on edit to set username'}
-            onSave={handleUsernameSave} />
-        </Box>
+          <Flex
+            direction={{ base: "column", sm: "row" }}
+            justify="space-between"
+            align={{ base: "flex-start", sm: "center" }}
+          >
+            <Text flex={1} mb={{ base: 2, sm: 0 }} textAlign="left">
+              {auth.currentUser?.displayName || "click on edit to set username"}
+            </Text>
+            <EditableTextField
+              b1="Edit"
+              initialValue={
+                auth.currentUser?.displayName || "click on edit to set username"
+              }
+              onSave={handleUsernameSave}
+            />
+          </Flex>
+        </VStack>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
-        {/* Description */}
-        <Box my={4}>
+        {/* Description Section */}
+        <VStack spacing={4} my={4} align="stretch">
           <Heading size="sm" mb={3}>
             Description
           </Heading>
           {loadingDescription ? (
             <Spinner />
           ) : (
-            <EditableTextField
-              b1="Edit"
-              initialValue={userDescription}
-              onSave={handleDescriptionSave}
-            />
+            <Flex
+              direction={{ base: "column", sm: "row" }}
+              justify="space-between"
+              align={{ base: "flex-start", sm: "center" }}
+            >
+              <Text flex={1} mb={{ base: 2, sm: 0 }} textAlign="left">
+                {userDescription || "You have not set a description yet."}
+              </Text>
+              <EditableTextField
+                b1="Edit"
+                initialValue={userDescription}
+                onSave={handleDescriptionSave}
+              />
+            </Flex>
           )}
-        </Box>
+        </VStack>
         <Divider borderColor="lightgrey" borderWidth="1px" />
 
-        {/* Role */}
-        <VStack spacing={4} align="stretch" my={4}>
+        {/* Role Section */}
+        <VStack spacing={4} my={4} align="stretch">
           <Heading size="sm">What are you using the app for?</Heading>
-          <Flex>
-            {loadingUserType ? <Spinner /> :
+          {loadingUserType ? (
+            <Spinner />
+          ) : (
+            <Flex
+              direction={{ base: "column", sm: "row" }}
+              justify="space-between"
+              align={{ base: "flex-start", sm: "center" }}
+              mb={{ base: 2, sm: 0 }}
+            >
               <Select
                 placeholder="Select option"
-                maxW="435px"
                 value={selectedRole || userType}
                 onChange={handleRoleChange}
+                // maxWidth={{ base: "100%", sm: "240px" }}
+                // flexShrink={0}
+                // mr={4}
+                flex={1}
+                size="sm"
+                mb={{ base: 2, sm: 0 }}
               >
                 <option value="teacher">Teacher</option>
                 <option value="student">Student</option>
                 <option value="creator">Creator</option>
                 <option value="business">Small Business</option>
                 <option value="personal">Personal</option>
-              </Select>}
-
-            <Button size="sm" fontWeight='500' onClick={handleUserTypeSave} ml='2rem'>
-              Save Role
-            </Button>
-          </Flex>
-
+              </Select>
+              <Spacer /> {/* This pushes the button to the right */}
+              <Button
+                size="sm"
+                fontWeight="500"
+                onClick={handleUserTypeSave}
+                // w={{ base: "full", md: "auto" }}
+                // mt={{ base: 2, md: 0 }}
+                flexShrink={0}
+              >
+                Save Role
+              </Button>
+            </Flex>
+          )}
         </VStack>
 
         {/* user visibility    */}
