@@ -7,18 +7,18 @@ import {
   Flex,
   Heading,
   Input,
-  Progress,
+  Radio,
+  RadioGroup,
   Select,
-  Skeleton,
-  SkeletonCircle,
   Spinner,
+  Stack,
   VStack,
 } from "@chakra-ui/react";
 import EditableTextField from "./sub-components/EditableTextField";
 import { useEffect, useState } from "react";
 // import { sendEmailVerification } from "firebase/auth";
 import { auth, db } from "../../firebase-config";
-import { updateProfile, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { UseToastNotification } from "../../utils/UseToastNotification";
@@ -26,6 +26,14 @@ import { UseToastNotification } from "../../utils/UseToastNotification";
 
 
 const Account = () => {
+
+  const [selectedRole, setSelectedRole] = useState('');
+  const [userType, setUserType] = useState('');
+  const [userDescription, setUserDescription] = useState<string>('Write about yourself !');
+  const [loadingDescription, setLoadingDescription] = useState<boolean>(true);
+  const [loadingUserType, setLoadingUserType] = useState<boolean>(true);
+  const [loadingUserVisibility, setLoadingUserVisibility] = useState<boolean>(true);
+  const [userVisibility, setUserVisibility] = useState<boolean>(true);  // true means public and false private.
 
   const showToast = UseToastNotification();
 
@@ -103,9 +111,7 @@ const Account = () => {
     }
   }
 
-  const [userDescription, setUserDescription] = useState<string>('Write about yourself !');
-  const [loadingDescription, setLoadingDescription] = useState<boolean>(true);
-  const [loadingUserType, setLoadingUserType] = useState<boolean>(true);
+
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -158,8 +164,7 @@ const Account = () => {
     }
   }
 
-  const [selectedRole, setSelectedRole] = useState('');
-  const [userType, setUserType] = useState('');
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -172,6 +177,7 @@ const Account = () => {
             if (docSnap.exists()) {
               const userData = docSnap.data();
               setUserType(userData.userType || ''); // Use an empty string if userType is not set
+              setUserVisibility(userData.userVisibility === 'public'); // Set based on the userVisibility field from Firestore
             } else {
               console.log("No such document!");
             }
@@ -179,6 +185,7 @@ const Account = () => {
             console.error("Error fetching user data:", error);
           } finally {
             setLoadingUserType(false); // This ensures we stop the spinner regardless
+            setLoadingUserVisibility(false);
           }
         } else {
           console.log("User email is null or undefined.");
@@ -188,6 +195,7 @@ const Account = () => {
 
     fetchUserData();
   }, []);
+
 
 
 
@@ -209,6 +217,25 @@ const Account = () => {
       } catch (err) {
         console.error("Error updating user type:", err);
         showToast('error', 'error updating user type');
+      }
+    }
+  };
+
+  const handleVisibilityChange = (value: string) => {
+    setUserVisibility(value === 'public');
+  };
+
+  const saveUserVisibility = async () => {
+    if (auth.currentUser) {
+      try {
+        const userRef = doc(db, "users", auth.currentUser.email as string);
+        await updateDoc(userRef, {
+          userVisibility: userVisibility ? 'public' : 'private'
+        });
+        showToast('success', `Visibility set to ${userVisibility ? 'public' : 'private'}`);
+      } catch (error) {
+        console.error("Error updating visibility:", error);
+        showToast('error', 'Error updating visibility');
       }
     }
   };
@@ -303,8 +330,30 @@ const Account = () => {
           </Flex>
 
         </VStack>
+
+        {/* user visibility    */}
+
+        <VStack spacing={4} align="stretch" my={4}>
+          <Heading size="sm">Set user visibility</Heading>
+          <Flex>
+            {loadingUserVisibility ? <Spinner /> :
+              <RadioGroup
+                onChange={handleVisibilityChange}
+                value={userVisibility ? 'public' : 'private'}
+              >
+                <Stack direction='row'>
+                  <Radio value='public' defaultChecked={userVisibility}>Public</Radio>
+                  <Radio value='private'>Private</Radio>
+                </Stack>
+              </RadioGroup>}
+
+            <Button size="sm" fontWeight='500' onClick={saveUserVisibility} ml='2rem'>
+              Save Visibility
+            </Button>
+          </Flex>
+        </VStack>
       </div >
-      {/* <Divider borderColor="lightgrey" borderWidth="1px" maxW="" /> */}
+
     </>
   );
 };
