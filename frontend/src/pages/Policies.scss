@@ -1,5 +1,31 @@
 
+// Using increased specificity
+html {
+    background-image: url('../assets/landing-bg.png') !important; // Use the actual path to your image
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    height: 100%;
+  }
+
+ body {
+    background-image: url('../assets/landing-bg.png') !important; // Use the actual path to your image
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    height: 100%;
+  }
   
+  // Using !important to force override
+//   body {
+//     background-image: url('../assets/landing-bg.png') !important; // Use the actual path to your image
+//   }
+  
+  // Ensure this stylesheet is loaded after Chakra UI's styles
+  
+
 .policyContainer {
     padding: 20px;
     max-width: 800px;
@@ -9,6 +35,17 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; // A more readable font
     color: #333;
+    transition: background-color 0.3s ease, transform 0.3s ease; // Smooth transition for background color and transform
+
+    &:hover {
+        background-color: darken(#fefcff, 2%); // Slightly darker on hover
+        transform: translateY(-3px); // Moves up slightly on hover
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); // Enhanced shadow on hover for a "lifting" effect
+        h1{
+        border-bottom: 1px solid darken(#fefcff, 10%);
+        }
+
+      }
     
   
     h1 {
@@ -19,6 +56,12 @@
       margin-bottom: 20px;
       font-size: 2rem; // Larger font size for the title
       color: #484c6c; // A color that might match your app theme
+
+      &:hover {
+        color: darken(#484c6c, 10%); // Darken the title color on hover
+
+
+      }
     }
 
      h1.minimized {
