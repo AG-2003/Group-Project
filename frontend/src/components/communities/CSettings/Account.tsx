@@ -333,7 +333,7 @@ const Account = () => {
   const handleAcceptRequest = async (userId: string) => {
     try {
       const communityRef = doc(db, "communities", community_id || "");
-      const userRef = doc(db, "users", userId); // Reference to the user document
+      const userRef = doc(db, "users", userId);
 
       const [communityDoc, userDoc] = await Promise.all([
         getDoc(communityRef),
@@ -503,7 +503,7 @@ const Account = () => {
                     size="sm"
                     colorScheme="green"
                     ml={2}
-                    onClick={() => handleAcceptRequest(request.id)}
+                    onClick={() => handleAcceptRequest(request.email)}
                   >
                     Accept
                   </Button>
@@ -511,7 +511,7 @@ const Account = () => {
                     size="sm"
                     colorScheme="red"
                     ml={2}
-                    onClick={() => handleRejectRequest(request.id)}
+                    onClick={() => handleRejectRequest(request.email)}
                   >
                     Reject
                   </Button>

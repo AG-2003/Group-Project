@@ -155,13 +155,15 @@ const CommunityDetails: React.FC = () => {
         const usersLikes: { [userId: string]: number } = {};
 
         postsSnapshot.forEach((postDoc) => {
-          const { Uid, likes } = postDoc.data();
-          usersLikes[Uid] = (usersLikes[Uid] || 0) + likes;
+          const { Uid, likedBy, dislikedBy } = postDoc.data();
+          usersLikes[Uid] =
+            (usersLikes[Uid] || 0) + (likedBy.length - dislikedBy.length);
         });
 
         repliesSnapshot.forEach((replyDoc) => {
-          const { Uid, likes } = replyDoc.data();
-          usersLikes[Uid] = (usersLikes[Uid] || 0) + likes;
+          const { Uid, likedBy, dislikedBy } = replyDoc.data();
+          usersLikes[Uid] =
+            (usersLikes[Uid] || 0) + (likedBy.length - dislikedBy.length);
         });
 
         const leaderboardPromises = Object.keys(usersLikes).map(
@@ -296,7 +298,7 @@ const CommunityDetails: React.FC = () => {
   const handleDeletePost = async (postId: string, postUid: string) => {
     try {
       const user = auth.currentUser;
-      if (user && user.uid === postUid) {
+      if (user && user.email === postUid) {
         // Check if current user is the owner of the post
         const postRef = doc(db, "communityPosts", postId);
         await deleteDoc(postRef);
