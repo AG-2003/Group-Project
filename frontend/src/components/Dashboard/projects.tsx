@@ -348,7 +348,7 @@ const Projects: React.FC = () => {
           ) : (
             <>
               <div className="projects-container">
-                {sharedProjects.length !== 0 && projects.length !== 0 && (
+                {projects.length !== 0 && (
                   <h2 className="projects-heading">Recent Designs</h2>
                 )}
                 <div className="projects-list">
