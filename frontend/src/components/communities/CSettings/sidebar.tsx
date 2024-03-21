@@ -6,15 +6,7 @@ import {
   ViewIcon,
   InfoOutlineIcon,
 } from "@chakra-ui/icons";
-import {
-  FaHouse,
-  FaChartColumn,
-  FaCircleUser,
-  FaBookmark,
-  FaPeopleGroup,
-} from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import "./SideBarSocial.scss";
 
 interface Props {
   onNavigate: (arg: string) => void;
@@ -29,45 +21,39 @@ const SideBar = ({ onNavigate }: Props) => {
   return (
     <VStack spacing={4} align="stretch" className="body">
       <Button
-       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
-        leftIcon={<FaHouse />}
-        onClick={() => navigate("/communities/all_posts")}
+        leftIcon={<SearchIcon />}
+        onClick={() => onNavigate("account")}
       >
-        All posts
+        Your account
       </Button>
       <Button
-       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
-        leftIcon={<FaCircleUser />}
-        onClick={() => navigate("/communities/your_posts")}
+        leftIcon={<LockIcon />}
+        onClick={() => onNavigate("security")}
       >
-        Your posts
+        Security
       </Button>
       <Button
-       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
-        leftIcon={<FaBookmark />}
-        onClick={() => navigate("/communities/saved_posts")}
+        leftIcon={<ViewIcon />}
+        onClick={() => onNavigate("preferences")}
       >
-        Saved posts
+        Preference
       </Button>
-      className="sidebar-button" // Added className for SCSS targeting
       <Button
-      className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
-        leftIcon={<FaPeopleGroup />}
-        onClick={() => navigate("/communities")}
+        leftIcon={<InfoOutlineIcon />}
+        onClick={() => onNavigate("privacy")}
       >
-        Community
+        Policy
       </Button>
       <Spacer /> {/* This will push your go back button to the bottom */}
       <Button
-       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<ArrowBackIcon />}

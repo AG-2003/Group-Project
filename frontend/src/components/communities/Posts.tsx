@@ -14,15 +14,16 @@ import { DocumentData } from "firebase/firestore";
 import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
 import "./Posts.scss"
 import CommentsModal from "./commentsModal";
-
+import EditPostModal from "./EditPostModal";
 
 interface Props {
   post: DocumentData;
   userId: string; // User ID
-  onLike: (postId: string, userId: string) => void; // Callback function to handle liking
-  onDislike: (postId: string, userId: string) => void; // Callback function to handle disliking
+  onLike: (postId: string, userId: string) => void;
+  onDislike: (postId: string, userId: string) => void;
   deletePost: (postId: string, postUid: string) => void;
   savePost: (post: string) => void;
+  editPost: (postId: string, newTitle: string, newDescription: string) => void;
 }
 
 const Posts = ({
@@ -32,7 +33,11 @@ const Posts = ({
   onDislike,
   deletePost,
   savePost,
+  editPost,
 }: Props) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
   const [timeAgo, setTimeAgo] = useState("");
   const [likeCount, setLikeCount] = useState(
     post.likedBy ? post.likedBy.length : 0
@@ -47,6 +52,23 @@ const Posts = ({
     post.dislikedBy && post.dislikedBy.includes(userId)
   );
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
+
+  const handleEditModalOpen = () => {
+    setIsEditModalOpen(true);
+    setNewTitle(post.title);
+    setNewDescription(post.description);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const handleEditPost = () => {
+    if (newTitle && newDescription) {
+      editPost(post.id, newTitle, newDescription);
+      handleEditModalClose();
+    }
+  };
 
   useEffect(() => {
     const calculateTimeAgo = () => {
@@ -140,82 +162,36 @@ const Posts = ({
     savePost(post.id);
   };
 
-  // return (
-  //   <Box>
-  //     <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
-  //       {/* Display post image if available, otherwise display a placeholder */}
-  //       {post.image ? (
-  //         <img
-  //           src={post.image}
-  //           alt=""
-  //           style={{
-  //             width: "100%",
-  //             height: "300px",
-  //             objectFit: "cover",
-  //             marginBottom: "1rem",
-  //           }}
-  //         />
-  //       ) : (
-  //         <Box
-  //           bg="gray.200"
-  //           w="100%"
-  //           h="300px" // Adjust the height of the square as needed
-  //           mb="4"
-  //         />
-  //       )}
-  //       <Text fontSize="lg" fontWeight="bold" mb="2">
-  //         {post.title}
-  //       </Text>
-  //       <Text fontSize="sm" color="gray.500" mb="2">
-  //         Date Posted: {post.date}
-  //       </Text>
-  //       <Text>{post.description}</Text>
-  //       {/* Like and Dislike buttons with counters */}
-  //       <Flex align="center" mt="2">
-  //         <Button
-  //           colorScheme={likeClicked ? "green" : "gray"}
-  //           size="sm"
-  //           mr="2"
-  //           onClick={handleLikeClick}
-  //           isDisabled={dislikeClicked}
-  //         >
-  //           Like
-  //         </Button>
-  //         <Text fontSize="sm" mr="2">
-  //           {post.like}
-  //         </Text>
-  //         <Button
-  //           colorScheme={dislikeClicked ? "red" : "gray"}
-  //           size="sm"
-  //           mr="2"
-  //           onClick={handleDislikeClick}
-  //           isDisabled={likeClicked}
-  //         >
-  //           Dislike
-  //         </Button>
-  //         <Button
-  //           colorScheme="blue"
-  //           size="sm"
-  //           mr="2"
-  //           onClick={handleShareClick}
-  //         >
-  //           Share
-  //         </Button>
-  //         <Button size="sm" onClick={handleCommentsClick}>
-  //           <Box as="span" mr="1">
-  //             <Text as="span">{post.commentsCount || 0}</Text>{" "}
-  //           </Box>
-  //           <Box as="span">
-  //             <Text as="span">Comments</Text>
-  //           </Box>
-  //         </Button>
-  //       </Flex>
-  //     </Box>
-  //   </Box>
-  // );
- return (
-    <Box className="post-container">
-      <Box className="post-box" borderWidth="1px" borderRadius="lg" p="4" mb="4">
+  return (
+    <Box>
+      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
+        <Flex justify="space-between" align="center" mb="2">
+          <Flex align="center">
+            <Avatar size="sm" name={post.Uname} src={post.Upic} mr="2" />
+            <Text fontSize="sm">{post.Uname}</Text>
+          </Flex>
+          <Text fontSize="sm" color="gray.500" mb="2">
+            {timeAgo}
+          </Text>
+          <Menu>
+            <MenuButton as={Button} size="sm" variant="ghost" color="gray.500">
+              ...
+            </MenuButton>
+            <MenuList>
+              {post.Uid === userId && (
+                <>
+                  <MenuItem onClick={handlePostDelete}>Delete</MenuItem>
+                  <MenuItem onClick={handleEditModalOpen}>Edit</MenuItem>
+                </>
+              )}
+              <MenuItem onClick={handleSave}>Save</MenuItem>
+              <MenuItem color="red">Report</MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
+        <Text fontSize="lg" fontWeight="bold" mb="2">
+          {post.title}
+        </Text>
         {post.image ? (
           <img
             src={post.image}
@@ -281,6 +257,22 @@ const Posts = ({
           </Button>
         </Flex>
       </Box>
+      {isEditModalOpen && (
+        <EditPostModal
+          newTitle={newTitle}
+          newDescription={newDescription}
+          setNewTitle={setNewTitle}
+          setNewDescription={setNewDescription}
+          handleEditPost={handleEditPost}
+          handleEditModalClose={handleEditModalClose}
+        />
+      )}
+      <CommentsModal
+        Pid={post.id}
+        isOpen={isCommentsModalOpen}
+        onClose={handleCloseCommentModal}
+        commentsEnabled={post.cStatus}
+      />
     </Box>
   );
 };

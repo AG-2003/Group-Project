@@ -39,6 +39,7 @@ import SavedPosts from "./components/communities/SavedPosts";
 import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
 import { Friends } from "./pages/Friends";
+import CSettings from "./components/communities/CSettings/CSettings";
 
 function App() {
   useEffect(() => {
@@ -88,6 +89,10 @@ function App() {
         <Route path="/communities/saved_posts" element={<SavedPosts />} />
         <Route path="/communities/all_posts" element={<AllPosts />} />
         <Route path="/communities/your_posts" element={<YourPosts />} />
+        <Route
+          path="/communities/in_communities/:community_id/settings"
+          element={<CSettings />}
+        />
       </Route>
     </Routes>
   );

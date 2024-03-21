@@ -45,9 +45,15 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   Pid: string;
+  commentsEnabled: boolean;
 }
 
-const CommentModal: React.FC<Props> = ({ Pid, isOpen, onClose }: Props) => {
+const CommentModal: React.FC<Props> = ({
+  Pid,
+  isOpen,
+  onClose,
+  commentsEnabled,
+}: Props) => {
   const [commentDescription, setCommentDescription] = useState("");
   const [comments, setComments] = useState<CommentData[]>([]);
   const [user] = useAuthState(auth);
@@ -240,6 +246,13 @@ const CommentModal: React.FC<Props> = ({ Pid, isOpen, onClose }: Props) => {
   };
 
   const renderModalContent = () => {
+    if (!commentsEnabled) {
+      return (
+        <Text textAlign="center" color="gray.500" mt="50px">
+          Comments Disabled
+        </Text>
+      );
+    }
     // Sort comments based on the number of likes in descending order
     const sortedComments = comments.slice().sort((a, b) => {
       const likesA =
@@ -287,6 +300,7 @@ const CommentModal: React.FC<Props> = ({ Pid, isOpen, onClose }: Props) => {
               placeholder="Write a comment..."
               value={commentDescription}
               onChange={handleCommentDescriptionChange}
+              disabled={!commentsEnabled}
             />
             <Button
               colorScheme="blue"
