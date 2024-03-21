@@ -1,22 +1,22 @@
 
 // Using increased specificity
-html {
-    background-image: url('../assets/landing-bg.png') !important; // Use the actual path to your image
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
-    height: 100%;
-  }
+// html {
+//     background-image: url('../assets/landing-bg.png') !important; // Use the actual path to your image
+//     background-size: cover !important;
+//     background-position: center !important;
+//     background-repeat: no-repeat !important;
+//     background-attachment: fixed !important;
+//     height: 100%;
+//   }
 
- body {
-    background-image: url('../assets/landing-bg.png') !important; // Use the actual path to your image
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
-    height: 100%;
-  }
+//  body {
+//     background-image: url('../assets/landing-bg.png') !important; // Use the actual path to your image
+//     background-size: cover !important;
+//     background-position: center !important;
+//     background-repeat: no-repeat !important;
+//     background-attachment: fixed !important;
+//     height: 100%;
+//   }
   
   // Using !important to force override
 //   body {
