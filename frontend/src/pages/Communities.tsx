@@ -16,8 +16,10 @@ const Communities = () => {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   return (
-    <>
-      <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+    <div style={{ position: "fixed", width: "100%"}}>
+      <div style={{ padding: "10px", background: "#484c6c" }}>
+        <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      </div>
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
         <AnimatePresence>
@@ -65,7 +67,7 @@ const Communities = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box flexGrow={1} padding="10px" marginLeft={5} overflowY="auto">
           <Flex
             className="containerTeams"
             direction="column"
@@ -79,7 +81,7 @@ const Communities = () => {
           </Flex>
         </Box>
       </Box>
-    </>
+    </div>
   );
 };
 

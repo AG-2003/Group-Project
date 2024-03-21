@@ -34,6 +34,7 @@ import SideBar from "../Social/sideBar";
 import Posts from "./Posts"; // Import the Posts component
 import "./Posts.scss"; // Import the CSS file for post styling
 import PostModal from "./PostModal";
+import { SettingsIcon } from "@chakra-ui/icons";
 
 const CommunityDetails: React.FC = () => {
   const [communityDetails, setCommunityDetails] = useState<DocumentData | null>(
@@ -68,10 +69,6 @@ const CommunityDetails: React.FC = () => {
   if (community_id) {
     community_id = decodeURIComponent(community_id);
   }
-
-  const handleChatClick = (communityId: string) => {
-    navigate(`/In_communities/chat/${encodeURIComponent(communityId)}`);
-  };
 
   // Fetch userID
   useEffect(() => {
@@ -284,6 +281,45 @@ const CommunityDetails: React.FC = () => {
       console.error("Error saving post:", error);
     }
   };
+
+  const editPost = async (
+    postId: string,
+    newTitle: string,
+    newDescription: string
+  ) => {
+    try {
+      // Ensure user is authenticated
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Retrieve post document from Firestore
+      const postRef = doc(db, "communityPosts", postId);
+      const postDocSnapshot = await getDoc(postRef);
+
+      if (postDocSnapshot.exists()) {
+        // Check if current user is the owner of the post
+
+        if (postDocSnapshot.data()?.Uid === user.uid) {
+          // Update post document in Firestore with new title and description
+          await updateDoc(postRef, {
+            title: newTitle,
+            description: newDescription,
+          });
+
+          console.log("Post updated successfully");
+        } else {
+          console.error("User is not authorized to edit this post.");
+        }
+      } else {
+        console.error("Post document not found");
+      }
+    } catch (error) {
+      console.error("Error editing post:", error);
+    }
+  };
+
   return (
     <>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
@@ -344,7 +380,7 @@ const CommunityDetails: React.FC = () => {
                       className="profile-avatar"
                       src={communityDetails.image || "fallback_image_url"}
                       name={communityDetails.name}
-                      borderRadius="10%" // Adjust this value as needed
+                      borderRadius="10%"
                     />
                     <Box className="profile-text">
                       <Text className="profile-name">
@@ -357,11 +393,24 @@ const CommunityDetails: React.FC = () => {
                   </Flex>
 
                   <Stack className="profile-stats">
-                    <Badge className="badge">0 Posts</Badge>
+                    <Badge className="badge">
+                      {communityPosts.length} Posts
+                    </Badge>
                     <Badge className="badge">
                       {communityDetails.members.length + 1} Members
                     </Badge>
                     <Badge className="badge">0 Awards</Badge>
+                    <Button
+                      colorScheme="gray"
+                      size="sm"
+                      ml="2"
+                      leftIcon={<SettingsIcon />}
+                      onClick={() =>
+                        navigate(
+                          `/communities/in_communities/${community_id}/settings`
+                        )
+                      }
+                    />
                   </Stack>
                 </Flex>
                 <Flex className="profile-body">
@@ -399,6 +448,7 @@ const CommunityDetails: React.FC = () => {
                           onDislike={handleDislike} // Pass onDislike function to Posts component
                           deletePost={handleDeletePost}
                           savePost={savePost}
+                          editPost={editPost}
                         />
                       ))}
                   </div>

@@ -7,6 +7,7 @@ import NavItem from "./navItem";
 export const Navbar: React.FC = () => {
   return (
     <nav className="nav-bar">
+      
       <div className="logo-and-name">
         <img src={logo} alt="Joints Logo" className="logo" />
         <img src={name} alt="Joints" className="name" />
@@ -42,10 +43,7 @@ export const Navbar: React.FC = () => {
           <a href="#whiteboards">Curriculum Vitae</a>
         </NavItem>
       </div>
-      <div className="buttonList">
-      <Link to="/policy">
-        <button className="policies">Learn More</button>
-      </Link>
+      
       <Link to="/auth">
         <button className="get-started">Get Started</button>
       </Link>

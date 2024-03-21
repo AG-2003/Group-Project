@@ -31,6 +31,8 @@ interface CommunityData {
   status: string;
   members: string[];
   image: string | null;
+  admins: string[];
+  creator: string;
 }
 
 interface Props {
@@ -42,7 +44,6 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
   const [communityName, setCommunityName] = useState("");
   const [communityDescription, setCommunityDescription] = useState("");
   const [communityStatus, setCommunityStatus] = useState("Public");
-  const [emailInputs, setEmailInputs] = useState([""]);
   const [image, setImage] = useState<File | null>(null);
   const [user] = useAuthState(auth);
 
@@ -75,27 +76,25 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
     onClose(); // Close the modal when saving is complete
   };
 
-  const quickClose = () => {
-    setEmailInputs([""]);
-  };
-
   const saveCommunityToFirestore = async () => {
     try {
-      const userMail = user?.email;
+      const userUid = user?.uid;
 
-      if (userMail) {
+      if (userUid) {
         const newCommunity: CommunityData = {
           id: communityName.toLowerCase().replace(/\s+/g, "-93217"),
           name: communityName,
           description: communityDescription,
           status: communityStatus,
-          members: emailInputs.filter((email) => email.trim() !== ""),
+          members: [userUid],
           image: null,
+          creator: userUid,
+          admins: [userUid],
         };
 
         const communityDocRef = doc(db, "communities", newCommunity.id);
 
-        const DocRef = doc(db, "users", userMail);
+        const DocRef = doc(db, "users", userUid);
 
         const docSnapshot = await getDoc(communityDocRef);
         const userDocSnapshot = await getDoc(DocRef);
@@ -107,26 +106,13 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
 
         await setDoc(communityDocRef, newCommunity);
 
+        // Add the community ID to the user's communities list
         await updateDoc(DocRef, {
           communities: [
             ...(userDocSnapshot.data()?.communities || []),
             newCommunity.id,
           ],
         });
-
-        for (const email of newCommunity.members) {
-          const memberDocRef = doc(db, "users", email);
-          const memberDocSnapshot = await getDoc(memberDocRef);
-
-          if (memberDocSnapshot.exists()) {
-            await updateDoc(memberDocRef, {
-              communities: [
-                ...(memberDocSnapshot.data()?.communities || []),
-                newCommunity.id,
-              ],
-            });
-          }
-        }
 
         if (image) {
           const storage = getStorage();
@@ -198,7 +184,7 @@ const CommunityModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Create a Community</ModalHeader>
-        <ModalCloseButton onClick={quickClose} />
+        <ModalCloseButton />
         <ModalBody>{renderModalContent()}</ModalBody>
         <ModalFooter>
           <Button colorScheme="red" mr={3} onClick={onClose}>

@@ -101,8 +101,10 @@ const Social = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <>
-      <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+    <div style={{ position: "fixed", width: "100%"}}>
+      <div style={{ padding: "10px", background: "#484c6c" }}>
+        <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      </div>
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
         <AnimatePresence>
@@ -150,7 +152,7 @@ const Social = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box flexGrow={1} padding="10px" marginLeft={5} overflowY="auto">
           <div style={{ marginTop: "60px" }}>
             {/* This div contains code to display the comment section */}
             {openComments && (
@@ -203,6 +205,116 @@ const Social = () => {
             )}
 
             {/*This Div contains the post */}
+            <div style={{ width: "800px" }}>
+              <div
+                style={{
+                  width: "840px",
+                  height: "600px",
+                  backgroundColor: "#dcdcf6",
+                  marginBottom: "20px",
+                  paddingTop: "30px",
+                  paddingBottom: "30px",
+                  paddingLeft: "60px",
+                  paddingRight: "60px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "15px",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: "#a3a3c2",
+                      width: "30px",
+                      height: "30px",
+                      borderRadius: "100%",
+                      marginRight: "8px",
+                    }}
+                  ></div>
+                  <label
+                    style={{
+                      fontSize: "15px",
+                      color: "#242424",
+                      marginRight: "20px",
+                    }}
+                  >
+                    Community Name
+                  </label>
+                  <label
+                    style={{
+                      fontSize: "10px",
+                      color: "#242424",
+                      marginRight: "20px",
+                    }}
+                  >
+                    Posted by username
+                  </label>
+                  <label
+                    style={{
+                      fontSize: "10px",
+                      color: "#242424",
+                      marginRight: "20px",
+                    }}
+                  >
+                    4 hours ago
+                  </label>
+                </div>
+                <h1
+                  style={{
+                    fontSize: "20px",
+                    marginLeft: "4px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  Post Title
+                </h1>
+                <div
+                  style={{
+                    height: "410px",
+                    backgroundColor: "#7f7f99",
+                    position: "relative",
+                    left: 0,
+                    right: 0,
+                  }}
+                ></div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: "20px",
+                    width: "300px",
+                    marginLeft: "10px",
+                  }}
+                >
+                  <FaRegThumbsUp
+                    size="25px"
+                    onClick={() => {
+                      setLikes(likes + 1);
+                    }}
+                  />
+                  <label>{likes}</label>
+                  <FaRegThumbsDown
+                    size="25px"
+                    onClick={() => {
+                      setDisLikes(dislikes + 1);
+                    }}
+                  />
+                  <label>{dislikes}</label>
+                  <FaRegComment
+                    size="25px"
+                    onClick={() => {
+                      setOpenComments(true);
+                    }}
+                  />
+                  <label>{comments}</label>
+                  <FaTelegramPlane size="25px" />
+                  <FaRegBookmark size="25px" />
+                </div>
+              </div>
+            </div>
             <div style={{ width: "800px" }}>
               <div
                 style={{
@@ -404,7 +516,7 @@ const Social = () => {
           </div>
         </Box>
       </Box>
-    </>
+    </div>
   );
 };
 
