@@ -49,9 +49,9 @@ const Sidebar = () => {
         className="sidebar-button" // Added className for SCSS targeting
         leftIcon={<ViewIcon />}
         paddingLeft={5}
-        onClick={() => {
-          nav("/Templates");
-        }}
+        // onClick={() => {
+        //   nav("/Templates");
+        // }}
       >
         Templates
       </Button>
@@ -73,9 +73,9 @@ const Sidebar = () => {
         className="sidebar-button" // Added className for SCSS targeting
         leftIcon={<PhoneIcon />}
         paddingLeft={5}
-        onClick={() => {
-          nav("/Calls");
-        }}
+        // onClick={() => {
+        //   nav("/Calls");
+        // }}
       >
         Calls
       </Button>
