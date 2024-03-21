@@ -7,6 +7,7 @@ import { ForgotPassword } from "./pages/Auth/ForgotPassword";
 import { SignUpEmail } from "./pages/Auth/SignUpEmail";
 import { SignUpPassword } from "./pages/Auth/SignUpPassword";
 import { NewPassword } from "./pages/Auth/NewPassword";
+import Policies from "./pages/Policies"
 // import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
@@ -56,6 +57,7 @@ function App() {
       <Route path="/signUpEmail" element={<SignUpEmail />} />
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
+      <Route path="/policy" element={<Policies />} />
       <Route element={<ProtectedRoutes />}>
         <Route path="/index" element={<Profile />} />
         <Route path="/Settings" element={<Settings />} />

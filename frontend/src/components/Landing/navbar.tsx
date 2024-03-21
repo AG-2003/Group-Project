@@ -43,7 +43,7 @@ export const Navbar: React.FC = () => {
         </NavItem>
       </div>
       <div className="buttonList">
-      <Link to="/policies">
+      <Link to="/policy">
         <button className="policies">Learn More</button>
       </Link>
       <Link to="/auth">
