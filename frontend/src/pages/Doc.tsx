@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-} from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import NavBar from "../components/Doc_/NavBar";
 import SideBar from "../components/Doc_/sideBar";

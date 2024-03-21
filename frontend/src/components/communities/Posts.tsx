@@ -162,7 +162,7 @@ const Posts = ({
 
   return (
     <Box>
-      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
+      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4" backgroundColor="#bcbcdc"  >
         <Flex justify="space-between" align="center" mb="2">
           <Flex align="center">
             <Avatar size="sm" name={post.Uname} src={post.Upic} mr="2" />

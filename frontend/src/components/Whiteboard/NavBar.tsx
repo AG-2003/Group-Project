@@ -100,14 +100,6 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       />
       <div className="nav-items">
         <button className="nav-item" onClick={() => { navigate(-1) }}>Home</button>
-        <div className="nav-item">File</div>
-        <div className="nav-item">Edit</div>
-        <div className="nav-item">View</div>
-        <div className="nav-item">Insert</div>
-        <div className="nav-item">Format</div>
-        <div className="nav-item">Tools</div>
-        <div className="nav-item">Extensions</div>
-        <div className="nav-item">Help</div>
       </div>
       <div className="title-area">
         <input
@@ -132,19 +124,6 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             aria-label="Video Call"
             icon={<IoVideocamOutline />}
             onClick={handleStartCall}
-          />
-        </Tooltip>
-        <Tooltip
-          label="Get Analytics"
-          className="tooltip-label"
-          placement="top"
-          hasArrow
-        >
-          <IconButton
-            className="action-icon analytics"
-            aria-label="Analyse"
-            icon={<IoBarChartOutline />}
-            onClick={onOpen}
           />
         </Tooltip>
         <Tooltip
