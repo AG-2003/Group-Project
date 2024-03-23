@@ -14,6 +14,7 @@ import {
   Th,
   Td,
   Button,
+  Text,
 } from "@chakra-ui/react";
 
 interface Props {
@@ -30,25 +31,28 @@ const LeaderboardModal = ({ isOpen, onClose, leaderboardData }: Props) => {
         <ModalHeader>Community Leaderboard</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Rank</Th>
-                <Th>User</Th>
-                <Th>Likes</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {leaderboardData.map((item, index) => (
-                <Tr key={index}>
-                  <Td>{index + 1}</Td>
-                  <Td>{item.displayName}</Td>{" "}
-                  {/* Displaying displayName instead of userId */}
-                  <Td>{item.likes}</Td>
+          {leaderboardData.length > 0 ? ( // Check if leaderboardData array is not empty
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Rank</Th>
+                  <Th>User</Th>
+                  <Th>Likes</Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
+              </Thead>
+              <Tbody>
+                {leaderboardData.map((item, index) => (
+                  <Tr key={index}>
+                    <Td>{index + 1}</Td>
+                    <Td>{item.displayName}</Td>
+                    <Td>{item.likes}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          ) : (
+            <Text>No data available. Be the first to be the first!</Text> // Message displayed when leaderboard is empty
+          )}
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" onClick={onClose}>

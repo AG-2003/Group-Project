@@ -486,7 +486,7 @@ const CommunityDetails: React.FC = () => {
                       {communityPosts.length} Posts
                     </Badge>
                     <Badge className="badge">
-                      {communityDetails.members.length + 1} Members
+                      {communityDetails.members.length || 0} Members
                     </Badge>
                     <Button
                       className="leaderboard-button"

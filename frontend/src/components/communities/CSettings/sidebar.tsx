@@ -26,7 +26,7 @@ const SideBar = ({ onNavigate }: Props) => {
         leftIcon={<SearchIcon />}
         onClick={() => onNavigate("account")}
       >
-        Your account
+        Community Information
       </Button>
       <Button
         variant="ghost"
@@ -34,7 +34,7 @@ const SideBar = ({ onNavigate }: Props) => {
         leftIcon={<LockIcon />}
         onClick={() => onNavigate("security")}
       >
-        Security
+        Leave Community
       </Button>
       <Button
         variant="ghost"
@@ -42,15 +42,7 @@ const SideBar = ({ onNavigate }: Props) => {
         leftIcon={<ViewIcon />}
         onClick={() => onNavigate("preferences")}
       >
-        Preference
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        leftIcon={<InfoOutlineIcon />}
-        onClick={() => onNavigate("privacy")}
-      >
-        Policy
+        Members List
       </Button>
       <Spacer /> {/* This will push your go back button to the bottom */}
       <Button
