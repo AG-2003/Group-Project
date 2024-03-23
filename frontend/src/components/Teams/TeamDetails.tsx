@@ -187,9 +187,9 @@ const TeamDetails: React.FC = () => {
       case "document":
         path = `/doc/share-teams/?id=${encodeURIComponent(projectId)}`;
         break;
-      case "board":
-        path = `/board/share/?id=${encodeURIComponent(projectId)}`;
-        break;
+      // case "board":
+      //   path = `/board/share/?id=${encodeURIComponent(projectId)}`;
+      //   break;
       // Add case for 'slides' as necessary
     }
     navigate(path, { state: { projectTitle } });
