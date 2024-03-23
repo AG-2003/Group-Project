@@ -103,7 +103,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
           type: postType,
           image: null, // Initialize with null value
           Cid: Cid,
-          Uid: Uid,
+          Uid: userMail,
           Uname: user?.displayName || "",
           Upic: user?.photoURL || "",
           date: new Date().toISOString(),
@@ -170,105 +170,47 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
   };
 
   const renderModalContent = () => {
-    switch (page) {
-      case 1:
-        return (
-          <>
-            <Heading>Create a post</Heading>
-            <Text mb={4} marginTop={5}>
-              Post Title
-            </Text>
-            <Input
-              mb={4}
-              placeholder="Title"
-              value={postTitle}
-              onChange={handlePostNameChange}
-            />
-            <Text mb={4}>Post Description</Text>
-            <Textarea
-              mb={4}
-              placeholder="Description"
-              value={postDescription}
-              onChange={handlePostDescriptionChange}
-            />
-            <Text mb={4}>Post Image</Text>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              mb={4}
-            />
-            <Button
-              colorScheme={commentsEnabled ? "gray" : "red"}
-              ml={2}
-              onClick={toggleComments}
-            >
-              Disable Comments
-            </Button>
-          </>
-        );
-      case 2:
-        return (
-          <>
-            <Heading>Create a post</Heading>
-            <Text mb={4} marginTop={5}>
-              Post Title
-            </Text>
-            <Input
-              mb={4}
-              placeholder="Title"
-              value={postTitle}
-              onChange={handlePostNameChange}
-            />
-            <Text mb={4}>Project link</Text>
-            <Input type="file" onChange={handleImageChange} mb={4} />
-
-            <Text mb={4}>Post Description</Text>
-            <Textarea
-              mb={4}
-              placeholder="Description"
-              value={postDescription}
-              onChange={handlePostDescriptionChange}
-            />
-          </>
-        );
-      default:
-        return null;
-    }
+    return (
+      <>
+        <Heading mt={3}>Create a post</Heading>
+        <Text mb={4} marginTop={5}>
+          Post Title
+        </Text>
+        <Input
+          mb={4}
+          placeholder="Title"
+          value={postTitle}
+          onChange={handlePostNameChange}
+        />
+        <Text mb={4}>Post Description</Text>
+        <Textarea
+          mb={4}
+          placeholder="Description"
+          value={postDescription}
+          onChange={handlePostDescriptionChange}
+        />
+        <Text mb={4}>Post Image</Text>
+        <Input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          mb={4}
+        />
+        <Button
+          colorScheme={commentsEnabled ? "gray" : "red"}
+          ml={2}
+          onClick={toggleComments}
+        >
+          Disable Comments
+        </Button>
+      </>
+    );
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          <Button
-            colorScheme={page === 1 ? "purple" : "gray"}
-            onClick={() => {
-              setPage(1);
-              handlePostTypeChange({
-                target: { value: "Post" },
-              } as React.ChangeEvent<HTMLSelectElement>);
-            }}
-            mr={2}
-            leftIcon={<BiMessageSquareAdd />}
-          >
-            Post
-          </Button>
-          <Button
-            colorScheme={page === 2 ? "purple" : "gray"}
-            onClick={() => {
-              setPage(2);
-              handlePostTypeChange({
-                target: { value: "Project" },
-              } as React.ChangeEvent<HTMLSelectElement>);
-            }}
-            leftIcon={<BiTask />}
-          >
-            Project
-          </Button>
-        </ModalHeader>
-
         <ModalCloseButton onClick={quickClose} />
         <ModalBody>{renderModalContent()}</ModalBody>
         <ModalFooter>
