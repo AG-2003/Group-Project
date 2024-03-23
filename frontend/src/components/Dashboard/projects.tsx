@@ -115,7 +115,7 @@ const Projects: React.FC = () => {
 
         // Filter shared documents and shared boards based on the user's email
         const filteredSharedDocs = sharedDocsSnapshot.docs.filter(doc =>
-          doc.data().user?.includes(user.email) && doc.data().isTrash === false
+          doc.data().user?.includes(user.email) && doc.data().isTrash === false && !doc.data().hasOwnProperty('team_id')
         ).map(doc => doc.data() as SuiteData);
         const filteredSharedBoards = sharedBoardsSnapshot.docs.filter(doc =>
           doc.data().user?.includes(user.email) && doc.data().isTrash === false

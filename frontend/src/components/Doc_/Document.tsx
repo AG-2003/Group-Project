@@ -33,6 +33,7 @@ const Document: React.FC<SuiteProps> = ({
   suiteId,
   suiteTitle,
   setSuiteTitle,
+  team_id
 }: SuiteProps) => {
   //Set the current value of the text editor or the react-quill component
   const [value, setValue] = useState<string>("");
@@ -41,7 +42,8 @@ const Document: React.FC<SuiteProps> = ({
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isSpellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(true);
-  const isSharePage = window.location.pathname.includes("/doc/share");
+  const isSharePage = window.location.pathname.includes("/doc/share") || window.location.pathname.includes("/doc/share-teams");
+  const isTeams = team_id !== "";
 
   const [isLoading, setIsLoading] = useState(true);
   const [latestLastEdited, setLatestLastEdited] = useState<string | null>(null);
@@ -322,6 +324,10 @@ const Document: React.FC<SuiteProps> = ({
             comments: comments,
             owner: user?.email || ""
           };
+
+          if(isTeams){
+            sharedDocument.team_id = team_id
+          }
         }
 
         // Save the document with the updated fields

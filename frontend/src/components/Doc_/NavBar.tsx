@@ -35,7 +35,8 @@ interface Props {
 
 
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
-  const isSharePage = window.location.pathname.includes("/doc/share");
+  const isSharePage = window.location.pathname.includes("/doc/share") || window.location.pathname.includes("/doc/share-teams");
+  const isTeams = window.location.pathname.includes("/doc/share-teams");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isShareModalOpen, onOpen: onShareModalOpen, onClose: onShareModalClose } = useDisclosure();
   const [user] = useAuthState(auth);
@@ -130,7 +131,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
   const getShareableLink = () => {
     const currentUrl = window.location.href;
     // Replace /doc/ with /doc/share/ in the URL
-    return currentUrl.replace("/doc/", "/doc/share/");
+    return isTeams? currentUrl : currentUrl.replace("/doc/", "/doc/share/");
   };
 
   // Function to copy the current URL to the clipboard
@@ -147,7 +148,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
   return (
     <div className="navbar">
       <div className="nav-items">
-        <button className="nav-item" onClick={() => { isSharePage? navigate('/projects') : navigate(-1) }}>Home</button>
+        <button className="nav-item" onClick={() => { isSharePage? (isTeams? navigate('/projects') : navigate(-1)) : navigate(-1) }}>Home</button>
       </div>
       <div className="title-area">
         <input

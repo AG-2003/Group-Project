@@ -16,6 +16,7 @@ const Doc: React.FC = () => {
   const params = new URLSearchParams(location.search);
   const uniqueID = decodeURIComponent(params.get("id") || "");
   const initialTitle = location.state?.title || "Untitled";
+  const team_id = location.state?.team_id || ""; // Extract the team_id from the state
   const [documentTitle, setDocumentTitle] = useState(initialTitle);
   const [isDesktop, setIsDesktop] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -102,6 +103,7 @@ const Doc: React.FC = () => {
             suiteId={uniqueID}
             suiteTitle={documentTitle}
             setSuiteTitle={setDocumentTitle}
+            team_id={team_id? team_id : ""}
           />
           <Footer onZoomChange={handleZoomChange} />
         </Box>
