@@ -243,7 +243,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
       <ModalContent>
         <ModalHeader>
           <Button
-            colorScheme={page === 1 ? "blue" : "gray"}
+            colorScheme={page === 1 ? "purple" : "gray"}
             onClick={() => {
               setPage(1);
               handlePostTypeChange({
@@ -256,7 +256,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
             Post
           </Button>
           <Button
-            colorScheme={page === 2 ? "blue" : "gray"}
+            colorScheme={page === 2 ? "purple" : "gray"}
             onClick={() => {
               setPage(2);
               handlePostTypeChange({
@@ -272,7 +272,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
         <ModalCloseButton onClick={quickClose} />
         <ModalBody>{renderModalContent()}</ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" onClick={SaveNClose}>
+          <Button colorScheme="purple" onClick={SaveNClose}>
             Complete
           </Button>
         </ModalFooter>

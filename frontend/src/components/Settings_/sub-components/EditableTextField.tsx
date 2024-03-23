@@ -36,20 +36,17 @@ const EditableTextField = ({ b1, initialValue, onSave }: Props) => {
       ) : (
         <Box>
           <span>{textValue}</span>
-          <Button ml='5rem' fontWeight="500" onClick={handleEditClick}>
+          <Button ml="5rem" fontWeight="500" onClick={handleEditClick}>
             {b1}
           </Button>
         </Box>
-      )
-      }
-      {
-        isEditing && (
-          <Button mt={2} onClick={handleSaveClick}>
-            Save
-          </Button>
-        )
-      }
-    </Box >
+      )}
+      {isEditing && (
+        <Button mt={2} onClick={handleSaveClick}>
+          Save
+        </Button>
+      )}
+    </Box>
   );
 };
 

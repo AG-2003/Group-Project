@@ -11,6 +11,8 @@ import {
   MenuList,
 } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
+import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
+import "./Posts.scss"
 import CommentsModal from "./commentsModal";
 import EditPostModal from "./EditPostModal";
 
@@ -194,52 +196,60 @@ const Posts = ({
           <img
             src={post.image}
             alt=""
-            style={{
-              width: "400px",
-              height: "300px",
-              objectFit: "cover",
-              marginBottom: "1rem",
-            }}
+            className="post-image"
           />
         ) : (
-          <Box bg="gray.200" w="100%" h="300px" mb="4" />
+          <Box
+            bg="gray.200"
+            w="100%"
+            h="300px"
+            mb="4"
+            className="post-placeholder"
+          />
         )}
-
-        <Text>{post.description}</Text>
-        {/* Like and Dislike buttons */}
-        <Flex align="center" mt="2">
+        <Text className="post-title" fontSize="lg" fontWeight="bold" mb="2">
+          {post.title}
+        </Text>
+        <Text className="post-date" fontSize="sm" color="gray.500" mb="2">
+          Date Posted: {post.date}
+        </Text>
+        <Text className="post-description">{post.description}</Text>
+        <Flex className="post-actions" align="center" mt="2">
           <Button
-            colorScheme={likeClicked ? "green" : "gray"}
+            className="like-button"
             size="sm"
             mr="2"
             onClick={handleLikeClick}
             isDisabled={dislikeClicked}
+            variant="ghost" // Use the 'ghost' variant or another appropriate one
           >
-            Like
+            <FaRegThumbsUp color={likeClicked ? "green" : "gray"} />
           </Button>
           <Text fontSize="sm" mr="2">
-            {likeCount - dislikeCount}
+            {post.like}
           </Text>
           <Button
-            colorScheme={dislikeClicked ? "red" : "gray"}
+            className="dislike-button"
             size="sm"
             mr="2"
             onClick={handleDislikeClick}
             isDisabled={likeClicked}
+            variant="ghost" // Use the 'ghost' variant or another appropriate one
           >
-            Dislike
+            <FaRegThumbsDown color={dislikeClicked ? "red" : "gray"} />
           </Button>
           <Button
-            colorScheme="blue"
+            className="share-button"
+            // colorScheme="blue"
             size="sm"
             mr="2"
             onClick={handleShareClick}
           >
             Share
           </Button>
-          <Button size="sm" onClick={handleCommentsClick}>
+          <Button className="comments-button" size="sm" onClick={handleCommentsClick}>
             <Box as="span" mr="1">
-              <Text as="span">{post.comments ? post.comments.length : 0}</Text>{" "}
+              <Text as="span">{post.commentsCount || 0}</Text>
             </Box>
             <Box as="span">
               <Text as="span">Comments</Text>
@@ -268,3 +278,5 @@ const Posts = ({
 };
 
 export default Posts;
+
+

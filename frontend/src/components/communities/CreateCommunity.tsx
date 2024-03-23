@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { HiMiniUserGroup } from "react-icons/hi2";
-import "./CreateJoin.scss";
+import "./CreateJoinComm.scss";
 import CreateCModal from "./CModal";
 
 const CreateCommunity = () => {
@@ -17,13 +17,13 @@ const CreateCommunity = () => {
 
   return (
     <>
-      <h2 className="projects-heading">Create a Community</h2>
-      <div className="containerCreateJoin">
-        <div className="team-box" onClick={handleCreateTeamClick}>
-          <div className="icon-container">
+      <h2 className="projects-heading-comm">Create a Community</h2>
+      <div className="containerCreateJoin-comm">
+        <div className="team-box-comm" onClick={handleCreateTeamClick}>
+          <div className="icon-container-comm">
             <IoIosCreate size={32} />
           </div>
-          <div className="team-info">
+          <div className="team-info-comm">
             <h2>Create a Community</h2>
             <p>Bring everyone together and get to work</p>
           </div>

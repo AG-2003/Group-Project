@@ -14,9 +14,9 @@ import "./Sidebar.scss";
 
 const Sidebar = () => {
   const nav = useNavigate();
-
+  
   return (
-    <VStack spacing={4} align="stretch" className="body">
+    <VStack spacing={4} align="stretch" className="body" >
       <Button
         variant="ghost"
         justifyContent="flex-start"
@@ -49,9 +49,9 @@ const Sidebar = () => {
         className="sidebar-button" // Added className for SCSS targeting
         leftIcon={<ViewIcon />}
         paddingLeft={5}
-        onClick={() => {
-          nav("/Templates");
-        }}
+        // onClick={() => {
+        //   nav("/Templates");
+        // }}
       >
         Templates
       </Button>
@@ -73,9 +73,9 @@ const Sidebar = () => {
         className="sidebar-button" // Added className for SCSS targeting
         leftIcon={<PhoneIcon />}
         paddingLeft={5}
-        onClick={() => {
-          nav("/Calls");
-        }}
+        // onClick={() => {
+        //   nav("/Calls");
+        // }}
       >
         Calls
       </Button>

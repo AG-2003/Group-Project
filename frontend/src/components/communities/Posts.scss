@@ -1,9 +1,81 @@
-// Posts.scss
-.posts-container {
-    margin-top: 20px;
-  
-    .post {
-      // Style each post here
+.post-container {
+  .post-box {
+    border-width: 1px;
+    border-color: #e2e8f0; /* A light gray border color */
+    border-radius: var(--chakra-radii-lg);
+    padding: var(--chakra-space-4);
+    margin-bottom: var(--chakra-space-4);
+    background-color: white;
+    /* Enhanced shadow for greater visibility */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Increased blur and spread for more pronounced shadow */
+
+
+
+    .post-image, .post-placeholder {
+      border-radius: var(--chakra-radii-lg);
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      margin-bottom: var(--chakra-space-4);
+    }
+
+    .post-title {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: var(--chakra-space-2);
+    }
+
+    .post-date {
+      font-size: var(--chakra-fontSizes-sm);
+      color: var(--chakra-colors-gray-500);
+      margin-bottom: var(--chakra-space-2);
+    }
+
+    .post-description {
+      margin-bottom: var(--chakra-space-2);
+    }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      margin-top: var(--chakra-space-2);
+
+      .like-button, .dislike-button, .share-button, .comments-button {
+        size: var(--chakra-sizes-lg);
+        margin-right: var(--chakra-space-2);
+
+        &:disabled {
+          cursor: not-allowed;
+        }
+      }
+      .like-button, .dislike-button {
+        // Increase the icon size
+        svg {
+          width: 24px; // Adjust this value to increase or decrease the icon size
+          height: auto;
+        }
+      
+        // Adjust padding for a larger button appearance
+        padding: 8px 12px; // You can adjust these values as needed
+      
+        // Optional: Adjust font size if your button contains text
+        font-size: 16px; // Adjust as needed
+      }
+
+      .share-button {
+        background: #885cd4; // Original purple background
+        color: white;
+        transition: background-color 0.2s; // Smooth transition for background color change
+      
+        &:hover {
+          background: #7648c1; // A darker shade for hover
+        }
+      
+        &:active {
+          background: #6439b1; // An even darker shade for active/click
+        }
+      }
+      
     }
   }
-  
+}

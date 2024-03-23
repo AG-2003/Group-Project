@@ -1,4 +1,12 @@
 import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  Button,
+  Input,
   IconButton,
   useDisclosure,
   Tooltip,
@@ -27,7 +35,10 @@ interface Props {
 
 
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
+  const isSharePage = window.location.pathname.includes("/doc/share") || window.location.pathname.includes("/doc/share-teams");
+  const isTeams = window.location.pathname.includes("/doc/share-teams");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isShareModalOpen, onOpen: onShareModalOpen, onClose: onShareModalClose } = useDisclosure();
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const iconStyle = {
@@ -60,6 +71,34 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
 
   // Function to start the call
+  // const handleStartCall = () => {
+  //   // Generate the roomID and construct the meeting link
+  //   const roomID = randomID(5);
+  //   const meetingLink =
+  //     window.location.protocol +
+  //     "//" +
+  //     window.location.host +
+  //     "/meeting?roomID=" +
+  //     roomID;
+
+  //   // Navigate to the Zoom meeting page
+  //   navigate(`/meeting?roomID=${roomID}`);
+
+  //   // Now you can send the meeting link to the chat or use it as needed
+  //   // For example, you can add a new message to the chat
+  //   const newMessage: Message = {
+  //     id: Date.now().toString(),
+  //     text: meetingLink,
+  //     userId: user?.email,
+  //     timestamp: serverTimestamp(),
+  //     userPic: user?.photoURL,
+  //     userName: user?.displayName,
+  //   };
+
+  //   // Add the new message to the chat
+
+  // };
+
   const handleStartCall = () => {
     // Generate the roomID and construct the meeting link
     const roomID = randomID(5);
@@ -70,8 +109,8 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       "/meeting?roomID=" +
       roomID;
 
-    // Navigate to the Zoom meeting page
-    navigate(`/meeting?roomID=${roomID}`);
+    // Open the meeting link in a new tab
+    window.open(meetingLink, '_blank');
 
     // Now you can send the meeting link to the chat or use it as needed
     // For example, you can add a new message to the chat
@@ -88,18 +127,28 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
   };
 
+  // Function to modify the URL
+  const getShareableLink = () => {
+    const currentUrl = window.location.href;
+    // Replace /doc/ with /doc/share/ in the URL
+    return isTeams? currentUrl : currentUrl.replace("/doc/", "/doc/share/");
+  };
+
+  // Function to copy the current URL to the clipboard
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(getShareableLink()).then(() => {
+      // You can add a notification or feedback to the user here
+      console.log("Copied to clipboard");
+      onShareModalClose()
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
 
   return (
     <div className="navbar">
-      <IconButton
-        className="menu-icon-button"
-        aria-label="Menu"
-        icon={<HamburgerIcon style={iconStyle} />}
-        onClick={onToggle}
-        colorScheme="purple.100"
-      />
       <div className="nav-items">
-        <button className="nav-item" onClick={() => { navigate(-1) }}>Home</button>
+        <button className="nav-item" onClick={() => { isSharePage? (isTeams? navigate(-1) : navigate('/projects')) : navigate(-1) }}>Home</button>
       </div>
       <div className="title-area">
         <input
@@ -136,10 +185,26 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             className="action-icon share"
             aria-label="share"
             icon={<IoShareOutline />}
-            onClick={onOpen}
+            onClick={onShareModalOpen}
           />
         </Tooltip>
       </div>
+      <Modal isOpen={isShareModalOpen} onClose={onShareModalClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Share this Document</ModalHeader>
+          <ModalBody>
+            <p>Anyone who has the following link will have access to the document.</p>
+            <Input value={getShareableLink()} isReadOnly my={4} />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="purple" mr={3} onClick={copyToClipboard}>
+              Copy Link
+            </Button>
+            <Button variant="ghost" onClick={onShareModalClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

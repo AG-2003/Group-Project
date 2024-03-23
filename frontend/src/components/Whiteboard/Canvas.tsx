@@ -10,7 +10,15 @@ import { debounce } from "../../utils/Time";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 import { SuiteData } from "../../interfaces/SuiteData";
 
-import { doc, setDoc, collection, getDoc, DocumentData, DocumentReference, onSnapshot } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  getDoc,
+  DocumentData,
+  DocumentReference,
+  onSnapshot,
+} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db, app as firebaseApp } from "../../firebase-config";
 
@@ -144,7 +152,11 @@ function isShape(tool: string): tool is Shape {
   return ["rectangle", "circle", "line"].includes(tool);
 }
 
-const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: SuiteProps) => {
+const Canvas: React.FC<SuiteProps> = ({
+  suiteId,
+  suiteTitle,
+  setSuiteTitle,
+}: SuiteProps) => {
   const [tool, setTool] = useState<Tool>("pointer");
   const [penColor, setPenColor] = useState<string>("#000000"); // Default pen color
   const [size, setSize] = useState<number>(5); // Default stroke size
@@ -163,12 +175,10 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
   const [showShapeMenu, setShowShapeMenu] = useState(false);
 
-
-
   //---------------Store the serialized data-----------------
-  const [serializedLinesData, setSerializedLinesData] = useState('')
-  const [serializedTextsData, setSerializedTextsData] = useState('')
-  const [serializedRectanglesData, setSerializedRectanglesData] = useState('')
+  const [serializedLinesData, setSerializedLinesData] = useState("");
+  const [serializedTextsData, setSerializedTextsData] = useState("");
+  const [serializedRectanglesData, setSerializedRectanglesData] = useState("");
 
   /**
    * Collaboration purpose
@@ -301,55 +311,80 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
               setRectangles(JSON.parse(boardContent[2]))
               setSuiteTitle(board.title)
             }
+          } else {
+            if(user?.email){
+              fetchDocumentFromFirestore(user?.email)
+              const userDocRef = doc(db, "users", user?.email);
+              const userDocSnapshot = await getDoc(userDocRef);
+              if(userDocSnapshot.exists()){
+                const boardsArray = userDocSnapshot.data().boards as SuiteData[] || []
+                const boardIndex = boardsArray.findIndex((board: SuiteData) => board.id === suiteId)
+                if(boardIndex!==-1){
+                  const board = boardsArray[boardIndex]
+                  if (board && board.content) {
+                    const boardContent = JSON.parse(board.content)
+                    setLines(JSON.parse(boardContent[0]))
+                    setTexts(JSON.parse(boardContent[1]))
+                    setRectangles(JSON.parse(boardContent[2]))
+                    setSuiteTitle(board.title)
+
+                    saveSharedBoardToFirestore(boardContent)
+                  }
+                }
+
+                boardsArray.splice(boardIndex, 1)
+                await setDoc(userDocRef, {boards: boardsArray}, { merge: true})
+              }
+            }
           }
+
+          setIsLoading(false)
         }
       } catch (error) {
         console.error("Error fetching document:", error);
       }
 
-      setIsLoading(false)
     };
     //____________________________________________________________
 
-
   useEffect(() => {
     /*
-      *lines-> to store what is written by the pen in the toolbar
-      *texts-> text from toolbar
-      *rectangles-> a part of the 'shapes' on the toolbar
-    */
-    if(!isLoading)
-      {
-        setSerializedLinesData(JSON.stringify(lines))
-        setSerializedTextsData(JSON.stringify(texts))
-        setSerializedRectanglesData(JSON.stringify(rectangles))
-      }
-
+     *lines-> to store what is written by the pen in the toolbar
+     *texts-> text from toolbar
+     *rectangles-> a part of the 'shapes' on the toolbar
+     */
+    if (!isLoading) {
+      setSerializedLinesData(JSON.stringify(lines));
+      setSerializedTextsData(JSON.stringify(texts));
+      setSerializedRectanglesData(JSON.stringify(rectangles));
+    }
   }, [lines, texts, rectangles]); // This effect runs whenever user changes the board
   //____________________________________________________________
 
-
-
   //---------------Function to save the document to the database----------------
-  const [user] = useAuthState(auth)
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
-    const username = user?.email
+    const username = user?.email;
     if (username && !isLoading) {
-      const dataArray = [serializedLinesData, serializedTextsData, serializedRectanglesData]
+      const dataArray = [
+        serializedLinesData,
+        serializedTextsData,
+        serializedRectanglesData,
+      ];
 
-      if(!isSharePage) {
-        debouncedSaveBoardToFirestore(
-          username,
-          suiteId,
-          suiteTitle,
-          dataArray
-        )
+      if (!isSharePage) {
+        debouncedSaveBoardToFirestore(username, suiteId, suiteTitle, dataArray);
       } else if (isSharePage) {
         saveSharedBoardToFirestore(dataArray as [string, string, string])
       }
     }
-  }, [serializedLinesData, serializedTextsData, serializedRectanglesData, suiteTitle])
+  }, [
+    serializedLinesData,
+    serializedTextsData,
+    serializedRectanglesData,
+    suiteTitle,
+  ]);
 
   const saveBoardToFirestore = async (
     username: string,
@@ -375,15 +410,13 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         (board: SuiteData) => board.id === boardId
       );
 
-
-
       if (existingBoardIndex !== -1) {
         // Update the existing document's title and content
         boardsArray[existingBoardIndex] = {
           ...boardsArray[existingBoardIndex],
           title: boardTitle,
           lastEdited: now,
-          content: JSON.stringify(data)
+          content: JSON.stringify(data),
         };
       } else {
         // Add a new document with a unique ID
@@ -392,9 +425,9 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
           title: boardTitle,
           lastEdited: now,
           content: JSON.stringify(data),
-          type: 'board',
+          type: "board",
           isTrash: false,
-          isShared: false
+          isShared: false,
         });
       }
 
@@ -408,7 +441,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
       );
     } catch (error) {
       console.error("Error saving document:", error);
-
     }
   };
 
@@ -447,7 +479,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
             type: 'board',
             boardContent: JSON.stringify(data),
             isTrash: false,
-            isShared: isSharePage
+            isShared: isSharePage,
+            owner: user?.email || ""
           };
         }
 
@@ -465,8 +498,6 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     2000 // Delay in milliseconds
   );
   //____________________________________________________________
-
-
 
   const toggleColorPicker = () => {
     const newShowColorPicker = !showColorPicker;
@@ -503,7 +534,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     setSize(newSize);
   };
 
-  const handleMouseDown: StageProps["onMouseDown"] = (e) => {
+  const handleMouseDown: StageProps["onMouseDown"] & StageProps["onTouchStart"] = (e) => {
+    e.evt.preventDefault();
     if (e.target !== e.target.getStage() && tool === "text") {
       return;
     }
@@ -592,7 +624,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     }
   };
 
-  const handleMouseMove: StageProps["onMouseMove"] = (e) => {
+  const handleMouseMove: StageProps["onMouseMove"] & StageProps["onTouchMove"]  = (e) => {
+    e.evt.preventDefault();
     if (!isDrawing.current) {
       return;
     }
@@ -668,7 +701,8 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
     // ...
   };
 
-  const handleMouseUp: StageProps["onMouseUp"] = () => {
+  const handleMouseUp: StageProps["onMouseUp"] & StageProps["onTouchEnd"]  = (e) => {
+    e.evt.preventDefault();
     if (selectedShape === "rectangle" && currentRectangle) {
       if (currentRectangle.width !== 0 && currentRectangle.height !== 0) {
         setRectangles([...rectangles, currentRectangle]);
@@ -779,6 +813,9 @@ const Canvas: React.FC<SuiteProps> = ({ suiteId, suiteTitle, setSuiteTitle }: Su
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
       >
         <Layer>
           {lines && lines.map((line, i) => (

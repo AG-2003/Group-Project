@@ -44,7 +44,7 @@ const SideBar = ({ onNavigate }: Props) => {
       >
         Preference
       </Button>
-      <Button
+      {/* <Button
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<InfoOutlineIcon />}
@@ -52,7 +52,7 @@ const SideBar = ({ onNavigate }: Props) => {
       >
         Policy
       </Button>
-      <Spacer /> {/* This will push your go back button to the bottom */}
+      <Spacer /> */}
       <Button
         variant="ghost"
         justifyContent="flex-start"

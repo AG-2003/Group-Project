@@ -1,0 +1,26 @@
+# TODO: remove the env: CI : False after all the warning are removed for optimized production build. 
+name: Deploy to Firebase Hosting on merge
+'on':
+  push:
+    branches:
+      - main
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build project
+        run: yarn build
+        env:
+          CI: false  
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_F29SO_GROUP_PROJECT_85F3B }}'
+          channelId: live
+          projectId: f29so-group-project-85f3b
