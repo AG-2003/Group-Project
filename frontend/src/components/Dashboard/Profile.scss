@@ -70,7 +70,7 @@
     .profile-header {
       flex-direction: column;
       align-items: center;
-      
+
       .profile-info,
       .profile-stats {
         margin-bottom: 1rem; // Add bottom margin for spacing
@@ -124,4 +124,42 @@
     }
   }
 
+}
+
+// Assuming .fc is the base class for the FullCalendar component
+.fc {
+
+  // Modify header button colors
+  .fc-toolbar-button {
+    background-color: #dcdcf6; // Light purple shade
+    color: white; // Assuming you want white text
+    border: none; // Remove default borders
+
+    &:hover {
+      background-color: darken(#dcdcf6, 10%); // Slightly darker on hover
+    }
+  }
+
+  // Change the header where the day names are mentioned to have a transparent background
+  .fc-col-header-cell {
+    background-color: #dcdcf6; // Make the background transparent
+    color: #333; // Change the text color if needed
+  }
+
+  // Highlight today's date with a darker purple
+  .fc-day-today {
+    background-color: #e5d4f2 !important; // Darker shade of purple
+    color: purple; // White text
+    border: 1px solid darken(#6a0dad, 10%); // Darker border for contrast
+  }
+
+  // Ensure grid lines are visible
+  .fc-daygrid-day {
+    border: 1px solid #ccc; // Change the color to ensure visibility against the new background
+  }
+
+  // Change the background for individual day cells
+  .fc-daygrid-day-frame {
+    background: none; // Light background for the day cells
+  }
 }

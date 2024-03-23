@@ -34,7 +34,7 @@ import CDetails from "./components/communities/CDetails";
 import { reportWebVitals } from "./utils/WebVitals";
 import { useEffect } from "react";
 import { BadgesPage } from "./pages/BadgesPage";
-import Calendar from "./pages/Calendar";
+import { Calendar } from "./pages/Calendar";
 import SavedPosts from "./components/communities/SavedPosts";
 import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
