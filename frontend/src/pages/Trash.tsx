@@ -4,7 +4,10 @@ import {
   Box,
   IconButton,
   Icon,
+  Image,
   Modal,
+  Grid,
+  GridItem,
   ModalOverlay,
   ModalContent,
   ModalHeader,
@@ -14,6 +17,8 @@ import {
   Button,
   Flex,
   useDisclosure,
+  Heading,
+  VStack,
 } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
@@ -22,11 +27,20 @@ import { SuiteData } from "../interfaces/SuiteData";
 import { FaTrash } from "react-icons/fa";
 import { auth, db } from "../firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { DocumentData, DocumentReference, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
+import {
+  DocumentData,
+  DocumentReference,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from "firebase/firestore";
 import { MdRestore } from "react-icons/md";
 import TrashBg from "../assets/TrashBg.png";
 import ArchiveBg from "../assets/Archive.png";
-import ShareDoc from "../assets/sharedoc.png"
+import ShareDoc from "../assets/sharedoc.png";
 import "./Trash.scss";
 
 interface Project {
@@ -58,8 +72,8 @@ const Dashboard: React.FC = () => {
       const userDocRef = doc(db, "users", user.email);
       const userDocSnapshot = await getDoc(userDocRef);
 
-      const sharedDocsRef = collection(db, "sharedDocs")
-      const sharedBoardsRef = collection(db, "sharedBoards")
+      const sharedDocsRef = collection(db, "sharedDocs");
+      const sharedBoardsRef = collection(db, "sharedBoards");
 
       if (userDocSnapshot.exists()) {
         const userData = userDocSnapshot.data();
@@ -82,20 +96,24 @@ const Dashboard: React.FC = () => {
 
         setProjects(combinedProjects);
 
-        if(user?.email){
+        if (user?.email) {
           // Fetch shared documents and shared boards
           const sharedDocsSnapshot = await getDocs(sharedDocsRef);
           const sharedBoardsSnapshot = await getDocs(sharedBoardsRef);
 
           // Filter shared documents and shared boards based on the user's email
-          const filteredSharedDocs = sharedDocsSnapshot.docs.filter(doc => {
-            const docData = doc.data() as SuiteData; // Replace YourDocumentType with the actual type
-            return docData.owner === user.email && docData.isTrash === true;
-          }).map(doc => doc.data() as SuiteData);
-          const filteredSharedBoards = sharedBoardsSnapshot.docs.filter(doc => {
-            const docData = doc.data() as SuiteData; // Replace YourDocumentType with the actual type
-            return docData.owner === user.email && docData.isTrash === true;
-          }).map(doc => doc.data() as SuiteData);
+          const filteredSharedDocs = sharedDocsSnapshot.docs
+            .filter((doc) => {
+              const docData = doc.data() as SuiteData; // Replace YourDocumentType with the actual type
+              return docData.owner === user.email && docData.isTrash === true;
+            })
+            .map((doc) => doc.data() as SuiteData);
+          const filteredSharedBoards = sharedBoardsSnapshot.docs
+            .filter((doc) => {
+              const docData = doc.data() as SuiteData; // Replace YourDocumentType with the actual type
+              return docData.owner === user.email && docData.isTrash === true;
+            })
+            .map((doc) => doc.data() as SuiteData);
 
           setSharedProjects([...filteredSharedDocs, ...filteredSharedBoards]);
         }
@@ -115,9 +133,9 @@ const Dashboard: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    console.log("Unshared Projects:", projects)
-    console.log("Shared Projects:", sharedProjects)
-  }, [sharedProjects, projects])
+    console.log("Unshared Projects:", projects);
+    console.log("Shared Projects:", sharedProjects);
+  }, [sharedProjects, projects]);
 
   useEffect(() => {
     const deleteOldProjects = async () => {
@@ -208,25 +226,22 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleSharedTrashIconClick = async (
-    id: string,
-    type: string
-    ) => {
-      let sharedDocRef: DocumentReference<DocumentData, DocumentData>
-      if(type === 'document') {
-        sharedDocRef = doc(db, "sharedDocs", id)
-      } else {
-        sharedDocRef = doc(db, "sharedBoards", id)
-      }
+  const handleSharedTrashIconClick = async (id: string, type: string) => {
+    let sharedDocRef: DocumentReference<DocumentData, DocumentData>;
+    if (type === "document") {
+      sharedDocRef = doc(db, "sharedDocs", id);
+    } else {
+      sharedDocRef = doc(db, "sharedBoards", id);
+    }
 
-      try {
-        // Delete the document
-        await deleteDoc(sharedDocRef);
-        console.log("Document successfully deleted!");
-     } catch (error) {
-        console.error("Error deleting document: ", error);
-     }
-  }
+    try {
+      // Delete the document
+      await deleteDoc(sharedDocRef);
+      console.log("Document successfully deleted!");
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
 
   const handleRecoveryIconClick = async (
     id: string,
@@ -235,7 +250,7 @@ const Dashboard: React.FC = () => {
   ): Promise<void> => {
     const userEmail = user?.email;
     if (userEmail) {
-      if(!isShared){
+      if (!isShared) {
         try {
           const userDocRef = doc(db, "users", userEmail);
           const docSnapshot = await getDoc(userDocRef);
@@ -264,23 +279,23 @@ const Dashboard: React.FC = () => {
           console.error("Error moving suite to trash:", error);
         }
       } else {
-        try{
-          let sharedDocRef: DocumentReference<DocumentData, DocumentData>
-          if(type === 'document') {
-            sharedDocRef = doc(db, "sharedDocs", id)
+        try {
+          let sharedDocRef: DocumentReference<DocumentData, DocumentData>;
+          if (type === "document") {
+            sharedDocRef = doc(db, "sharedDocs", id);
           } else {
-            sharedDocRef = doc(db, "sharedBoards", id)
+            sharedDocRef = doc(db, "sharedBoards", id);
           }
 
-          if(sharedDocRef) {
-            const docSnapshot = await getDoc(sharedDocRef)
+          if (sharedDocRef) {
+            const docSnapshot = await getDoc(sharedDocRef);
 
-            if(docSnapshot.exists()){
+            if (docSnapshot.exists()) {
               // Fetch the document data
               const docData = docSnapshot.data() as SuiteData;
 
               // Check if the user's email matches the 'owner' property of the document
-              if(docData && docData.owner === user.email) {
+              if (docData && docData.owner === user.email) {
                 // If the condition is met, update the isTrash property to true
                 await setDoc(sharedDocRef, { isTrash: false }, { merge: true });
               } else {
@@ -307,13 +322,17 @@ const Dashboard: React.FC = () => {
     onClose: closeSharedModal,
   } = useDisclosure();
 
-  const setCurrentProjectState = (id: string, type: string, isShared: boolean) => {
+  const setCurrentProjectState = (
+    id: string,
+    type: string,
+    isShared: boolean
+  ) => {
     setCurrentProjectToDelete({ id: id, type: type, isShared: isShared });
   };
 
   const handleConfirmClick = () => {
     // Perform your logic here
-    if(!currentProjectToDelete.isShared){
+    if (!currentProjectToDelete.isShared) {
       handleTrashIconClick(
         currentProjectToDelete["id"],
         currentProjectToDelete["type"]
@@ -330,6 +349,7 @@ const Dashboard: React.FC = () => {
     fetchProjects();
 
     closeSharedModal();
+    closeModal();
   };
 
   useEffect(() => {
@@ -377,196 +397,247 @@ const Dashboard: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
-          <div className="tprojects-container">
-            <h2 className="tprojects-heading">Recently Deleted</h2>
-              {projects.length === 0 && sharedProjects.length===0 ? (
-                <Box textAlign="center" mt="20px">
-                  <img className="Image" src={TrashBg} alt="No Projects" />
-                </Box>
-              ) : (
-                <>
-                  <div className="tprojects-list">
-                    {projects.map((project: SuiteData) => (
+        <Box flexGrow={1} p={{ base: 2, md: 10 }} overflowX="hidden">
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            align="left"
+            justify="left"
+            maxWidth="100vw"
+          >
+            <Heading
+              as="h2"
+              size="lg"
+              mb={4}
+              textAlign={{ base: "left", md: "left" }}
+            >
+              Recently Deleted
+            </Heading>
+            {projects.length === 0 && sharedProjects.length === 0 ? (
+              <Box
+                width={{ base: "80%", sm: "80%", md: "50%" }}
+                minWidth={{ base: "300px", sm: "400px" }}
+                mt={4}
+              >
+                <Image src={TrashBg} alt="No Projects" />
+              </Box>
+            ) : (
+              <>
+                <Grid
+                  templateColumns={{
+                    base: "repeat(1, 1fr)", // all screens
+                    sm: "repeat(2, 1fr)", // small screens and up
+                    md: "repeat(3, 1fr)", // medium screens and up
+                    lg: "repeat(4, 1fr)", // large screens and up
+                    xl: "repeat(5, 1fr)", // extra large screens and up
+                    "2xl": "repeat(6, 1fr)", // 2xl screens and up
+                  }}
+                  gap={6}
+                >
+                  {projects.map((project: SuiteData) => (
+                    <div
+                      key={project.id}
+                      className="tproject-card"
+                      style={{ position: "relative", marginBottom: "20px" }}
+                    >
                       <div
-                        key={project.id}
-                        className="tproject-card"
-                        style={{ position: "relative", marginBottom: "20px" }}
+                        className="tcard-top"
+                        style={{ backgroundImage: `url(${ArchiveBg})` }}
                       >
+                        <h3 className="tproject-title">{project.title}</h3>
+                      </div>
+                      <div className="tcard-bottom">
                         <div
-                          className="tcard-top"
-                          style={{ backgroundImage: `url(${ArchiveBg})` }}
+                          className="icon-container"
+                          style={{
+                            position: "absolute",
+                            right: "2px",
+                          }}
                         >
-                          <h3 className="tproject-title">{project.title}</h3>
-                        </div>
-                        <div className="tcard-bottom">
-                          <div
-                            className="icon-container"
+                          <IconButton
+                            icon={<Icon as={MdRestore} color="#484c6c" />}
+                            size="sm"
                             style={{
-                              position: "absolute",
-                              right: "2px",
+                              backgroundColor: "transparent",
                             }}
-                          >
-                            <IconButton
-                              icon={<Icon as={MdRestore} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Restore Project"
-                              onClick={() => {
-                                handleRecoveryIconClick(project.id, project.type, project.isShared);
-                              } } />
-                            <IconButton
-                              icon={<Icon as={FaTrash} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                                marginRight: "8px", // Add margin to separate icons
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Delete Project"
-                              onClick={() => {
-                                openModal();
-                                setCurrentProjectState(project.id, project.type, project.isShared);
-                              }}
-                              />
-                          </div>
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Restore Project"
+                            onClick={() => {
+                              handleRecoveryIconClick(
+                                project.id,
+                                project.type,
+                                project.isShared
+                              );
+                            }}
+                          />
+                          <IconButton
+                            icon={<Icon as={FaTrash} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                              marginRight: "8px", // Add margin to separate icons
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Delete Project"
+                            onClick={() => {
+                              openModal();
+                              setCurrentProjectState(
+                                project.id,
+                                project.type,
+                                project.isShared
+                              );
+                            }}
+                          />
                         </div>
                       </div>
-
-                    ))}
-                    <Modal
-                      isOpen={isModalOpen}
-                      onClose={closeModal}
-                      blockScrollOnMount={false}
-                      motionPreset="none"
-                      isCentered
-                    >
-                      <ModalOverlay />
-                      <ModalContent>
-                        <ModalHeader>
-                          <ModalCloseButton onClick={closeModal} />
-                        </ModalHeader>
-                        <ModalBody>
-                          <p className="popup-text">
-                            Are you sure you would like to delete the project? This
-                            action cannot be undone.
-                          </p>
-                        </ModalBody>
-                        <ModalFooter>
-                          <Flex justifyContent="space-between">
-                            <Button
-                              colorScheme="red"
-                              flex="1"
-                              mr={2}
-                              onClick={handleConfirmClick}
-                            >
-                              Confirm
-                            </Button>
-                            <Button flex="1" variant="outline" onClick={closeModal}>
-                              Deny
-                            </Button>
-                          </Flex>
-                        </ModalFooter>
-                      </ModalContent>
-                    </Modal>
-                  </div>
-                  {/* // For shared Projects */}
-                  <div className="tprojects-list">
-                    {sharedProjects.map((project: SuiteData) => (
-                      <div
-                        key={project.id}
-                        className="tproject-card"
-                        style={{ position: "relative", marginBottom: "20px" }}
-                      >
-                        <div
-                          className="tcard-top"
-                          style={{ backgroundImage: `url(${ShareDoc})` }}
-                        >
-                          <h3 className="tproject-title">{project.title}</h3>
-                        </div>
-                        <div className="tcard-bottom">
-                          <div
-                            className="icon-container"
-                            style={{
-                              position: "absolute",
-                              right: "2px",
-                            }}
+                    </div>
+                  ))}
+                  <Modal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    blockScrollOnMount={false}
+                    motionPreset="none"
+                    isCentered
+                  >
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader>
+                        <ModalCloseButton onClick={closeModal} />
+                      </ModalHeader>
+                      <ModalBody>
+                        <p className="popup-text">
+                          Are you sure you would like to delete the project?
+                          This action cannot be undone.
+                        </p>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Flex justifyContent="space-between">
+                          <Button
+                            colorScheme="red"
+                            flex="1"
+                            mr={2}
+                            onClick={handleConfirmClick}
                           >
-                            <IconButton
-                              icon={<Icon as={MdRestore} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Restore Project"
-                              onClick={() => {
-                                handleRecoveryIconClick(project.id, project.type, project.isShared);
-                              } } />
-                            <IconButton
-                              icon={<Icon as={FaTrash} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                                marginRight: "8px", // Add margin to separate icons
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Delete Project"
-                              onClick={() => {
-                                openSharedModal();
-                                setCurrentProjectState(project.id, project.type, project.isShared);
-                              }}
-                              />
-                          </div>
+                            Confirm
+                          </Button>
+                          <Button
+                            flex="1"
+                            variant="outline"
+                            onClick={closeModal}
+                          >
+                            Deny
+                          </Button>
+                        </Flex>
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
+                </Grid>
+                {/* // For shared Projects */}
+                <div className="tprojects-list">
+                  {sharedProjects.map((project: SuiteData) => (
+                    <div
+                      key={project.id}
+                      className="tproject-card"
+                      style={{ position: "relative", marginBottom: "20px" }}
+                    >
+                      <div
+                        className="tcard-top"
+                        style={{ backgroundImage: `url(${ShareDoc})` }}
+                      >
+                        <h3 className="tproject-title">{project.title}</h3>
+                      </div>
+                      <div className="tcard-bottom">
+                        <div
+                          className="icon-container"
+                          style={{
+                            position: "absolute",
+                            right: "2px",
+                          }}
+                        >
+                          <IconButton
+                            icon={<Icon as={MdRestore} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Restore Project"
+                            onClick={() => {
+                              handleRecoveryIconClick(
+                                project.id,
+                                project.type,
+                                project.isShared
+                              );
+                            }}
+                          />
+                          <IconButton
+                            icon={<Icon as={FaTrash} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                              marginRight: "8px", // Add margin to separate icons
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Delete Project"
+                            onClick={() => {
+                              openSharedModal();
+                              setCurrentProjectState(
+                                project.id,
+                                project.type,
+                                project.isShared
+                              );
+                            }}
+                          />
                         </div>
                       </div>
-                    ))}
-                    <Modal
-                      isOpen={isShareModalOpen}
-                      onClose={closeSharedModal}
-                      blockScrollOnMount={false}
-                      motionPreset="none"
-                      isCentered
-                    >
-                      <ModalOverlay />
-                      <ModalContent>
-                        <ModalHeader>
-                          <ModalCloseButton onClick={closeSharedModal} />
-                        </ModalHeader>
-                        <ModalBody>
-                          <p className="popup-text">
-                            Are you sure you would like to delete the project? This
-                            action cannot be undone.
-                          </p>
-                        </ModalBody>
-                        <ModalFooter>
-                          <Flex justifyContent="space-between">
-                            <Button
-                              colorScheme="red"
-                              flex="1"
-                              mr={2}
-                              onClick={handleConfirmClick}
-                            >
-                              Confirm
-                            </Button>
-                            <Button flex="1" variant="outline" onClick={closeSharedModal}>
-                              Deny
-                            </Button>
-                          </Flex>
-                        </ModalFooter>
-                      </ModalContent>
-                    </Modal>
-                  </div>
-                </>
-              )}
-          </div>
+                    </div>
+                  ))}
+                  <Modal
+                    isOpen={isShareModalOpen}
+                    onClose={closeSharedModal}
+                    blockScrollOnMount={false}
+                    motionPreset="none"
+                    isCentered
+                  >
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader>
+                        <ModalCloseButton onClick={closeSharedModal} />
+                      </ModalHeader>
+                      <ModalBody>
+                        <p className="popup-text">
+                          Are you sure you would like to delete the project?
+                          This action cannot be undone.
+                        </p>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Flex justifyContent="space-between">
+                          <Button
+                            colorScheme="red"
+                            flex="1"
+                            mr={2}
+                            onClick={handleConfirmClick}
+                          >
+                            Confirm
+                          </Button>
+                          <Button
+                            flex="1"
+                            variant="outline"
+                            onClick={closeSharedModal}
+                          >
+                            Deny
+                          </Button>
+                        </Flex>
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
+                </div>
+              </>
+            )}
+          </Flex>
         </Box>
       </Box>
     </>

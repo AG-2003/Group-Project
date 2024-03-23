@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, getDoc, setDoc, collection, getDocs, DocumentReference, DocumentData } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  getDocs,
+  DocumentReference,
+  DocumentData,
+} from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "./Projects.scss";
 import Navbar from "./Navbar";
@@ -114,12 +122,20 @@ const Projects: React.FC = () => {
         const sharedBoardsSnapshot = await getDocs(sharedBoardsRef);
 
         // Filter shared documents and shared boards based on the user's email
-        const filteredSharedDocs = sharedDocsSnapshot.docs.filter(doc =>
-          doc.data().user?.includes(user.email) && doc.data().isTrash === false
-        ).map(doc => doc.data() as SuiteData);
-        const filteredSharedBoards = sharedBoardsSnapshot.docs.filter(doc =>
-          doc.data().user?.includes(user.email) && doc.data().isTrash === false
-        ).map(doc => doc.data() as SuiteData);
+        const filteredSharedDocs = sharedDocsSnapshot.docs
+          .filter(
+            (doc) =>
+              doc.data().user?.includes(user.email) &&
+              doc.data().isTrash === false
+          )
+          .map((doc) => doc.data() as SuiteData);
+        const filteredSharedBoards = sharedBoardsSnapshot.docs
+          .filter(
+            (doc) =>
+              doc.data().user?.includes(user.email) &&
+              doc.data().isTrash === false
+          )
+          .map((doc) => doc.data() as SuiteData);
 
         // Use the existing lastEdited field from Firestore data, don't generate a new one
         let combinedProjects: SuiteData[] = [
@@ -256,15 +272,15 @@ const Projects: React.FC = () => {
   const handleSharedTrashIconClick = async (id: string, type: string) => {
     if (user?.email) {
       try {
-        let sharedDocRef: DocumentReference<DocumentData, DocumentData>
-        if (type === 'document') {
-          sharedDocRef = doc(db, "sharedDocs", id)
+        let sharedDocRef: DocumentReference<DocumentData, DocumentData>;
+        if (type === "document") {
+          sharedDocRef = doc(db, "sharedDocs", id);
         } else {
-          sharedDocRef = doc(db, "sharedBoards", id)
+          sharedDocRef = doc(db, "sharedBoards", id);
         }
 
         if (sharedDocRef) {
-          const docSnapshot = await getDoc(sharedDocRef)
+          const docSnapshot = await getDoc(sharedDocRef);
 
           if (docSnapshot.exists()) {
             // Fetch the document data
@@ -285,7 +301,7 @@ const Projects: React.FC = () => {
     }
 
     fetchProjects();
-  }
+  };
 
   return (
     <>
@@ -348,7 +364,7 @@ const Projects: React.FC = () => {
           ) : (
             <>
               <div className="projects-container">
-                {sharedProjects.length !== 0 && projects.length !== 0 && (
+                {projects.length !== 0 && (
                   <h2 className="projects-heading">Recent Designs</h2>
                 )}
                 <div className="projects-list">
@@ -449,7 +465,7 @@ const Projects: React.FC = () => {
                 </div>
               </div>
 
-              {sharedProjects.length !== 0 &&
+              {sharedProjects.length !== 0 && (
                 <div className="projects-container">
                   <h2 className="projects-heading">Shared</h2>
                   <div className="projects-list">
@@ -458,13 +474,19 @@ const Projects: React.FC = () => {
                         key={project.id}
                         className="project-card"
                         onClick={() =>
-                          handleSharedCardClick(project.id, project.title, project.type)
+                          handleSharedCardClick(
+                            project.id,
+                            project.title,
+                            project.type
+                          )
                         }
                       >
                         <div
                           className="card-top"
                           style={{
-                            backgroundImage: `url(${getImageForType(project.type)})`,
+                            backgroundImage: `url(${getImageForType(
+                              project.type
+                            )})`,
                           }}
                         >
                           <h3 className="project-title">{project.title}</h3>
@@ -480,17 +502,20 @@ const Projects: React.FC = () => {
                             className="delete-icon"
                             onClick={(event) => {
                               event.stopPropagation();
-                              handleSharedTrashIconClick(project.id, project.type);
+                              handleSharedTrashIconClick(
+                                project.id,
+                                project.type
+                              );
                             }}
                           />
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>}
+                </div>
+              )}
             </>
           )}
-
         </Box>
       </Box>
     </>
