@@ -38,6 +38,18 @@ interface Post {
 const YourPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [yourPosts, setYourPosts] = useState<Post[]>([]);
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const user = await auth.currentUser;
+      if (user) {
+        setUserId(user?.email || "");
+      }
+    };
+
+    fetchUserId();
+  }, []);
 
   // Function to fetch user's posts
   const fetchUserPosts = async () => {
@@ -339,7 +351,7 @@ const YourPosts = () => {
                   <Posts
                     key={index}
                     post={post}
-                    userId={post.Uid}
+                    userId={userId}
                     onLike={handleLike}
                     onDislike={handleDislike}
                     deletePost={handleDeletePost}
