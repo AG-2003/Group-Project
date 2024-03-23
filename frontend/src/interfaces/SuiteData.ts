@@ -12,4 +12,5 @@ export interface SuiteData {
     comments?: CommentType[],
     user?: string[]
     owner?: string
+    team_id?: string
 }
