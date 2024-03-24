@@ -10,8 +10,13 @@ import {
   IconButton,
   useDisclosure,
   Tooltip,
+  UnorderedList,
+  ListItem,
+  InputGroup,
+  InputRightElement,
+  Text
 } from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { CloseIcon, CopyIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
   IoVideocamOutline,
   IoBarChartOutline,
@@ -202,17 +207,47 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       <Modal isOpen={isShareModalOpen} onClose={onShareModalClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Share this WhiteBoard</ModalHeader>
-          <ModalBody>
-            <p>Anyone who has the following link will have access to the board.</p>
-            <Input value={getShareableLink()} isReadOnly my={4} />
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="purple" mr={3} onClick={copyToClipboard}>
-              Copy Link
-            </Button>
-            <Button variant="ghost" onClick={onShareModalClose}>Cancel</Button>
-          </ModalFooter>
+            <ModalHeader display="flex" justifyContent="space-between" alignItems="center">
+              <Text fontSize="xl" fontWeight="bold">Share this Document</Text>
+              <IconButton
+                aria-label="Close modal"
+                icon={<CloseIcon />}
+                onClick={onShareModalClose}
+                variant="ghost"
+              />
+            </ModalHeader>
+            <ModalBody p={6}>
+              <Text mb={4}>Please note:</Text>
+              <UnorderedList spacing={2}>
+                <ListItem>This document's shareable link grants access to anyone in possession of it. Handle with care.</ListItem>
+                <ListItem>To ensure no loss of content, the document's owner MUST manually paste this link before the document's shareable link is distributed.</ListItem>
+              </UnorderedList>
+              <InputGroup size="md" mt={4} >
+                <Input
+                    pr="4.5rem"
+                    value={getShareableLink()}
+                    _hover={{cursor: 'pointer' }}
+                    fontFamily="mono"
+                    bgColor={"#f0f4f4"}
+                    onClick={copyToClipboard}
+                    isReadOnly
+                  />
+                <InputRightElement width="4.5rem">
+                  <IconButton
+                      aria-label="Copy link"
+                      icon={<CopyIcon />}
+                      variant="ghost"
+                      onClick={copyToClipboard}
+                    />
+                </InputRightElement>
+              </InputGroup>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="purple" mr={3} onClick={copyToClipboard} _hover={{ bgColor: "purple.600" }}>
+                Copy Link
+              </Button>
+              <Button variant="outline" onClick={onShareModalClose} _hover={{ bgColor: "gray.200" }}>Cancel</Button>
+            </ModalFooter>
         </ModalContent>
       </Modal>
     </div>

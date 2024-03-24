@@ -13,7 +13,9 @@ import {
   Button,
   MenuList,
   Icon,
-  IconButton
+  IconButton,
+  Grid,
+  GridItem
 } from "@chakra-ui/react";
 import { auth, db } from "../../firebase-config";
 import {
@@ -305,44 +307,52 @@ const TeamDetails: React.FC = () => {
                   {isLoadingProjects || sharedProjects.length===0 ? (<p className="no-documents-message">
                     There are no documents yet.
                   </p>) : (
-                    sharedProjects.length !== 0 &&
-                      <div className="projects-container">
-                        <div className="projects-list">
-                          {sharedProjects.map((project: SuiteData) => (
-                            <div
-                              key={project.id}
-                              className="project-card"
-                              onClick={() =>
-                                handleSharedCardClick(project.id, project.title, project.type)
-                              }
-                            >
-                              <div
-                                className="card-top"
-                                style={{
-                                  backgroundImage: `url(${getImageForType(project.type)})`,
-                                }}
-                              >
-                                <h3 className="project-title">{project.title}</h3>
-                              </div>
-                              <div className="card-bottom">
-                                <p className="last-edited">
-                                  Last edited: {formatDate(project.lastEdited)}
-                                </p>
-                                <IconButton
-                                  icon={<Icon as={FaTrash} color="#484c6c" />}
-                                  size="sm"
-                                  aria-label="Delete Project"
-                                  className="delete-icon"
-                                  onClick={(event: { stopPropagation: () => void; }) => {
-                                    event.stopPropagation();
-                                    // handleSharedTrashIconClick(project.id, project.type);
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                    <Grid templateColumns="repeat(auto-fit, minmax(240px, 1fr))" gap={6} w="100%">
+                    {sharedProjects.map((project) => (
+                      <GridItem key={project.id} w="100%" >
+                        <Box
+                          h="140px"
+                          bgImage={`url(${getImageForType(project.type)})`}
+                          bgPosition="center"
+                          bgRepeat="no-repeat"
+                          bgSize="cover"
+                          p={3}
+                          borderRadius="lg"
+                          borderWidth="1px"
+                          borderColor="gray.200"
+                          position="relative"
+                          overflow="hidden"
+                          _hover={{
+                            transform: "translateY(-5px)",
+                            shadow: "lg",
+                          }}
+                          onClick={() =>
+                            handleSharedCardClick(project.id, project.title, project.type)
+                          }
+                        >
+                          <Box
+                            bg="rgba(0, 0, 0, 0.6)"
+                            position="absolute"
+                            top="0"
+                            right="0"
+                            bottom="0"
+                            left="0"
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="end"
+                            p={3}
+                          >
+                            <Text fontWeight="bold" fontSize="lg" color="white" noOfLines={1}>
+                              {project.title}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                            </Text>
+                          </Box>
+                        </Box>
+                      </GridItem>
+                    ))}
+                    </Grid>
                   )}
                 </Flex>
                 {/* chat onclick goes here */}
