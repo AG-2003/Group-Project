@@ -18,6 +18,10 @@ import {
   Spinner,
   HStack,
   Spacer,
+  Menu,
+  MenuList,
+  MenuItem,
+  MenuButton,
 } from "@chakra-ui/react";
 import { auth, db } from "../../firebase-config";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
@@ -30,7 +34,7 @@ import { Link as ReactRouterLink } from "react-router-dom";
 import { Link as ChakraLink, LinkProps } from "@chakra-ui/react";
 import { SuiteData } from "../../interfaces/SuiteData";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { FiAward } from "react-icons/fi";
+import { FiAward, FiClipboard, FiFileText, FiGrid } from "react-icons/fi";
 import { BadgesType } from "../../interfaces/BadgesType";
 import DocBg from "../../assets/DocBg.png";
 import BoardBg from "../../assets/BoardBg.png";
@@ -43,6 +47,8 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { CalendarComponent } from "../Calendar/CalendarComponent";
 import { fetchTodaysEvents } from "../../utils/TodaysEvents";
+
+import Modal from "./sub-components/Modal";
 
 // Define an interface for the props if you're using TypeScript
 interface StatCardProps {
@@ -296,7 +302,7 @@ const Profile: React.FC = () => {
 
             const todaysEvents = allEvents.filter(event => {
               const eventStartDate = new Date(event.start);
-              eventStartDate.setHours(0, 0, 0, 0); // Set to start of event start date              
+              eventStartDate.setHours(0, 0, 0, 0); // Set to start of event start date
               const eventEndDate = event.end ? new Date(event.end) : new Date(event.start);
               eventEndDate.setHours(23, 59, 59, 999); // Set to end of event end date
 
@@ -545,14 +551,42 @@ const Profile: React.FC = () => {
                   <Text fontSize="lg" color="gray.600">
                     You have no projects yet.
                   </Text>
-                  <Button
-                    mt={3}
-                    bgColor='purple.100'
-                    _hover={{ backgroundColor: '#dcdcf6' }}
-                    onClick={() => {/* @daawar TODO: proper project creation steps.*/ }}
-                  >
-                    Create a Project
-                  </Button>
+                  <Modal
+                      isOpen={modalType !== ""}
+                      onClose={closeModal}
+                      // onConfirm={handleConfirm}
+                      modalType={modalType}
+                    />
+                  <Menu>
+                      <MenuButton
+                          as={Button}
+                          mt={3}
+                          bgColor='purple.100'
+                          _hover={{ backgroundColor: '#dcdcf6' }}
+                      >
+                          Create a Project
+                      </MenuButton>
+                      <MenuList>
+                          <MenuItem
+                              icon={<FiFileText />}
+                              onClick={() => openModal("Doc")}
+                            >
+                              Doc
+                            </MenuItem>
+                            <MenuItem
+                              icon={<FiGrid />}
+                              onClick={() => openModal("Spreadsheet")}
+                            >
+                              Spreadsheet
+                            </MenuItem>
+                            <MenuItem
+                              icon={<FiClipboard />}
+                              onClick={() => openModal("Whiteboard")}
+                            >
+                              Whiteboard
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
                 </Box>
               )}
 
