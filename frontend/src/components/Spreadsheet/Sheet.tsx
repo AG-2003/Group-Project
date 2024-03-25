@@ -10,19 +10,12 @@ import { SuiteProps } from "../../interfaces/SuiteProps";
 import { debounce } from "../../utils/Time";
 import { useInterval } from "@chakra-ui/react";
 import { SuiteData } from "../../interfaces/SuiteData";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
-
-
-
-
-
-// interface Sheet {
-//   id: string;
-//   title: string;
-//   content: string
-//   type: string;
-//   lastEdited: string;
-// }
+interface UserDocData {
+  sheets: SuiteData[];
+  hasCreatedSheet?: boolean; // The '?' makes this property optional
+}
 
 
 const TOOLBAR_ITEMS = [
@@ -62,7 +55,7 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     id: '',
     status: 0,
   }]);
-
+  const showToast = UseToastNotification();
   const [loading, setLoading] = useState(true);
 
   // // console.log('this is the initial data \n')
@@ -87,35 +80,27 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
     suiteTitle: string,
     data: string
   ) => {
-    console.log('SAVING')
     try {
       const userDocRef = doc(collection(db, "users"), userEmail);
-      // Get the current sheet to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
       let sheetsArray: SuiteData[] = [];
+      let userDocData: UserDocData = { sheets: [] }; // Default structure with required properties
 
       if (docSnapshot.exists()) {
-        // Get the existing sheets array or initialize it if it doesn't exist
-        sheetsArray = docSnapshot.data().sheets || [];
+        userDocData = docSnapshot.data() as UserDocData; // Cast the data to UserDocData type
+        sheetsArray = userDocData.sheets || [];
       }
+
+      const now = new Date().toISOString();
 
       // Check if the sheet with the given ID already exists
       const existingSheetIndex = sheetsArray.findIndex(
         (sheet: SuiteData) => sheet.id === suiteId
       );
 
-      const now = new Date().toISOString();
+      const isNewSheet = existingSheetIndex === -1;
 
-      if (existingSheetIndex !== -1) {
-        // Update the existing sheet's title and content
-        sheetsArray[existingSheetIndex] = {
-          ...sheetsArray[existingSheetIndex],
-          id: suiteId,
-          title: suiteTitle,
-          content: data,
-          lastEdited: now
-        };
-      } else {
+      if (isNewSheet) {
         // Add a new sheet with a unique ID
         sheetsArray.push({
           id: suiteId,
@@ -126,23 +111,40 @@ const Sheet: React.FC<SuiteProps> = ({ suiteTitle, suiteId, setSuiteTitle }: Sui
           isTrash: false,
           isShared: false
         });
+      } else {
+        // Update the existing sheet's title and content
+        sheetsArray[existingSheetIndex] = {
+          ...sheetsArray[existingSheetIndex],
+          id: suiteId,
+          title: suiteTitle,
+          content: data,
+          lastEdited: now
+        };
       }
 
       // Update the user's sheet with the new or updated sheets array
+      // And potentially update hasCreatedSheet flag
       await setDoc(
         userDocRef,
-        {
+        isNewSheet ? {
+          sheets: sheetsArray,
+          hasCreatedSheet: true,
+        } : {
           sheets: sheetsArray,
         },
         { merge: true }
       );
 
+      // If it's a new sheet and the user has never created a sheet before, show the toast
+      if (isNewSheet && !userDocData.hasCreatedSheet) {
+        showToast('success', 'You have successfully earned a badge for creating your first spreadsheet.');
+      }
     } catch (error) {
-      console.error("Error saving document:", error);
+      console.error("Error saving sheet:", error);
     }
-    console.log('SAVED');
+  }, [showToast]);
 
-  }, []);
+
 
   const debouncedSaveSheetToFirestore = useMemo(() => debounce(
     saveSheetToFirestore,

@@ -159,6 +159,7 @@ const Security = () => {
             await updateDoc(userRef, {
               Badges: badges
             })
+            showToast('success', 'you have successfully earnt a badge for verifying your email.');
           }
 
         }

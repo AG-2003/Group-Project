@@ -17,6 +17,7 @@ import { QuillBinding } from "y-quill";
 import QuillCursors from "quill-cursors";
 import * as Y from "yjs";
 import { FireProvider } from "y-fire";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
 ReactQuill.Quill.register("modules/cursors", QuillCursors);
 
@@ -47,11 +48,11 @@ const Document: React.FC<SuiteProps> = ({
 
   const [isLoading, setIsLoading] = useState(true);
   const [latestLastEdited, setLatestLastEdited] = useState<string | null>(null);
-
+  const showToast = UseToastNotification();
   const [user] = useAuthState(auth);
 
   const documentPath = `/sharedDocs/${suiteId}`;
-  const [yDoc, setYDoc]  = useState<Y.Doc | null>(null)
+  const [yDoc, setYDoc] = useState<Y.Doc | null>(null)
 
   useEffect(() => {
     if (isSharePage && !isLoading) {
@@ -173,7 +174,7 @@ const Document: React.FC<SuiteProps> = ({
           setComments(comments || []);
         }
       } else {
-        if(user?.email){
+        if (user?.email) {
           const userDocRef = doc(db, "users", user?.email);
           const userDocSnapshot = await getDoc(userDocRef);
           if (userDocSnapshot.exists()) {
@@ -183,7 +184,7 @@ const Document: React.FC<SuiteProps> = ({
             if (documentIndex !== -1) {
               // Display the shared content
               const document = documentsArray[documentIndex];
-              if(document as SuiteData){
+              if (document as SuiteData) {
                 setTimeout(() => {
                   setValue(document.content)
                   setSuiteTitle(document.title || "Untitled")
@@ -240,9 +241,13 @@ const Document: React.FC<SuiteProps> = ({
       const userDocRef = doc(db, "users", userEmail);
       const docSnapshot = await getDoc(userDocRef);
       let documentsArray: SuiteData[] = [];
+      let hasCreatedDocument = false; // Initialize to false
 
       if (docSnapshot.exists()) {
-        documentsArray = docSnapshot.data().documents || [];
+        const userData = docSnapshot.data();
+        documentsArray = userData.documents || [];
+        // If the flag is not set, it will remain false
+        hasCreatedDocument = userData.hasCreatedDocument || false;
       }
 
       const now = new Date().toISOString(); // Get current time as ISO string
@@ -252,36 +257,49 @@ const Document: React.FC<SuiteProps> = ({
         (doc) => doc.id === suiteId
       );
 
-      if (existingDocIndex !== -1) {
-        // Update the existing document's title, content, and last edited time
-        documentsArray[existingDocIndex] = {
-          ...documentsArray[existingDocIndex], // Spread existing properties
-          title: suiteTitle,
-          content: text,
-          lastEdited: now, // Update last edited time
-          comments,
-        };
-      } else {
+      const isNewDocument = existingDocIndex === -1;
+
+      if (isNewDocument) {
         // Add a new document with a unique ID and current last edited time
         documentsArray.push({
           id: suiteId,
           title: suiteTitle,
           content: text,
-          lastEdited: now, // Set last edited time for new document
+          lastEdited: now,
           type: "document",
           isTrash: false,
           isShared: false,
           comments,
         });
+      } else {
+        // Update the existing document's title, content, and last edited time
+        documentsArray[existingDocIndex] = {
+          ...documentsArray[existingDocIndex],
+          title: suiteTitle,
+          content: text,
+          lastEdited: now,
+          comments,
+        };
       }
 
       // Update the user's document with the new or updated documents array
-      await setDoc(userDocRef, { documents: documentsArray }, { merge: true });
+      // And set hasCreatedDocument to true if this is their first document
+      await setDoc(userDocRef, {
+        documents: documentsArray,
+        hasCreatedDocument: isNewDocument ? true : hasCreatedDocument // Only update the flag if the document is new
+      }, { merge: true });
+
+      // If the user has never created a document before and the document is new, show the toast
+      if (!hasCreatedDocument && isNewDocument) {
+        showToast('success', 'You have successfully earned a badge for creating a new document.');
+      }
+
       console.log("Document saved successfully");
     } catch (error) {
       console.error("Error saving document:", error);
     }
   };
+
 
   //Save a shared document to firestore
   const saveSharedDocumentToFirestore = async (
@@ -325,7 +343,7 @@ const Document: React.FC<SuiteProps> = ({
             owner: user?.email || ""
           };
 
-          if(isTeams){
+          if (isTeams) {
             sharedDocument.team_id = team_id
           }
         }
@@ -484,7 +502,7 @@ const Document: React.FC<SuiteProps> = ({
           };
           setComments((prevComments) => [...prevComments, comment]);
 
-          if(yDoc && isSharePage){
+          if (yDoc && isSharePage) {
             const yComments = yDoc.getArray<CommentType>('comments')
             yComments.push([comment])
           }
