@@ -17,21 +17,31 @@ import {
   MenuItem,
   MenuList,
   Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
 } from "@chakra-ui/react";
 import { FaTrash } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 import SideBar from "./sidebar";
 import { SuiteData } from "../../interfaces/SuiteData";
 import { FiClipboard, FiFileText, FiGrid } from "react-icons/fi";
-import Modal from "./sub-components/Modal";
+import ProjectModal from "./sub-components/Modal";
 import DocBg from "../../assets/DocBg.png";
 import BoardBg from "../../assets/BoardBg.png";
 import SheetBg from "../../assets/SheetBg.png";
 import NoProj from "../../assets/ProjectsEmpty.png";
+
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<SuiteData[]>([]);
   const [sharedProjects, setSharedProjects] = useState<SuiteData[]>([]);
   const [user] = useAuthState(auth);
+  const showToast = UseToastNotification();
   const navigate = useNavigate();
 
   const [isLoadingProjects, setIsLoadingProjects] = useState<boolean>(true);
@@ -49,6 +59,11 @@ const Projects: React.FC = () => {
 
   // Function to close the modal
   const closeModal = () => setModalType("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<{ id: string; type: string; event: React.MouseEvent } | null>(null);
+  const [isSharedModalOpen, setIsSharedModalOpen] = useState(false);
+  const [sharedProjectToDelete, setSharedProjectToDelete] = useState<{ id: string; type: string} | null>(null);
 
   // Function to handle the confirmation (submit) of the modal
   const handleConfirm = () => closeModal(); // Close the modal after submission
@@ -275,7 +290,7 @@ const Projects: React.FC = () => {
               // If the condition is met, update the isTrash property to true
               await setDoc(sharedDocRef, { isTrash: true }, { merge: true });
             } else {
-              console.log("User is not the owner of this document.");
+              showToast("error", "You are NOT the owner of this project");
             }
           }
         }
@@ -380,14 +395,34 @@ const Projects: React.FC = () => {
                           aria-label="Delete Project"
                           className="delete-icon"
                           onClick={(event) => {
-                            event.stopPropagation();
-                            handleTrashIconClick(
-                              project.id,
-                              project.type,
-                              event
-                            );
+                              event.stopPropagation();
+                              setProjectToDelete({ id: project.id, type: project.type, event });
+                              setIsModalOpen(true);
                           }}
-                        />
+                          />
+                          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                            <ModalOverlay />
+                            <ModalContent>
+                                <ModalHeader>Confirm Deletion</ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody>
+                                  Are you sure you want to delete this project? This action cannot be undone.
+                                </ModalBody>
+                                <ModalFooter>
+                                  <Button colorScheme="red" mr={3} onClick={() => {
+                                    if (projectToDelete) {
+                                      handleTrashIconClick(projectToDelete.id, projectToDelete.type, projectToDelete.event);
+                                    }
+                                    setIsModalOpen(false);
+                                  }}>
+                                    Confirm
+                                  </Button>
+                                  <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
+                                    Cancel
+                                  </Button>
+                                </ModalFooter>
+                            </ModalContent>
+                          </Modal>
                       </div>
                     </div>
                   ))}
@@ -400,7 +435,7 @@ const Projects: React.FC = () => {
                         <p className="no-projects-text">
                           Create your first design now!
                         </p>
-                        <Modal
+                        <ProjectModal
                           isOpen={modalType !== ""}
                           onClose={closeModal}
                           // onConfirm={handleConfirm}
@@ -479,10 +514,34 @@ const Projects: React.FC = () => {
                             aria-label="Delete Project"
                             className="delete-icon"
                             onClick={(event) => {
-                              event.stopPropagation();
-                              handleSharedTrashIconClick(project.id, project.type);
+                                event.stopPropagation();
+                                setSharedProjectToDelete({ id: project.id, type: project.type });
+                                setIsSharedModalOpen(true);
                             }}
-                          />
+                            />
+                            <Modal isOpen={isSharedModalOpen} onClose={() => setIsSharedModalOpen(false)}>
+                            <ModalOverlay />
+                            <ModalContent>
+                                <ModalHeader>Confirm Deletion</ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody>
+                                  Are you sure you want to delete this project? This action cannot be undone.
+                                </ModalBody>
+                                <ModalFooter>
+                                  <Button colorScheme="red" mr={3} onClick={() => {
+                                    if (sharedProjectToDelete) {
+                                      handleSharedTrashIconClick(sharedProjectToDelete.id, sharedProjectToDelete.type,);
+                                    }
+                                    setIsSharedModalOpen(false);
+                                  }}>
+                                    Confirm
+                                  </Button>
+                                  <Button variant="ghost" onClick={() => setIsSharedModalOpen(false)}>
+                                    Cancel
+                                  </Button>
+                                </ModalFooter>
+                            </ModalContent>
+                          </Modal>
                         </div>
                       </div>
                     ))}
