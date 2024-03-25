@@ -14,6 +14,9 @@ import {
   Button,
   Flex,
   useDisclosure,
+  Grid,
+  GridItem,
+  Text
 } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
@@ -24,6 +27,7 @@ import { auth, db } from "../firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { DocumentData, DocumentReference, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { MdRestore } from "react-icons/md";
+import { UseToastNotification } from "../utils/UseToastNotification";
 import TrashBg from "../assets/TrashBg.png";
 import ArchiveBg from "../assets/Archive.png";
 import ShareDoc from "../assets/sharedoc.png"
@@ -43,6 +47,8 @@ const Dashboard: React.FC = () => {
     { id: "", type: "", isShared: false }
   );
   const [user] = useAuthState(auth);
+  const showToast = UseToastNotification()
+  const [toastShown, setToastShown] = useState(false);
 
   // Variants for Framer Motion animation
   const sidebarVariants = {
@@ -103,21 +109,9 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // This will manage the disclosure of the warning modal
-  const {
-    isOpen: isWarningModalOpen,
-    onOpen: openWarningModal,
-    onClose: closeWarningModal,
-  } = useDisclosure({ defaultIsOpen: true }); // Automatically open the modal when the component mounts
-
   useEffect(() => {
     fetchProjects();
   }, [user]);
-
-  useEffect(() => {
-    console.log("Unshared Projects:", projects)
-    console.log("Shared Projects:", sharedProjects)
-  }, [sharedProjects, projects])
 
   useEffect(() => {
     const deleteOldProjects = async () => {
@@ -145,9 +139,11 @@ const Dashboard: React.FC = () => {
   }, [projects]);
 
   useEffect(() => {
-    // Open the warning modal when the page loads
-    openWarningModal();
-  }, [openWarningModal]);
+    if (!toastShown) {
+       showToast("info", "Projects here shall remain for 30 days before permanent deletion.");
+       setToastShown(true);
+    }
+   }, [toastShown]);
 
   const stripHtml = (html: string): string => {
     // Create a new div element and set its innerHTML to the HTML string
@@ -342,18 +338,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <Modal isOpen={isWarningModalOpen} onClose={closeWarningModal}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Warning</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <p className="modal-content">
-              Projects stored here will automatically be deleted within 30 days.
-            </p>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
@@ -386,184 +370,243 @@ const Dashboard: React.FC = () => {
                 </Box>
               ) : (
                 <>
-                  <div className="tprojects-list">
-                    {projects.map((project: SuiteData) => (
-                      <div
-                        key={project.id}
-                        className="tproject-card"
-                        style={{ position: "relative", marginBottom: "20px" }}
-                      >
-                        <div
-                          className="tcard-top"
-                          style={{ backgroundImage: `url(${ArchiveBg})` }}
+                  <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6}>
+                    {projects.map((project) => (
+                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-5px)", shadow: "lg"}}>
+                        <Box
+                          h="150px"
+                          bgImage={`url(${ArchiveBg})`}
+                          bgPosition="center"
+                          bgRepeat="no-repeat"
+                          bgSize="cover"
+                          p={3}
+                          borderTopLeftRadius="md"
+                          borderTopRightRadius="md"
+                          borderWidth="1px"
+                          borderColor="gray.200"
+                          position="relative"
+                          overflow="hidden"
                         >
-                          <h3 className="tproject-title">{project.title}</h3>
-                        </div>
-                        <div className="tcard-bottom">
-                          <div
-                            className="icon-container"
-                            style={{
-                              position: "absolute",
-                              right: "2px",
-                            }}
+                          <Box
+                            bg="rgba(0, 0, 0, 0.6)"
+                            position="absolute"
+                            top="0"
+                            right="0"
+                            bottom="0"
+                            left="0"
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="end"
+                            p={3}
                           >
-                            <IconButton
-                              icon={<Icon as={MdRestore} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Restore Project"
-                              onClick={() => {
-                                handleRecoveryIconClick(project.id, project.type, project.isShared);
-                              } } />
-                            <IconButton
-                              icon={<Icon as={FaTrash} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                                marginRight: "8px", // Add margin to separate icons
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Delete Project"
-                              onClick={() => {
-                                openModal();
-                                setCurrentProjectState(project.id, project.type, project.isShared);
-                              }}
-                              />
-                          </div>
-                        </div>
-                      </div>
-
+                            <Text fontWeight="500" fontSize="1.2rem" color="white" noOfLines={1}>
+                              {project.title}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Type: {project.type}, unshared
+                            </Text>
+                          </Box>
+                        </Box>
+                        <Box // Container for icons
+                          p={2}
+                          backgroundColor="white" // Set the background to white
+                          borderBottomLeftRadius="md"
+                          borderBottomRightRadius="md"
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+                        >
+                          {/* Your IconButtons go here */}
+                          <IconButton
+                            icon={<Icon as={MdRestore} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Restore Project"
+                            onClick={() => {
+                              handleRecoveryIconClick(project.id, project.type, project.isShared);
+                            }}
+                          />
+                          <IconButton
+                            icon={<Icon as={FaTrash} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                              marginRight: "8px", // Add margin to separate icons
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Delete Project"
+                            onClick={() => {
+                              openModal();
+                              setCurrentProjectState(project.id, project.type, project.isShared);
+                            }}
+                          />
+                        </Box>
+                        <Modal
+                          isOpen={isModalOpen}
+                          onClose={closeModal}
+                          blockScrollOnMount={false}
+                          motionPreset="none"
+                          isCentered
+                        >
+                          <ModalOverlay />
+                          <ModalContent>
+                            <ModalHeader>
+                              <ModalCloseButton onClick={closeModal} />
+                            </ModalHeader>
+                            <ModalBody>
+                              <p className="popup-text">
+                                Are you sure you would like to delete the project? This
+                                action cannot be undone.
+                              </p>
+                            </ModalBody>
+                            <ModalFooter>
+                              <Flex justifyContent="space-between">
+                                <Button
+                                  colorScheme="red"
+                                  flex="1"
+                                  mr={2}
+                                  onClick={handleConfirmClick}
+                                >
+                                  Confirm
+                                </Button>
+                                <Button flex="1" variant="outline" onClick={closeModal}>
+                                  Deny
+                                </Button>
+                              </Flex>
+                            </ModalFooter>
+                          </ModalContent>
+                        </Modal>
+                      </GridItem>
                     ))}
-                    <Modal
-                      isOpen={isModalOpen}
-                      onClose={closeModal}
-                      blockScrollOnMount={false}
-                      motionPreset="none"
-                      isCentered
-                    >
-                      <ModalOverlay />
-                      <ModalContent>
-                        <ModalHeader>
-                          <ModalCloseButton onClick={closeModal} />
-                        </ModalHeader>
-                        <ModalBody>
-                          <p className="popup-text">
-                            Are you sure you would like to delete the project? This
-                            action cannot be undone.
-                          </p>
-                        </ModalBody>
-                        <ModalFooter>
-                          <Flex justifyContent="space-between">
-                            <Button
-                              colorScheme="red"
-                              flex="1"
-                              mr={2}
-                              onClick={handleConfirmClick}
-                            >
-                              Confirm
-                            </Button>
-                            <Button flex="1" variant="outline" onClick={closeModal}>
-                              Deny
-                            </Button>
-                          </Flex>
-                        </ModalFooter>
-                      </ModalContent>
-                    </Modal>
-                  </div>
+                  </Grid>
                   {/* // For shared Projects */}
-                  <div className="tprojects-list">
+                  <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6} marginTop="5vh">
                     {sharedProjects.map((project: SuiteData) => (
-                      <div
-                        key={project.id}
-                        className="tproject-card"
-                        style={{ position: "relative", marginBottom: "20px" }}
-                      >
-                        <div
-                          className="tcard-top"
-                          style={{ backgroundImage: `url(${ShareDoc})` }}
+                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-1px)", shadow: "lg"}}>
+                        <Box
+                          h="150px"
+                          bgImage={`url(${ShareDoc})`}
+                          bgPosition="center"
+                          bgRepeat="no-repeat"
+                          bgSize="cover"
+                          p={3}
+                          borderTopLeftRadius="md"
+                          borderTopRightRadius="md"
+                          borderWidth="1px"
+                          borderColor="gray.200"
+                          position="relative"
+                          overflow="hidden"
                         >
-                          <h3 className="tproject-title">{project.title}</h3>
-                        </div>
-                        <div className="tcard-bottom">
-                          <div
-                            className="icon-container"
-                            style={{
-                              position: "absolute",
-                              right: "2px",
-                            }}
+                          <Box
+                            bg="rgba(0, 0, 0, 0.6)"
+                            position="absolute"
+                            top="0"
+                            right="0"
+                            bottom="0"
+                            left="0"
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="end"
+                            p={3}
                           >
-                            <IconButton
-                              icon={<Icon as={MdRestore} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Restore Project"
-                              onClick={() => {
-                                handleRecoveryIconClick(project.id, project.type, project.isShared);
-                              } } />
-                            <IconButton
-                              icon={<Icon as={FaTrash} color="#484c6c" />}
-                              size="sm"
-                              style={{
-                                backgroundColor: "transparent",
-                                marginRight: "8px", // Add margin to separate icons
-                              }}
-                              transition="transform 0.3s ease-in-out"
-                              _hover={{ transform: "scale(1.1)" }}
-                              aria-label="Delete Project"
-                              onClick={() => {
-                                openSharedModal();
-                                setCurrentProjectState(project.id, project.type, project.isShared);
-                              }}
-                              />
-                          </div>
-                        </div>
-                      </div>
+                            <Text fontWeight="500" fontSize="1.2rem" color="white" noOfLines={1}>
+                              {project.title}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Type: {project.type}, shared
+                            </Text>
+                          </Box>
+                        </Box>
+                        <Box // Container for icons
+                          p={2}
+                          backgroundColor="white" // Set the background to white
+                          borderBottomLeftRadius="md"
+                          borderBottomRightRadius="md"
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+                        >
+                          {/* Your IconButtons go here */}
+                          <IconButton
+                            icon={<Icon as={MdRestore} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Restore Project"
+                            onClick={() => {
+                              handleRecoveryIconClick(project.id, project.type, project.isShared);
+                            }}
+                          />
+                          <IconButton
+                            icon={<Icon as={FaTrash} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                              marginRight: "8px", // Add margin to separate icons
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Delete Project"
+                            onClick={() => {
+                              openSharedModal();
+                              setCurrentProjectState(project.id, project.type, project.isShared);
+                            }}
+                          />
+                        </Box>
+                        <Modal
+                          isOpen={isShareModalOpen}
+                          onClose={closeSharedModal}
+                          blockScrollOnMount={false}
+                          motionPreset="none"
+                          isCentered
+                        >
+                          <ModalOverlay />
+                          <ModalContent>
+                            <ModalHeader>
+                              <ModalCloseButton onClick={closeSharedModal} />
+                            </ModalHeader>
+                            <ModalBody>
+                              <p className="popup-text">
+                                Are you sure you would like to delete the project? This
+                                action cannot be undone.
+                              </p>
+                            </ModalBody>
+                            <ModalFooter>
+                              <Flex justifyContent="space-between">
+                                <Button
+                                  colorScheme="red"
+                                  flex="1"
+                                  mr={2}
+                                  onClick={handleConfirmClick}
+                                >
+                                  Confirm
+                                </Button>
+                                <Button flex="1" variant="outline" onClick={closeSharedModal}>
+                                  Deny
+                                </Button>
+                              </Flex>
+                            </ModalFooter>
+                          </ModalContent>
+                        </Modal>
+                      </GridItem>
                     ))}
-                    <Modal
-                      isOpen={isShareModalOpen}
-                      onClose={closeSharedModal}
-                      blockScrollOnMount={false}
-                      motionPreset="none"
-                      isCentered
-                    >
-                      <ModalOverlay />
-                      <ModalContent>
-                        <ModalHeader>
-                          <ModalCloseButton onClick={closeSharedModal} />
-                        </ModalHeader>
-                        <ModalBody>
-                          <p className="popup-text">
-                            Are you sure you would like to delete the project? This
-                            action cannot be undone.
-                          </p>
-                        </ModalBody>
-                        <ModalFooter>
-                          <Flex justifyContent="space-between">
-                            <Button
-                              colorScheme="red"
-                              flex="1"
-                              mr={2}
-                              onClick={handleConfirmClick}
-                            >
-                              Confirm
-                            </Button>
-                            <Button flex="1" variant="outline" onClick={closeSharedModal}>
-                              Deny
-                            </Button>
-                          </Flex>
-                        </ModalFooter>
-                      </ModalContent>
-                    </Modal>
-                  </div>
+                  </Grid>
                 </>
               )}
           </div>
