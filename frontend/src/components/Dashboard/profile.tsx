@@ -280,7 +280,7 @@ const Profile: React.FC = () => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
         const comms: [] = userData.communities;
-        setTotalNoOfCommunities(comms.length);
+        setTotalNoOfCommunities(comms.length || 0);
       }
     }
   }
