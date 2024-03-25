@@ -348,7 +348,31 @@ const Projects: React.FC = () => {
           )}
         </AnimatePresence>
         {/* Code is contained in this box */}
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box
+          flexGrow={1}
+          padding="10px"
+          marginLeft={5}
+          overflow="scroll"
+          sx={{
+              '&::-webkit-scrollbar': {
+                width: '10px',
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-button': {
+                display: 'none', // Hide scrollbar arrows
+              },
+              '&:hover::-webkit-scrollbar-thumb': {
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+              },
+              '&:hover': {
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+              },
+          }}
+          >
           {isLoadingProjects ? (
             <Flex
               height="100vh" // Adjust this to the desired height or use "100%" for full container height

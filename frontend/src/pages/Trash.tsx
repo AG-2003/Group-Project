@@ -253,7 +253,6 @@ const Dashboard: React.FC = () => {
                 { merge: true }
               );
               setCurrentProjectToDelete({ id: "", type: "", isShared: false });
-              fetchProjects();
             }
           }
         } catch (error) {
@@ -289,6 +288,8 @@ const Dashboard: React.FC = () => {
         }
       }
     }
+
+    fetchProjects();
   };
 
   const {
@@ -361,7 +362,31 @@ const Dashboard: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box
+          flexGrow={1}
+          padding="10px"
+          marginLeft={5}
+          overflow="scroll"
+          sx={{
+              '&::-webkit-scrollbar': {
+                width: '10px',
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-button': {
+                display: 'none', // Hide scrollbar arrows
+              },
+              '&:hover::-webkit-scrollbar-thumb': {
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+              },
+              '&:hover': {
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+              },
+          }}
+          >
           <div className="tprojects-container">
             <h2 className="tprojects-heading">Recently Deleted</h2>
               {projects.length === 0 && sharedProjects.length===0 ? (
@@ -551,6 +576,7 @@ const Dashboard: React.FC = () => {
                             aria-label="Restore Project"
                             onClick={() => {
                               handleRecoveryIconClick(project.id, project.type, project.isShared);
+
                             }}
                           />
                           <IconButton
