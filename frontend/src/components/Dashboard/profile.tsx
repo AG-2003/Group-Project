@@ -29,7 +29,7 @@ import "./Profile.scss"; // Make sure this path is correct
 import Navbar from "./Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "./sidebar";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, getDocsFromCache } from "firebase/firestore";
 import { Link as ReactRouterLink } from "react-router-dom";
 import { Link as ChakraLink, LinkProps } from "@chakra-ui/react";
 import { SuiteData } from "../../interfaces/SuiteData";
@@ -93,6 +93,7 @@ const Profile: React.FC = () => {
   const [user] = useAuthState(auth);
   const [totalNoOfProjects, setTotalNoOfProjects] = useState<number>(0);
   const [totalNoOfAwards, setTotalNoOfAwards] = useState<number>(0);
+  const [totalNoOfCommunities, setTotalNoOfCommunities] = useState<number>(0);
   const [lastAccessedProjects, setLastAccessedProjects] = useState<SuiteData[]>([]);
   const [todaysEvents, setTodaysEvents] = useState<EventType[]>();
 
@@ -151,6 +152,7 @@ const Profile: React.FC = () => {
     fetchDescription();
     getTotalNoOfProjects();
     getTotalNoOfAwards();
+    getTotalNoOfCommunities();
 
 
     // Function to automatically check the sidebar status on window resize
@@ -269,7 +271,19 @@ const Profile: React.FC = () => {
     }
   };
 
+  //--------------------calculate communities-----------
 
+  const getTotalNoOfCommunities = async () => {
+    if (user?.email) {
+      const docRef = doc(db, 'users', user.email);
+      const docSnapshot = await getDoc(docRef);
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        const comms: [] = userData.communities;
+        setTotalNoOfCommunities(comms.length);
+      }
+    }
+  }
 
   //-------------------Calculate no. of awards----------------------
 
@@ -472,7 +486,7 @@ const Profile: React.FC = () => {
                 justify="center"
               >
                 <StatCard title="Projects" value={totalNoOfProjects} />
-                <StatCard title="Communities" value="11" /> {/* TODO: add the actual amount*/}
+                <StatCard title="Communities" value={totalNoOfCommunities} />
                 <StatCard title="Awards" value={totalNoOfAwards} />
               </Stack>
 
@@ -552,41 +566,41 @@ const Profile: React.FC = () => {
                     You have no projects yet.
                   </Text>
                   <Modal
-                      isOpen={modalType !== ""}
-                      onClose={closeModal}
-                      // onConfirm={handleConfirm}
-                      modalType={modalType}
-                    />
+                    isOpen={modalType !== ""}
+                    onClose={closeModal}
+                    // onConfirm={handleConfirm}
+                    modalType={modalType}
+                  />
                   <Menu>
-                      <MenuButton
-                          as={Button}
-                          mt={3}
-                          bgColor='purple.100'
-                          _hover={{ backgroundColor: '#dcdcf6' }}
+                    <MenuButton
+                      as={Button}
+                      mt={3}
+                      bgColor='purple.100'
+                      _hover={{ backgroundColor: '#dcdcf6' }}
+                    >
+                      Create a Project
+                    </MenuButton>
+                    <MenuList>
+                      <MenuItem
+                        icon={<FiFileText />}
+                        onClick={() => openModal("Doc")}
                       >
-                          Create a Project
-                      </MenuButton>
-                      <MenuList>
-                          <MenuItem
-                              icon={<FiFileText />}
-                              onClick={() => openModal("Doc")}
-                            >
-                              Doc
-                            </MenuItem>
-                            <MenuItem
-                              icon={<FiGrid />}
-                              onClick={() => openModal("Spreadsheet")}
-                            >
-                              Spreadsheet
-                            </MenuItem>
-                            <MenuItem
-                              icon={<FiClipboard />}
-                              onClick={() => openModal("Whiteboard")}
-                            >
-                              Whiteboard
-                            </MenuItem>
-                        </MenuList>
-                    </Menu>
+                        Doc
+                      </MenuItem>
+                      <MenuItem
+                        icon={<FiGrid />}
+                        onClick={() => openModal("Spreadsheet")}
+                      >
+                        Spreadsheet
+                      </MenuItem>
+                      <MenuItem
+                        icon={<FiClipboard />}
+                        onClick={() => openModal("Whiteboard")}
+                      >
+                        Whiteboard
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
                 </Box>
               )}
 
