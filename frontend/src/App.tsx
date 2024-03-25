@@ -40,6 +40,7 @@ import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
 import { Friends } from "./pages/Friends";
 import CSettings from "./components/communities/CSettings/CSettings";
+import { useReceivedRequests } from "./context/RecievedRequestsContext";
 
 function App() {
   useEffect(() => {

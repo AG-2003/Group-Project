@@ -13,6 +13,7 @@ import { debounce } from "../utils/Time";
 import { UseToastNotification } from "../utils/UseToastNotification";
 import cardBg2 from '../assets/carbBg2.png'
 import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
+import { useReceivedRequests } from "../context/RecievedRequestsContext";
 
 
 
@@ -32,7 +33,9 @@ export const Friends: React.FC = () => {
     const [friends, setFriends] = useState<string[]>([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [sentRequests, setSentRequests] = useState<string[]>([]);
-    const [receivedRequests, setReceivedRequests] = useState<string[]>([]);
+    // const [receivedRequests, setReceivedRequests] = useState<string[]>([]);
+    const { receivedRequests, setReceivedRequests } = useReceivedRequests();
+
 
 
     // State for managing modal visibility and the current selected friend
@@ -213,7 +216,8 @@ export const Friends: React.FC = () => {
             });
 
             setFriends(prev => [...prev, requesterEmail]);
-            setReceivedRequests(prev => prev.filter(req => req !== requesterEmail));
+            const updatedReceivedRequests = receivedRequests.filter(req => req !== requesterEmail);
+            setReceivedRequests(updatedReceivedRequests);
 
             showToast('info', 'Added new friend');
         } catch (error) {
@@ -241,7 +245,8 @@ export const Friends: React.FC = () => {
             });
 
 
-            setReceivedRequests(prev => prev.filter(req => req !== requesterEmail));
+            const updatedReceivedRequests = receivedRequests.filter(req => req !== requesterEmail);
+            setReceivedRequests(updatedReceivedRequests);
 
             showToast('info', 'Friend request rejected');
         } catch (error) {

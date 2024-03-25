@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Quill } from "react-quill";
+import { ReceivedRequestsProvider, useReceivedRequests } from "./context/RecievedRequestsContext";
 
 const Size = Quill.import("attributors/style/size");
 Size.whitelist = ["10px", "12px", "14px", "16px", "18px", "20px"]; // Add your font sizes
@@ -48,7 +49,9 @@ root.render(
   <ChakraProvider theme={theme}>
     <React.StrictMode>
       <Router>
-        <App />
+        <ReceivedRequestsProvider>
+          <App />
+        </ReceivedRequestsProvider>
       </Router>
     </React.StrictMode>
   </ChakraProvider>
