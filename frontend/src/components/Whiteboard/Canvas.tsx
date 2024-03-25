@@ -216,6 +216,7 @@ const Canvas: React.FC<SuiteProps> = ({
               lineOrder.set(username, 0)
             } else if (newLine && newLine.points.length !== 0){
 
+              console.log("Original Lines:",lines)
               setLines(prevLines => {
                 let newLines = [...prevLines];
                 // Ensure newLines has a length at least as great as value + 1
@@ -229,9 +230,9 @@ const Canvas: React.FC<SuiteProps> = ({
                   });
                 }
                 newLines[value] = newLine;
+                console.log("New lines:",newLines)
                 return newLines;
               });
-
             }
           })
         }
