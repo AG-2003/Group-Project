@@ -6,6 +6,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Box,
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { FiFileText, FiGrid, FiClipboard, FiAward } from "react-icons/fi";
@@ -16,6 +17,7 @@ import Modal from "./sub-components/Modal";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
 import { useNavigate } from "react-router-dom";
 import "./NavBarDash.scss"
+import { useReceivedRequests } from "../../context/RecievedRequestsContext";
 
 interface Props {
   isSidebarOpen: boolean;
@@ -27,6 +29,8 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
   };
+
+  const { receivedRequests } = useReceivedRequests();
 
   // State to control the visibility and type of the modal
   const [modalType, setModalType] = useState("");
@@ -44,7 +48,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
 
   const userProfile = UseUserProfilePic();
 
-  
+
 
   return (
     <div className="navBar-Dash">
@@ -63,7 +67,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
         />
 
         <Menu>
-        <MenuButton as={IconButton} aria-label="Options" icon={<FaPlus />} className="menuButton-Dash" />
+          <MenuButton as={IconButton} aria-label="Options" icon={<FaPlus />} className="menuButton-Dash" />
           <MenuList>
             <MenuItem icon={<FiFileText />} onClick={() => openModal("Doc")}>Doc</MenuItem>
             <MenuItem icon={<LuPresentation />} onClick={() => openModal("Slide")}>Slide</MenuItem>
@@ -71,13 +75,31 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             <MenuItem icon={<FiClipboard />} onClick={() => openModal("Whiteboard")}>Whiteboard</MenuItem>
           </MenuList>
         </Menu>
+        <Box position="relative" >
+          <IconButton
+            className="friendsIcon-Dash"
+            onClick={() => navigate('/friends')}
+            icon={<FaUserFriends />}
+            aria-label="Friends"
+          />
+          {/* Conditionally render the notification dot */}
+          {receivedRequests.length > 0 && (
+            <Box
+              position="absolute"
+              right="8" // Adjust based on your styling and icon size, negative values are allowed
+              top="2" // Adjust based on your styling and icon size, negative values are allowed
+              width="11px"
+              height="11px"
+              borderRadius="50%"
+              bg="red.500"
+            // border="2px solid"
+            // borderColor="gray.800" // Adjust to match your navbar's background color
+            // zIndex="1" // Ensure the dot is above the icon
+            />
+          )}
+        </Box>
 
-        <IconButton
-          className="friendsIcon-Dash"
-          onClick={() => { navigate('/friends') }}
-          icon={<FaUserFriends />}
-          aria-label={"friends"}
-        />
+
 
         <IconButton
           className="badgeIcon-Dash"
@@ -93,7 +115,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
             backgroundColor={"#484c6c"}
             size={"sm"}
           />
-        </Link>        
+        </Link>
       </div>
     </div>
   );
