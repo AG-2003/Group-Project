@@ -138,85 +138,100 @@ const CommunityDetails: React.FC = () => {
     fetchCommunityPosts();
   }, [community_id]);
 
-  useEffect(() => {
-    const fetchLeaderboardData = async () => {
-      try {
-        const postsQuery = query(
-          collection(db, "communityPosts"),
-          where("Cid", "==", community_id)
-        );
-        const postsSnapshot = await getDocs(postsQuery);
-        const repliesQuery = query(
-          collection(db, "communityReplies"),
-          where("Cid", "==", community_id)
-        );
-        const repliesSnapshot = await getDocs(repliesQuery);
+  const fetchLeaderboardData = async () => {
+    try {
+      const postsQuery = query(
+        collection(db, "communityPosts"),
+        where("Cid", "==", community_id)
+      );
+      const postsSnapshot = await getDocs(postsQuery);
+      const repliesQuery = query(
+        collection(db, "communityReplies"),
+        where("Cid", "==", community_id)
+      );
+      const repliesSnapshot = await getDocs(repliesQuery);
 
-        const usersLikes: { [userId: string]: number } = {};
+      const usersLikes: { [userId: string]: number } = {};
 
-        postsSnapshot.forEach((postDoc) => {
-          const { Uid, likedBy, dislikedBy } = postDoc.data();
-          usersLikes[Uid] =
-            (usersLikes[Uid] || 0) + (likedBy.length - dislikedBy.length);
-        });
+      postsSnapshot.forEach((postDoc) => {
+        const { Uid, likedBy, dislikedBy } = postDoc.data();
+        usersLikes[Uid] =
+          (usersLikes[Uid] || 0) + (likedBy.length - dislikedBy.length);
+      });
 
-        repliesSnapshot.forEach((replyDoc) => {
-          const { Uid, likedBy, dislikedBy } = replyDoc.data();
-          usersLikes[Uid] =
-            (usersLikes[Uid] || 0) + (likedBy.length - dislikedBy.length);
-        });
+      repliesSnapshot.forEach((replyDoc) => {
+        const { Uid, likedBy, dislikedBy } = replyDoc.data();
+        usersLikes[Uid] =
+          (usersLikes[Uid] || 0) + (likedBy.length - dislikedBy.length);
+      });
 
-        const leaderboardPromises = Object.keys(usersLikes).map(
-          async (userId) => {
-            try {
-              const userDocRef = doc(db, "users", userId);
-              const userDocSnapshot = await getDoc(userDocRef);
-              if (userDocSnapshot.exists()) {
-                const userData = userDocSnapshot.data();
-                if (userData) {
-                  const displayName = userData.displayName || "Unknown"; // Replace "Unknown" with a default value if display name is not available
-                  return {
-                    userId,
-                    displayName,
-                    likes: usersLikes[userId],
-                  };
-                }
+      const leaderboardPromises = Object.keys(usersLikes).map(
+        async (userId) => {
+          try {
+            const userDocRef = doc(db, "users", userId);
+            const userDocSnapshot = await getDoc(userDocRef);
+            if (userDocSnapshot.exists()) {
+              const userData = userDocSnapshot.data();
+              if (userData) {
+                const displayName = userData.displayName || "Unknown"; // Replace "Unknown" with a default value if display name is not available
+                return {
+                  userId,
+                  displayName,
+                  likes: usersLikes[userId],
+                };
               }
-            } catch (error) {
-              console.error(
-                `Error fetching user data for userId ${userId}:`,
-                error
-              );
             }
-            return null;
+          } catch (error) {
+            console.error(
+              `Error fetching user data for userId ${userId}:`,
+              error
+            );
           }
-        );
+          return null;
+        }
+      );
 
-        const leaderboardData = await Promise.all(leaderboardPromises);
-        const filteredLeaderboardData = leaderboardData.filter(
-          (data) => data !== null
-        ) as { userId: string; displayName: string; likes: number }[];
+      const leaderboardData = await Promise.all(leaderboardPromises);
+      const filteredLeaderboardData = leaderboardData.filter(
+        (data) => data !== null
+      ) as { userId: string; displayName: string; likes: number }[];
 
-        const sortedLeaderboard = filteredLeaderboardData.sort(
-          (a, b) => b.likes - a.likes
-        );
+      const sortedLeaderboard = filteredLeaderboardData.sort(
+        (a, b) => b.likes - a.likes
+      );
 
-        setLeaderboardData(sortedLeaderboard);
-      } catch (error) {
-        console.error("Error fetching leaderboard data:", error);
-      }
-    };
+      setLeaderboardData(sortedLeaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchLeaderboardData();
   }, [community_id]);
 
-  const openLeaderboardModal = () => {
+  const openLeaderboardModal = async () => {
     setIsOpen(true);
+    await fetchLeaderboardData();
   };
 
   const closeLeaderboardModal = () => {
     setIsOpen(false);
   };
+
+  // Function to check if user is an admin
+  const isAdmin = (
+    communityDetails: DocumentData | null,
+    userId: string
+  ): boolean => {
+    if (communityDetails && communityDetails.admins) {
+      return communityDetails.admins.includes(userId);
+    }
+    return false;
+  };
+
+  // Call isAdmin function to check if user is an admin
+  const isUserAdmin = isAdmin(communityDetails, userId);
 
   // Function to handle liking a post
   const handleLike = async (postId: string, userId: string) => {
@@ -298,7 +313,7 @@ const CommunityDetails: React.FC = () => {
   const handleDeletePost = async (postId: string, postUid: string) => {
     try {
       const user = auth.currentUser;
-      if (user && user.email === postUid) {
+      if ((user && user.email === postUid) || isUserAdmin) {
         // Check if current user is the owner of the post
         const postRef = doc(db, "communityPosts", postId);
         await deleteDoc(postRef);
@@ -306,18 +321,20 @@ const CommunityDetails: React.FC = () => {
         // Remove the deleted post from state
         setCommunityPosts(communityPosts.filter((post) => post.id !== postId));
 
-        // Update the user document to remove the deleted post from the posts array
-        const userDocRef = doc(db, "users", user.email || "");
-        const userDocSnapshot = await getDoc(userDocRef);
-        if (userDocSnapshot.exists()) {
-          const userData = userDocSnapshot.data();
-          if (userData) {
-            const updatedCommunityPosts = userData.posts.filter(
-              (id: string) => id !== postId
-            );
-            await updateDoc(userDocRef, {
-              posts: updatedCommunityPosts,
-            });
+        if (user) {
+          // Update the user document to remove the deleted post from the posts array
+          const userDocRef = doc(db, "users", user.email || "");
+          const userDocSnapshot = await getDoc(userDocRef);
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            if (userData) {
+              const updatedCommunityPosts = userData.posts.filter(
+                (id: string) => id !== postId
+              );
+              await updateDoc(userDocRef, {
+                posts: updatedCommunityPosts,
+              });
+            }
           }
         }
       } else {
@@ -521,14 +538,17 @@ const CommunityDetails: React.FC = () => {
                     <Text fontSize="xl" fontWeight="bold" mb="4" mt="2">
                       Latest Posts
                     </Text>
-                    <Button
-                      colorScheme="blue"
-                      size="sm"
-                      ml="2"
-                      onClick={handleCreatePostClick}
-                    >
-                      Create a Post
-                    </Button>
+
+                    {communityDetails.members.includes(userId) && (
+                      <Button
+                        colorScheme="blue"
+                        size="sm"
+                        ml="2"
+                        onClick={handleCreatePostClick}
+                      >
+                        Create a Post
+                      </Button>
+                    )}
                   </Flex>
 
                   <PostModal
@@ -552,6 +572,7 @@ const CommunityDetails: React.FC = () => {
                           deletePost={handleDeletePost}
                           savePost={savePost}
                           editPost={editPost}
+                          admin={isUserAdmin}
                         />
                       ))}
                   </div>

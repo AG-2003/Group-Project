@@ -7,6 +7,7 @@ import {
   Stack,
   Badge,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 import { db } from "../../firebase-config";
 import {
@@ -22,6 +23,7 @@ import InvModal from "./InvModal";
 import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Dashboard/sidebar";
+import { SettingsIcon } from "@chakra-ui/icons";
 
 const TeamDetails: React.FC = () => {
   const [teamDetails, setTeamDetails] = useState<DocumentData | null>(null);
@@ -149,9 +151,17 @@ const TeamDetails: React.FC = () => {
                   <Stack className="profile-stats">
                     <Badge className="badge">0 Projects</Badge>
                     <Badge className="badge">
-                      {teamDetails.members.length + 1} Members
+                      {teamDetails.members.length || 0} Members
                     </Badge>
-                    <Badge className="badge">0 Awards</Badge>
+                    <Button
+                      colorScheme="gray"
+                      size="sm"
+                      ml="2"
+                      leftIcon={<SettingsIcon />}
+                      onClick={() =>
+                        navigate(`/Teams/In_teams/${team_id}/settings`)
+                      }
+                    />
                   </Stack>
                 </Flex>
                 <Flex className="profile-body">

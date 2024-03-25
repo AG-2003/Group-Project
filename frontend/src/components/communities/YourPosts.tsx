@@ -357,6 +357,7 @@ const YourPosts = () => {
                     deletePost={handleDeletePost}
                     savePost={savePost}
                     editPost={editPost}
+                    admin={false}
                   />
                 ))}
               </div>

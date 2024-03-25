@@ -37,6 +37,7 @@ import SavedPosts from "./components/communities/SavedPosts";
 import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
 import CSettings from "./components/communities/CSettings/CSettings";
+import TSettings from "./components/Teams/Tsettings/TSettings";
 
 function App() {
   useEffect(() => {
@@ -74,6 +75,10 @@ function App() {
         <Route path="/Sheet" element={<Spreadsheet />} />;
         <Route path="/Teams/In_teams/:team_id" element={<TeamDetails />} />
         <Route path="/In_teams/chat/:team_id" element={<TeamsChat />} />
+        <Route
+          path="Teams/In_teams/:team_id/settings"
+          element={<TSettings />}
+        />
         <Route path="/meeting" element={<Call />} />
         <Route path="/communities" element={<Communities />} />
         <Route

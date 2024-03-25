@@ -13,6 +13,7 @@ import {
 import { DocumentData } from "firebase/firestore";
 import CommentsModal from "./commentsModal";
 import EditPostModal from "./EditPostModal";
+import Linkify from "react-linkify";
 
 interface Props {
   post: DocumentData;
@@ -22,6 +23,7 @@ interface Props {
   deletePost: (postId: string, postUid: string) => void;
   savePost: (post: string) => void;
   editPost: (postId: string, newTitle: string, newDescription: string) => void;
+  admin: boolean;
 }
 
 const Posts = ({
@@ -32,6 +34,7 @@ const Posts = ({
   deletePost,
   savePost,
   editPost,
+  admin,
 }: Props) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -139,11 +142,6 @@ const Posts = ({
     }
   };
 
-  const handleShareClick = () => {
-    // Logic to share the post link
-    console.log("Share clicked");
-  };
-
   const handleCommentsClick = () => {
     setIsCommentsModalOpen(true);
   };
@@ -176,14 +174,13 @@ const Posts = ({
               ...
             </MenuButton>
             <MenuList>
-              {post.Uid === userId && (
+              {(post.Uid === userId || admin) && (
                 <>
                   <MenuItem onClick={handlePostDelete}>Delete</MenuItem>
                   <MenuItem onClick={handleEditModalOpen}>Edit</MenuItem>
                 </>
               )}
               <MenuItem onClick={handleSave}>Save</MenuItem>
-              <MenuItem color="red">Report</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
@@ -205,7 +202,9 @@ const Posts = ({
           <Box bg="gray.200" w="100%" h="300px" mb="4" />
         )}
 
-        <Text>{post.description}</Text>
+        <Text>
+          <Linkify>{post.description}</Linkify>
+        </Text>
         {/* Like and Dislike buttons */}
         <Flex align="center" mt="2">
           <Button
@@ -228,14 +227,6 @@ const Posts = ({
             isDisabled={likeClicked}
           >
             Dislike
-          </Button>
-          <Button
-            colorScheme="blue"
-            size="sm"
-            mr="2"
-            onClick={handleShareClick}
-          >
-            Share
           </Button>
           <Button size="sm" onClick={handleCommentsClick}>
             <Box as="span" mr="1">

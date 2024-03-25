@@ -382,6 +382,16 @@ const Account = () => {
 
         // Update the state with the updated requests
         fetchRequests();
+
+        const memberDisplayNames = await Promise.all(
+          updatedMembers.map(async (memberId) => {
+            const userRef = doc(db, "users", memberId);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.data() as UserData | undefined;
+            return userData;
+          })
+        );
+        setCommunityMembers(memberDisplayNames.filter(Boolean) as UserData[]);
       } else {
         showToast("error", "Community or user not found.");
       }
