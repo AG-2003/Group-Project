@@ -1,169 +1,449 @@
 .navBar-Dash {
-    display: flex;
-    // position: fixed;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem; /* Example padding, adjust as needed */
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: #484c6c; /* Background color for the navbar */
+  display: flex;
+  // position: fixed;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  /* Example padding, adjust as needed */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #484c6c;
+  /* Background color for the navbar */
 }
 
 .badgeIcon-Dash {
-    border: none; /* Remove border if not needed */
-    margin-right: 2rem;
-    display: inline-flex; /* Ensures that the icon container can be transformed */
-    justify-content: center;
-    align-items: center;
-    transition: transform 0.2s ease-in-out, color 0.2s ease; /* Smooth transition for scaling and color */
+  border: none;
+  /* Remove border if not needed */
+  margin-right: 2rem;
+  display: inline-flex;
+  /* Ensures that the icon container can be transformed */
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
 
-    &.css-22xpxh {
-      background-color: #484c6c; /* Set the background color for icons */
-      font-size: 30px; /* Set the initial icon size */
-      color: #e0dcf4; /* Adjust icon color as needed */
+  &.css-22xpxh {
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
 
-      &:hover {
-        background-color: #484c6c; /* Darker shade on hover, adjust as needed */
-        color: #b1a2ef; /* Change icon color on hover */
-        transform: scale(1.2); /* Increase the icon size */
-      }
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
     }
   }
-  
+}
 
-  .menuIcon-Dash {
-    border: none; /* Remove border if not needed */
 
-    &.css-22xpxh {
-      background-color: #484c6c; /* Set the background color for icons */
-      font-size: 30px; /* Set the initial icon size */
-      color: #e0dcf4; /* Adjust icon color as needed */
+.menuIcon-Dash {
+  border: none;
+  /* Remove border if not needed */
 
-      &:hover {
-        background-color: #484c6c; /* Darker shade on hover, adjust as needed */
-        color: #b1a2ef; /* Change icon color on hover */
-      }
+  &.css-22xpxh {
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
+
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
     }
   }
-  
+}
+
 
 .rightSection-Dash {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .menuButton-Dash {
-    margin-right: 2rem;
-    font-weight: 100;
-    transition: transform 0.2s ease-in-out, color 0.2s ease; /* Smooth transition for scaling and color */
+  margin-right: 2rem;
+  font-weight: 100;
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
 
-    &.css-22xpxh {
-      background-color: #484c6c; /* Set the background color for icons */
-      font-size: 30px; /* Set the initial icon size */
-      color: #e0dcf4; /* Adjust icon color as needed */
+  &.css-22xpxh {
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
 
-      &:hover {
-        background-color: #484c6c; /* Darker shade on hover, adjust as needed */
-        color: #b1a2ef; /* Change icon color on hover */
-      transform: scale(1.2); /* Increase the icon size */
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
     }
   }
 }
 
 .friendsIcon-Dash {
   margin-right: 2rem;
-  transition: transform 0.2s ease-in-out, color 0.2s ease; /* Smooth transition for scaling and color */
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
 
 
   &.css-22xpxh {
-    background-color: #484c6c; /* Set the background color for icons */
-    font-size: 30px; /* Set the initial icon size */
-    color: #e0dcf4; /* Adjust icon color as needed */
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
 
-      &:hover {
-        background-color: #484c6c; /* Darker shade on hover, adjust as needed */
-        color: #b1a2ef; /* Change icon color on hover */
-    transform: scale(1.2); /* Increase the icon size */
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
+    }
   }
-}
 }
 
 .userAvatar-Dash {
-    /* Assuming the Avatar component allows for background color styling through class */
-    margin-right: 2rem;
-    // background-color: #484c6c; /* Set background color */
-   transition: transform 0.2s ease-in-out, color 0.2s ease; /* Smooth transition for scaling and color */
+  /* Assuming the Avatar component allows for background color styling through class */
+  margin-right: 2rem;
+  // background-color: #484c6c; /* Set background color */
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
 
-   .css-16ite8i{
-    transition: transform 0.2s ease-in-out, color 0.2s ease; /* Smooth transition for scaling and color */
+  .css-16ite8i {
+    transition: transform 0.2s ease-in-out, color 0.2s ease;
+    /* Smooth transition for scaling and color */
 
-     color: #e0dcf4; /* Set background color */
-     &:hover {
-      background-color: #484c6c; /* Darker shade on hover, adjust as needed */
-      color: #b1a2ef; /* Change icon color on hover */
-      transform: scale(1.2); /* Increase the icon size */
-     }
+    color: #e0dcf4;
 
-   }
+    /* Set background color */
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
+    }
 
-   
   }
-  
-  /* 15-inch Laptops */
-    @media screen and (max-width: 1200px) {
-      .badgeIcon-Dash {
-        &.css-22xpxh {
-        font-size: 25px; /* Set the initial icon size */
-        }
-      }
-      .menuIcon-Dash {
-        &.css-22xpxh {
-        font-size: 25px; /* Set the initial icon size */
-        }
-      }
-      .menuButton-Dash {
-        &.css-22xpxh {
-        font-size: 25px; /* Set the initial icon size */
-        }
-      }
-      .userAvatar-Dash {
-        &.css-22xpxh {
-        size: 25px; /* Set the initial icon size */
-        }
-      }
-      .friendsIcon-Dash {
-        &.css-22xpxh {
-          size: 25px; /* Set the initial icon size */
-          }
+
+
+}
+
+/* 15-inch Laptops */
+@media screen and (max-width: 1200px) {
+  .badgeIcon-Dash {
+    &.css-22xpxh {
+      font-size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuIcon-Dash {
+    &.css-22xpxh {
+      font-size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuButton-Dash {
+    &.css-22xpxh {
+      font-size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .userAvatar-Dash {
+    &.css-22xpxh {
+      size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .friendsIcon-Dash {
+    &.css-22xpxh {
+      size: 25px;
+      /* Set the initial icon size */
+    }
   }
 }
-  
-  /* 13-inch Laptops */
-    @media screen and (max-width: 850) {
-      .badgeIcon-Dash {
-        &.css-22xpxh {
-        font-size: 20px; /* Set the initial icon size */
-        }
-      }
-      .menuIcon-Dash {
-        &.css-22xpxh {
-        font-size: 20px; /* Set the initial icon size */
-        }
-      }
-      .menuButton-Dash {
-        &.css-22xpxh {
-        font-size: 20px; /* Set the initial icon size */
-        }
-      }
-      .userAvatar-Dash {
-        &.css-22xpxh {
-        size: 20px; /* Set the initial icon size */
-        }
-      }
-      .friendsIcon-Dash {
-        &.css-22xpxh {
-          size: 20px; /* Set the initial icon size */
-          }
+
+/* 13-inch Laptops */
+@media screen and (max-width: 850) {
+  .badgeIcon-Dash {
+    &.css-22xpxh {
+      font-size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuIcon-Dash {
+    &.css-22xpxh {
+      font-size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuButton-Dash {
+    &.css-22xpxh {
+      font-size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .userAvatar-Dash {
+    &.css-22xpxh {
+      size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .friendsIcon-Dash {
+    &.css-22xpxh {
+      size: 20px;
+      /* Set the initial icon size */
+    }
   }
 }
-  
+
+.navBar-Dash {
+  display: flex;
+  // position: fixed;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  /* Example padding, adjust as needed */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #484c6c;
+  /* Background color for the navbar */
+}
+
+.badgeIcon-Dash {
+  border: none;
+  /* Remove border if not needed */
+  margin-right: 2rem;
+  display: inline-flex;
+  /* Ensures that the icon container can be transformed */
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
+
+  &.css-22xpxh {
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
+
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
+    }
+  }
+}
+
+
+.menuIcon-Dash {
+  border: none;
+  /* Remove border if not needed */
+
+  &.css-22xpxh {
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
+
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+    }
+  }
+}
+
+
+.rightSection-Dash {
+  display: flex;
+  align-items: center;
+}
+
+.menuButton-Dash {
+  margin-right: 2rem;
+  font-weight: 100;
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
+
+  &.css-22xpxh {
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
+
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
+    }
+  }
+}
+
+.friendsIcon-Dash {
+  margin-right: 2rem;
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
+
+
+  &.css-22xpxh {
+    background-color: #484c6c;
+    /* Set the background color for icons */
+    font-size: 30px;
+    /* Set the initial icon size */
+    color: #e0dcf4;
+    /* Adjust icon color as needed */
+
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
+    }
+  }
+}
+
+.userAvatar-Dash {
+  /* Assuming the Avatar component allows for background color styling through class */
+  margin-right: 2rem;
+  // background-color: #484c6c; /* Set background color */
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+  /* Smooth transition for scaling and color */
+
+  .css-16ite8i {
+    transition: transform 0.2s ease-in-out, color 0.2s ease;
+    /* Smooth transition for scaling and color */
+
+    color: #e0dcf4;
+
+    /* Set background color */
+    &:hover {
+      background-color: #484c6c;
+      /* Darker shade on hover, adjust as needed */
+      color: #b1a2ef;
+      /* Change icon color on hover */
+      transform: scale(1.2);
+      /* Increase the icon size */
+    }
+
+  }
+
+
+}
+
+/* 15-inch Laptops */
+@media screen and (max-width: 1200px) {
+  .badgeIcon-Dash {
+    &.css-22xpxh {
+      font-size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuIcon-Dash {
+    &.css-22xpxh {
+      font-size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuButton-Dash {
+    &.css-22xpxh {
+      font-size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .userAvatar-Dash {
+    &.css-22xpxh {
+      size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .friendsIcon-Dash {
+    &.css-22xpxh {
+      size: 25px;
+      /* Set the initial icon size */
+    }
+  }
+}
+
+/* 13-inch Laptops */
+@media screen and (max-width: 850) {
+  .badgeIcon-Dash {
+    &.css-22xpxh {
+      font-size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuIcon-Dash {
+    &.css-22xpxh {
+      font-size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .menuButton-Dash {
+    &.css-22xpxh {
+      font-size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .userAvatar-Dash {
+    &.css-22xpxh {
+      size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+
+  .friendsIcon-Dash {
+    &.css-22xpxh {
+      size: 20px;
+      /* Set the initial icon size */
+    }
+  }
+}
