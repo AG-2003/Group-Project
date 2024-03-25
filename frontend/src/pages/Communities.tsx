@@ -29,9 +29,7 @@ const Communities = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   return (
     <div style={{ position: "fixed", width: "100%" }}>
-      <div style={{ padding: "10px", background: "#484c6c" }}>
         <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      </div>
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)" position="relative">
         {!isDesktop && (
@@ -46,7 +44,7 @@ const Communities = () => {
                 style={{
                   paddingTop: "10px",
                   height: "inherit",
-                  backgroundColor: "#f6f6f6",
+                  backgroundColor: "#f4f1fa",
                   boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                   overflow: "hidden",
                   position: "absolute",
@@ -69,7 +67,7 @@ const Communities = () => {
                 style={{
                   paddingTop: "10px",
                   height: "inherit",
-                  backgroundColor: "#f6f6f6",
+                  backgroundColor: "#f4f1fa",
                   boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                   overflow: "hidden",
                   position: "absolute",
@@ -97,7 +95,7 @@ const Communities = () => {
               style={{
                 paddingTop: "10px",
                 height: "inherit",
-                backgroundColor: "#f6f6f6",
+                backgroundColor: "#f4f1fa",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
                 flexShrink: "0",
@@ -119,7 +117,7 @@ const Communities = () => {
               style={{
                 paddingTop: "10px",
                 height: "inherit",
-                backgroundColor: "#f6f6f6",
+                backgroundColor: "#f4f1fa",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
                 flexShrink: "0",

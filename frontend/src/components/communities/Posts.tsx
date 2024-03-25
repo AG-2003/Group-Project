@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
 import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
-import "./Posts.scss"
+import "./Posts.scss";
 import CommentsModal from "./commentsModal";
 import EditPostModal from "./EditPostModal";
 
@@ -164,7 +164,14 @@ const Posts = ({
 
   return (
     <Box>
-      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4" backgroundColor="#bcbcdc"  >
+      <Box
+        borderWidth="1px"
+        borderRadius="lg"
+        p="4"
+        mb="4"
+        backgroundColor="#bcbcdc"
+        justifyContent={"center"}
+      >
         <Flex justify="space-between" align="center" mb="2">
           <Flex align="center">
             <Avatar size="sm" name={post.Uname} src={post.Upic} mr="2" />
@@ -193,11 +200,7 @@ const Posts = ({
           {post.title}
         </Text>
         {post.image ? (
-          <img
-            src={post.image}
-            alt=""
-            className="post-image"
-          />
+          <img src={post.image} alt="" className="post-image" />
         ) : (
           <Box
             bg="gray.200"
@@ -247,7 +250,11 @@ const Posts = ({
           >
             Share
           </Button>
-          <Button className="comments-button" size="sm" onClick={handleCommentsClick}>
+          <Button
+            className="comments-button"
+            size="sm"
+            onClick={handleCommentsClick}
+          >
             <Box as="span" mr="1">
               <Text as="span">{post.commentsCount || 0}</Text>
             </Box>
@@ -278,5 +285,3 @@ const Posts = ({
 };
 
 export default Posts;
-
-

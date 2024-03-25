@@ -596,6 +596,8 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { UseToastNotification } from "../../utils/UseToastNotification";
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
 
 const Account = () => {
 
@@ -805,6 +807,12 @@ const Account = () => {
     }
   };
 
+  const navigate = useNavigate(); // Hook for navigation
+
+  const goBack = () => {
+    navigate(-1); // Go back to previous page
+  };
+
 
 
 
@@ -813,6 +821,13 @@ const Account = () => {
       {/* Header */}
       <div className="head">
         <Heading>Your Account</Heading>
+        <Button
+        size="sm"
+        leftIcon={<ArrowBackIcon />}
+        onClick={goBack}
+      >
+        Go back
+      </Button>
       </div>
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="" />
 

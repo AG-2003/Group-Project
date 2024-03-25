@@ -1,4 +1,7 @@
 .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   text-align: left;
   /* Align the header text to the left */
   padding-left: 1rem;
@@ -78,6 +81,16 @@
   .head,
   .body {
     padding: 0.5rem;
+  }
+  
+  .body .avatar {
+    margin-right: 1rem;
+    /* Space after the avatar */
+    margin-bottom: 1rem;
+    width: 70px;
+    /* Make the avatar larger */
+    height: 70px;
+    /* Make the avatar larger */
   }
 
   .upload-section {
