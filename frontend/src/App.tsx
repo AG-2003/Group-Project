@@ -40,7 +40,8 @@ import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
 import { Friends } from "./pages/Friends";
 import CSettings from "./components/communities/CSettings/CSettings";
-import { useReceivedRequests } from "./context/RecievedRequestsContext";
+
+
 
 function App() {
   useEffect(() => {
@@ -74,6 +75,7 @@ function App() {
         <Route path="/Social" element={<Social />} />
         <Route path="/badges" element={<BadgesPage />} />
         <Route path="/friends" element={<Friends />} />
+
         <Route path="/calendar" element={<Calendar />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />

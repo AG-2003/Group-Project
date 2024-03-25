@@ -14,6 +14,8 @@ import { UseToastNotification } from "../utils/UseToastNotification";
 import cardBg2 from '../assets/carbBg2.png'
 import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
 import { useReceivedRequests } from "../context/RecievedRequestsContext";
+import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -35,6 +37,7 @@ export const Friends: React.FC = () => {
     const [sentRequests, setSentRequests] = useState<string[]>([]);
     const [favorites, setFavorites] = useState<string[]>([]);
     const { receivedRequests, setReceivedRequests } = useReceivedRequests();
+    const navigate = useNavigate();
 
 
 
@@ -371,6 +374,7 @@ export const Friends: React.FC = () => {
         fetchUserFriends();
     }, []);
 
+
     const menuBg = useColorModeValue('white', 'gray.700');
     const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
     const menuItemHoverColor = useColorModeValue('purple.700', 'purple.100');
@@ -509,7 +513,7 @@ export const Friends: React.FC = () => {
                                                             </MenuItem>
                                                             <MenuItem
                                                                 _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => console.log("Chat")}
+                                                                onClick={() => console.log('chats')}
                                                             >
                                                                 Chat
                                                             </MenuItem>
