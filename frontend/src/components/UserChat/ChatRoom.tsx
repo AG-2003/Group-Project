@@ -1,25 +1,28 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { db } from '../../firebase-config';
+import { db, auth } from '../../firebase-config';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, Timestamp } from 'firebase/firestore';
-import { AuthContext } from '../../context/AuthContext';
+// import { AuthContext } from '../../context/AuthContext';
 import { Box, VStack, Input, Button } from '@chakra-ui/react';
 import { formatDistanceToNow } from 'date-fns';
 import MessageItem from './MessageItem';
+import add from '../../assets/add.png';
 
 interface Message {
     id: string;
     senderId: string;
     text: string;
-    createdAt: Date | null; // Now expecting a Date object or null
+    createdAt: Date | null;
+    senderPhotoURL?: string; // Add this line
 }
+
 
 
 const ChatRoom: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const { chatId } = useParams<{ chatId: string }>();
-    const { currentUser } = useContext(AuthContext);
+    const currentUser = auth.currentUser;
 
     useEffect(() => {
         if (!chatId) return;
@@ -29,12 +32,22 @@ const ChatRoom: React.FC = () => {
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const msgs: Message[] = querySnapshot.docs.map((doc) => {
-                const data = doc.data() as { senderId: string, text: string, createdAt: Timestamp };
-                // Convert the Timestamp to a Date object
+                const data = doc.data() as {
+                    senderId: string,
+                    text: string,
+                    createdAt: Timestamp,
+                    photoUrl: string | undefined
+                };
                 const createdAt = data.createdAt ? data.createdAt.toDate() : null;
-                return { id: doc.id, senderId: data.senderId, text: data.text, createdAt }; // This now matches the Message interface
+                return {
+                    id: doc.id,
+                    senderId: data.senderId,
+                    text: data.text,
+                    createdAt,
+                    senderPhotoURL: data.photoUrl
+                }; // Add senderPhotoURL to the message object
             });
-            setMessages(msgs); // msgs is now an array of Message objects
+            setMessages(msgs);
         });
         return unsubscribe; // This is the cleanup function to unsubscribe from the listener when the component unmounts
     }, [chatId]);
@@ -44,9 +57,9 @@ const ChatRoom: React.FC = () => {
         if (!newMessage.trim()) return;
         if (!chatId) return;
 
-        // Check if currentUser and currentUser.uid exist
-        if (!currentUser || !currentUser.uid) {
-            console.error("No user ID found");
+        // Check if currentUser and currentUser.email exist
+        if (!currentUser || !currentUser.email) {
+            console.error("No user email found");
             // Optionally, handle this error with user feedback
             return;
         }
@@ -55,8 +68,9 @@ const ChatRoom: React.FC = () => {
         try {
             await addDoc(messagesRef, {
                 text: newMessage,
-                senderId: currentUser.uid, // We've now checked that currentUser.uid is not undefined
+                senderId: currentUser.email, // Use email instead of uid
                 createdAt: serverTimestamp(),
+                photoUrl: auth.currentUser?.photoURL
             });
             setNewMessage('');
         } catch (error) {
@@ -66,28 +80,50 @@ const ChatRoom: React.FC = () => {
     };
 
 
+
+
+
     return (
-        <Box p={4}>
-            <VStack spacing={4}>
-                <VStack spacing={4} overflowY="scroll" height="400px" width="100%">
+        <Box p={4} bg="purple.50" height="95vh" width="100%">
+            <VStack spacing={4} align="stretch" height='full' overflow='auto'>
+                <VStack
+                    spacing={4}
+                    overflowY="auto"
+                    height="full"
+                    p={4}
+                    bg="white"
+                    borderRadius="lg"
+                    boxShadow="md"
+                >
+
                     {messages.map((message) => (
                         <MessageItem
                             key={message.id}
                             senderId={message.senderId}
                             text={message.text}
                             createdAt={message.createdAt}
-                            currentUserId={currentUser?.uid ?? ''}
+                            currentUserId={currentUser?.email ?? ''}
+                            senderPhotoURL={message.senderPhotoURL}
                         />
                     ))}
+
                 </VStack>
-                <form onSubmit={sendMessage}>
+                <Box as="form" onSubmit={sendMessage} display="flex" mt={3}>
                     <Input
+                        flexGrow={1}
+                        mr={2}
                         placeholder="Type a message..."
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
+                        bg="white"
+                        borderColor="purple.300"
+                        _hover={{ borderColor: 'purple.400' }}
+                        _focus={{ borderColor: 'purple.500' }}
                     />
-                    <Button type="submit" colorScheme="blue" mt={3}>Send</Button>
-                </form>
+                    <Button type="submit" colorScheme="purple">
+                        Send
+                    </Button>
+                </Box>
             </VStack>
         </Box>
     );

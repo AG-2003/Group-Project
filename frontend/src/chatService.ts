@@ -23,6 +23,7 @@ interface Message {
     senderId: string;
     text: string;
     createdAt: typeof serverTimestamp;
+    userPhotoURL: string
 }
 
 const chatsCol = collection(db, 'chats') as CollectionReference<Chat>;
@@ -37,12 +38,13 @@ const createChat = async (participants: string[]) => {
 };
 
 // Send a message in a chat session
-const sendMessage = async (chatId: string, senderId: string, text: string) => {
+const sendMessage = async (chatId: string, senderId: string, text: string, userPhotoURL: string) => {
     const messagesCol = getMessagesCol(chatId);
     return await addDoc(messagesCol, {
         senderId,
         text,
         createdAt: serverTimestamp(),
+        userPhotoURL,
     });
 };
 

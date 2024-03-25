@@ -41,6 +41,7 @@ import YourPosts from "./components/communities/YourPosts";
 import { Friends } from "./pages/Friends";
 import CSettings from "./components/communities/CSettings/CSettings";
 import ChatRoom from "./components/UserChat/ChatRoom";
+import { UserChats } from "./pages/Auth/UserChats";
 
 
 
@@ -77,7 +78,7 @@ function App() {
         <Route path="/Social" element={<Social />} />
         <Route path="/badges" element={<BadgesPage />} />
         <Route path="/friends" element={<Friends />} />
-        <Route path="/chat/:chatId" element={<ChatRoom />} />
+        <Route path="/chat/:chatId" element={<UserChats />} />
         <Route path="/calendar" element={<Calendar />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
