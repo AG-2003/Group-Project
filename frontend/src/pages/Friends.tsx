@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
     Box, Button, Divider, Flex, Input, useColorModeValue, Text, HStack, VStack, IconButton, StackDivider,
     Container, Menu, MenuButton, MenuList, MenuItem, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
-    ModalBody, ModalCloseButton, useDisclosure, Heading, ButtonGroup
+    ModalBody, ModalCloseButton, useDisclosure, Heading, ButtonGroup, Tabs, TabList, TabPanels, TabPanel, Tab
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
@@ -33,7 +33,7 @@ export const Friends: React.FC = () => {
     const [friends, setFriends] = useState<string[]>([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [sentRequests, setSentRequests] = useState<string[]>([]);
-    // const [receivedRequests, setReceivedRequests] = useState<string[]>([]);
+    const [favorites, setFavorites] = useState<string[]>([]);
     const { receivedRequests, setReceivedRequests } = useReceivedRequests();
 
 
@@ -80,8 +80,6 @@ export const Friends: React.FC = () => {
         setSearchTerm(event.target.value);
     };
 
-    const debouncedSearchTerm = useCallback(debounce(handleSearchChange, 500), []);
-
     useEffect(() => {
         const fetchUsers = async () => {
             const usersColRef = collection(db, 'users');
@@ -96,7 +94,23 @@ export const Friends: React.FC = () => {
             }
         };
 
+        const fetchFavorites = async () => {
+            if (!userEmail) return;
+            const userDocRef = doc(db, 'users', userEmail);
+            try {
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists() && userDocSnap.data()) {
+                    const userData = userDocSnap.data();
+                    const userFavs: string[] = userData.favorites || [];
+                    setFavorites(userFavs);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
         fetchUsers();
+        fetchFavorites();
     }, []);
 
 
@@ -201,19 +215,22 @@ export const Friends: React.FC = () => {
         const friendDocRef = doc(db, 'users', requesterEmail);
 
         try {
+            const batch = writeBatch(db);
 
 
-            await updateDoc(userDocRef, {
+            batch.update(userDocRef, {
                 userFriends: arrayUnion(requesterEmail),
                 receivedRequests: arrayRemove(requesterEmail)
             });
 
             // Add current user to friend's list
-            await updateDoc(friendDocRef, {
+            batch.update(friendDocRef, {
                 userFriends: arrayUnion(userEmail),
                 sentRequests: arrayRemove(userEmail)
 
             });
+
+            await batch.commit();
 
             setFriends(prev => [...prev, requesterEmail]);
             const updatedReceivedRequests = receivedRequests.filter(req => req !== requesterEmail);
@@ -226,7 +243,7 @@ export const Friends: React.FC = () => {
         }
     }
 
-    // TODO: use batch 
+
     const rejectFriendRequest = async (requesterEmail: string) => {
         if (!userEmail) return;
 
@@ -254,6 +271,48 @@ export const Friends: React.FC = () => {
             showToast('error', `Error rejecting friend request: ${error}`);
         }
     };
+
+    const handleAddFavorite = async (friendEmail: string) => {
+        if (!userEmail || !friendEmail) return;
+
+        const userDocRef = doc(db, 'users', userEmail);
+
+        try {
+            await updateDoc(userDocRef, {
+                favorites: arrayUnion(friendEmail)
+            });
+
+            setFavorites(prevFavorites => [...favorites, friendEmail]);
+            showToast('success', `${friendEmail} added to favorites.`);
+
+        } catch (err) {
+            showToast('error', `Failed to add ${friendEmail} to favorites: ${err}`);
+        }
+
+    }
+
+
+    const handleRemoveFavorite = async (friendEmail: string) => {
+        if (!userEmail || !friendEmail) return;
+
+        const userDocRef = doc(db, 'users', userEmail);
+
+        try {
+            await updateDoc(userDocRef, {
+                favorites: arrayRemove(friendEmail)
+            });
+
+            // Update the local state to reflect the change
+            setFavorites(prevFavorites => prevFavorites.filter(email => email !== friendEmail));
+
+            // Show a success toast notification
+            showToast('success', `${friendEmail} removed from favorites.`);
+        } catch (err) {
+            console.error("Error removing from favorites:", err);
+            showToast('error', `Failed to remove ${friendEmail} from favorites: ${err}`);
+        }
+    }
+
 
 
     const removeFriend = async (friendEmail: string) => {
@@ -312,11 +371,6 @@ export const Friends: React.FC = () => {
         fetchUserFriends();
     }, []);
 
-    // Calls fetchUserFriends whenever you add a friend
-    const addFriendAndUpdate = async (friendEmail: string) => {
-        await addFriend(friendEmail);
-        await fetchUserFriends();
-    };
     const menuBg = useColorModeValue('white', 'gray.700');
     const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
     const menuItemHoverColor = useColorModeValue('purple.700', 'purple.100');
@@ -387,7 +441,7 @@ export const Friends: React.FC = () => {
 
                             <VStack
                                 divider={<StackDivider borderColor="gray.200" />}
-                                spacing={4}
+                                spacing={3}
                                 align="stretch"
                             >
                                 {searchResults.map((result) => (
@@ -422,68 +476,132 @@ export const Friends: React.FC = () => {
                                     </Flex>
                                 ))}
                             </VStack>
-                            <Text fontSize="2xl" my={4}>
-                                My Friends
-                            </Text>
-                            <Divider my={4} />
-                            <VStack
-                                divider={<StackDivider borderColor="gray.200" />}
-                                spacing={4}
-                                align="stretch"
-                            >
-                                {friends.map((friendEmail) => (
-                                    <Flex key={friendEmail} justifyContent="space-between" alignItems="center" p="4" bg="white" borderRadius="md" shadow="base" bgImage={cardBg2}>
-                                        <Text>{friendEmail}</Text>
-                                        <Menu placement="bottom-start" gutter={4} strategy="fixed">
-
-                                            <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
-                                            <MenuList bg={menuBg} zIndex={10} minW="240px">
-                                                <MenuItem
-                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                    onClick={() => removeFriend(friendEmail)}
-                                                >
-                                                    Remove Friend
-                                                </MenuItem>
-                                                <MenuItem
-                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                    onClick={() => console.log("View Profile")}
-                                                >
-                                                    View User Profile
-                                                </MenuItem>
-                                                <MenuItem
-                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                    onClick={() => console.log("Chat")}
-                                                >
-                                                    Chat
-                                                </MenuItem>
-
-                                            </MenuList>
-                                        </Menu>
-                                    </Flex>
-                                ))}
-                                {selectedFriend && (
-                                    <Modal isOpen={isModalOpen} onClose={closeModal} isCentered>
-                                        <ModalOverlay />
-                                        <ModalContent
-                                            // bg={useColorModeValue('white', 'gray.800')} // Background color
-                                            boxShadow="xl" // Shadow for depth
-                                            rounded="lg" // Rounded corners
+                            {/* Here begins the Tabs component */}
+                            <Tabs isFitted variant="enclosed" mt={8} colorScheme="purple">
+                                <TabList mb="1em">
+                                    <Tab _selected={{ color: 'white', bg: 'purple.400' }}>My Friends</Tab>
+                                    <Tab _selected={{ color: 'white', bg: 'purple.400' }}>Favorites</Tab>
+                                </TabList>
+                                <TabPanels>
+                                    <TabPanel>
+                                        <VStack
+                                            divider={<StackDivider borderColor="gray.200" />}
+                                            spacing={1}
+                                            align="stretch"
                                         >
-                                            <ModalHeader>{selectedFriend.username || selectedFriend.email}</ModalHeader>
-                                            <ModalCloseButton />
-                                            <ModalBody>
-                                                {/* Content here */}
-                                            </ModalBody>
-                                        </ModalContent>
-                                    </Modal>
-                                )}
-                            </VStack>
+                                            {friends.map((friendEmail) => (
+                                                <Flex key={friendEmail} justifyContent="space-between" alignItems="center" p="4" bg="white" borderRadius="md" shadow="base" bgImage={cardBg2}>
+                                                    <Text>{friendEmail}</Text>
+                                                    <Menu placement="bottom-start" gutter={4} strategy="fixed">
+                                                        <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
+                                                        <MenuList bg={menuBg} zIndex={10} minW="240px">
+                                                            <MenuItem
+                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                onClick={() => removeFriend(friendEmail)}
+                                                            >
+                                                                Remove Friend
+                                                            </MenuItem>
+                                                            <MenuItem
+                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                onClick={() => console.log("View Profile")}
+                                                            >
+                                                                View User Profile
+                                                            </MenuItem>
+                                                            <MenuItem
+                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                onClick={() => console.log("Chat")}
+                                                            >
+                                                                Chat
+                                                            </MenuItem>
+                                                            {favorites.includes(friendEmail) ? (
+                                                                <MenuItem
+                                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                    onClick={() => handleRemoveFavorite(friendEmail)} // Implement this function similar to handleAddFavorite
+                                                                >
+                                                                    Remove from Favorites
+                                                                </MenuItem>
+                                                            ) : (
+                                                                <MenuItem
+                                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                    onClick={() => handleAddFavorite(friendEmail)}
+                                                                >
+                                                                    Add to Favorites
+                                                                </MenuItem>
+                                                            )}
+                                                        </MenuList>
+                                                    </Menu>
+                                                </Flex>
+                                            ))}
+                                        </VStack>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        {/* Mapping over favorites */}
+                                        {favorites.length > 0 ? (
+                                            <VStack
+                                                divider={<StackDivider borderColor="gray.200" />}
+                                                spacing={1}
+                                                align="stretch"
+                                            >
+                                                {friends
+                                                    .filter((friendEmail) => favorites.includes(friendEmail))
+                                                    .map((friendEmail) => (
+                                                        <Flex key={friendEmail} justifyContent="space-between" alignItems="center" p="4" bg="white" borderRadius="md" shadow="base" bgImage={cardBg2}>
+                                                            <Text>{friendEmail}</Text>
+                                                            <Menu placement="bottom-start" gutter={4} strategy="fixed">
+                                                                <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
+                                                                <MenuList bg={menuBg} zIndex={10} minW="240px">
+                                                                    <MenuItem
+                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                        onClick={() => removeFriend(friendEmail)}
+                                                                    >
+                                                                        Remove Friend
+                                                                    </MenuItem>
+                                                                    <MenuItem
+                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                        onClick={() => console.log("View Profile")}
+                                                                    >
+                                                                        View User Profile
+                                                                    </MenuItem>
+                                                                    <MenuItem
+                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                        onClick={() => console.log("Chat")}
+                                                                    >
+                                                                        Chat
+                                                                    </MenuItem>
+                                                                    {favorites.includes(friendEmail) ? (
+                                                                        <MenuItem
+                                                                            _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                            onClick={() => handleRemoveFavorite(friendEmail)} // Implement this function similar to handleAddFavorite
+                                                                        >
+                                                                            Remove from Favorites
+                                                                        </MenuItem>
+                                                                    ) : (
+                                                                        <MenuItem
+                                                                            _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                            onClick={() => handleAddFavorite(friendEmail)}
+                                                                        >
+                                                                            Add to Favorites
+                                                                        </MenuItem>
+                                                                    )}
+                                                                </MenuList>
+                                                            </Menu>
+                                                        </Flex>
+                                                    ))
+                                                }
+                                            </VStack>
+                                        ) : (
+                                            <Text>No favorites yet.</Text>
+                                        )}
+
+                                    </TabPanel>
+                                </TabPanels>
+                            </Tabs>
 
                         </Box>
+
                     </Flex>
                 </Box >
             </Box >
         </>
     )
 }
-

@@ -5,7 +5,7 @@ import "./Canvas.scss";
 import { FaRegSquare, FaRegCircle, FaSlash, FaRegStar } from "react-icons/fa";
 import { FiTriangle } from "react-icons/fi";
 import { BsArrowUpRight } from "react-icons/bs";
-
+import { UseToastNotification } from "../../utils/UseToastNotification";
 import { debounce } from "../../utils/Time";
 import { SuiteProps } from "../../interfaces/SuiteProps";
 import { SuiteData } from "../../interfaces/SuiteData";
@@ -56,6 +56,12 @@ interface RectangleType {
   width: number;
   height: number;
   fill: string;
+}
+
+// Add a new interface for the user's document data
+interface UserDocData {
+  boards: SuiteData[];
+  hasCreatedBoard?: boolean;
 }
 
 const colors = [
@@ -174,6 +180,7 @@ const Canvas: React.FC<SuiteProps> = ({
     useState<RectangleType | null>(null);
   const [rectangles, setRectangles] = useState<RectangleType[]>([]);
   const [showShapeMenu, setShowShapeMenu] = useState(false);
+  const showToast = UseToastNotification();
 
   //---------------Store the serialized data-----------------
   const [serializedLinesData, setSerializedLinesData] = useState("");
@@ -189,7 +196,7 @@ const Canvas: React.FC<SuiteProps> = ({
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
 
   useEffect(() => {
-    if(isSharePage){
+    if (isSharePage) {
       const ydoc = new Y.Doc()
 
       //Update Lines
@@ -203,20 +210,20 @@ const Canvas: React.FC<SuiteProps> = ({
       const yprovider = new FireProvider({ firebaseApp, ydoc, path: `sharedBoards/${suiteId}` })
 
       const updateLines = () => {
-        if(user?.email){
+        if (user?.email) {
           let username = user?.email
           lineOrder.forEach((value, key) => {
             const newLine = linesMap.get(key) as LineType
 
-            if(value===-1) {
+            if (value === -1) {
               setLines([])
               setTexts([])
               setRectangles([])
               setCurrentRectangle(null)
               lineOrder.set(username, 0)
-            } else if (newLine && newLine.points.length !== 0){
+            } else if (newLine && newLine.points.length !== 0) {
 
-              console.log("Original Lines:",lines)
+              console.log("Original Lines:", lines)
               setLines(prevLines => {
                 let newLines = [...prevLines];
                 // Ensure newLines has a length at least as great as value + 1
@@ -230,7 +237,7 @@ const Canvas: React.FC<SuiteProps> = ({
                   });
                 }
                 newLines[value] = newLine;
-                console.log("New lines:",newLines)
+                console.log("New lines:", newLines)
                 return newLines;
               });
             }
@@ -265,88 +272,88 @@ const Canvas: React.FC<SuiteProps> = ({
     }
   }, [])
 
-    //---------------------------Function to render the saved whiteboard--------------
-    useEffect(() => {
-      const username = user?.email
-      if (username && !isSharePage) {
-        fetchDocumentFromFirestore(username);
-      } else if(isSharePage){
-        fetchSharedBoardFromFirestore(doc(collection(db, "sharedBoards"), suiteId))
-      }
-    }, []);
+  //---------------------------Function to render the saved whiteboard--------------
+  useEffect(() => {
+    const username = user?.email
+    if (username && !isSharePage) {
+      fetchDocumentFromFirestore(username);
+    } else if (isSharePage) {
+      fetchSharedBoardFromFirestore(doc(collection(db, "sharedBoards"), suiteId))
+    }
+  }, []);
 
-    const fetchDocumentFromFirestore = async (username: string) => {
-      try {
-        if (username) {
-          const userDocRef = doc(collection(db, "users"), username);
-          const docSnapshot = await getDoc(userDocRef);
-          if (docSnapshot.exists()) {
-            const boardsArray: SuiteData[] = docSnapshot.data().boards || [];
-            const board = boardsArray.find(board => board.id === suiteId);
-            if (board && board.content) {
-              const boardContent = JSON.parse(board.content)
-              setLines(JSON.parse(boardContent[0]))
-              setTexts(JSON.parse(boardContent[1]))
-              setRectangles(JSON.parse(boardContent[2]))
-              setSuiteTitle(board.title)
-            }
+  const fetchDocumentFromFirestore = async (username: string) => {
+    try {
+      if (username) {
+        const userDocRef = doc(collection(db, "users"), username);
+        const docSnapshot = await getDoc(userDocRef);
+        if (docSnapshot.exists()) {
+          const boardsArray: SuiteData[] = docSnapshot.data().boards || [];
+          const board = boardsArray.find(board => board.id === suiteId);
+          if (board && board.content) {
+            const boardContent = JSON.parse(board.content)
+            setLines(JSON.parse(boardContent[0]))
+            setTexts(JSON.parse(boardContent[1]))
+            setRectangles(JSON.parse(boardContent[2]))
+            setSuiteTitle(board.title)
           }
         }
-      } catch (error) {
-        console.error("Error fetching document:", error);
       }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
 
-      setIsLoading(false)
-    };
+    setIsLoading(false)
+  };
 
-    const fetchSharedBoardFromFirestore = async (sharedBoardRef: DocumentReference<DocumentData, DocumentData>) => {
-      try {
-        if (isSharePage) {
-          const docSnapshot = await getDoc(sharedBoardRef);
-          if (docSnapshot.exists()) {
-            const board = docSnapshot.data() as SuiteData;
-            if (board && board.boardContent) {
-              const boardContent = JSON.parse(board.boardContent)
-              setLines(JSON.parse(boardContent[0]))
-              setTexts(JSON.parse(boardContent[1]))
-              setRectangles(JSON.parse(boardContent[2]))
-              setSuiteTitle(board.title)
-            }
-          } else {
-            if(user?.email){
-              fetchDocumentFromFirestore(user?.email)
-              const userDocRef = doc(db, "users", user?.email);
-              const userDocSnapshot = await getDoc(userDocRef);
-              if(userDocSnapshot.exists()){
-                const boardsArray = userDocSnapshot.data().boards as SuiteData[] || []
-                const boardIndex = boardsArray.findIndex((board: SuiteData) => board.id === suiteId)
-                if(boardIndex!==-1){
-                  const board = boardsArray[boardIndex]
-                  if (board && board.content) {
-                    const boardContent = JSON.parse(board.content)
-                    setLines(JSON.parse(boardContent[0]))
-                    setTexts(JSON.parse(boardContent[1]))
-                    setRectangles(JSON.parse(boardContent[2]))
-                    setSuiteTitle(board.title)
+  const fetchSharedBoardFromFirestore = async (sharedBoardRef: DocumentReference<DocumentData, DocumentData>) => {
+    try {
+      if (isSharePage) {
+        const docSnapshot = await getDoc(sharedBoardRef);
+        if (docSnapshot.exists()) {
+          const board = docSnapshot.data() as SuiteData;
+          if (board && board.boardContent) {
+            const boardContent = JSON.parse(board.boardContent)
+            setLines(JSON.parse(boardContent[0]))
+            setTexts(JSON.parse(boardContent[1]))
+            setRectangles(JSON.parse(boardContent[2]))
+            setSuiteTitle(board.title)
+          }
+        } else {
+          if (user?.email) {
+            fetchDocumentFromFirestore(user?.email)
+            const userDocRef = doc(db, "users", user?.email);
+            const userDocSnapshot = await getDoc(userDocRef);
+            if (userDocSnapshot.exists()) {
+              const boardsArray = userDocSnapshot.data().boards as SuiteData[] || []
+              const boardIndex = boardsArray.findIndex((board: SuiteData) => board.id === suiteId)
+              if (boardIndex !== -1) {
+                const board = boardsArray[boardIndex]
+                if (board && board.content) {
+                  const boardContent = JSON.parse(board.content)
+                  setLines(JSON.parse(boardContent[0]))
+                  setTexts(JSON.parse(boardContent[1]))
+                  setRectangles(JSON.parse(boardContent[2]))
+                  setSuiteTitle(board.title)
 
-                    saveSharedBoardToFirestore(boardContent)
-                  }
+                  saveSharedBoardToFirestore(boardContent)
                 }
-
-                boardsArray.splice(boardIndex, 1)
-                await setDoc(userDocRef, {boards: boardsArray}, { merge: true})
               }
+
+              boardsArray.splice(boardIndex, 1)
+              await setDoc(userDocRef, { boards: boardsArray }, { merge: true })
             }
           }
-
-          setIsLoading(false)
         }
-      } catch (error) {
-        console.error("Error fetching document:", error);
-      }
 
-    };
-    //____________________________________________________________
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+
+  };
+  //____________________________________________________________
 
   useEffect(() => {
     /*
@@ -387,6 +394,8 @@ const Canvas: React.FC<SuiteProps> = ({
     suiteTitle,
   ]);
 
+  // ...
+
   const saveBoardToFirestore = async (
     username: string,
     boardId: string,
@@ -395,55 +404,65 @@ const Canvas: React.FC<SuiteProps> = ({
   ) => {
     try {
       const userDocRef = doc(collection(db, "users"), username);
-      // Get the current document to see if there are existing documents
       const docSnapshot = await getDoc(userDocRef);
       let boardsArray: SuiteData[] = [];
+      // Initialize userDocData here, similar to your sheets function
+      let userDocData: UserDocData = { boards: [] }; // Default to an empty boards array if no data exists
 
       if (docSnapshot.exists()) {
-        // Get the existing documents array or initialize it if it doesn't exist
-        boardsArray = docSnapshot.data().boards || [];
+        userDocData = docSnapshot.data() as UserDocData; // Cast the document snapshot to UserDocData type
+        boardsArray = userDocData.boards || [];
       }
 
-      const now = new Date().toISOString(); // Get current time as ISO string
+      const now = new Date().toISOString();
 
-      // Check if the document with the given ID already exists
+      // Check if the board with the given ID already exists
       const existingBoardIndex = boardsArray.findIndex(
         (board: SuiteData) => board.id === boardId
       );
 
-      if (existingBoardIndex !== -1) {
-        // Update the existing document's title and content
-        boardsArray[existingBoardIndex] = {
-          ...boardsArray[existingBoardIndex],
-          title: boardTitle,
-          lastEdited: now,
-          content: JSON.stringify(data),
-        };
-      } else {
-        // Add a new document with a unique ID
+      const isNewBoard = existingBoardIndex === -1;
+
+      if (isNewBoard) {
+        // Add a new board with a unique ID
         boardsArray.push({
           id: boardId,
           title: boardTitle,
-          lastEdited: now,
           content: JSON.stringify(data),
-          type: "board",
+          type: 'board',
+          lastEdited: now,
           isTrash: false,
           isShared: false,
         });
+      } else {
+        // Update the existing board's title and content
+        boardsArray[existingBoardIndex] = {
+          ...boardsArray[existingBoardIndex],
+          title: boardTitle,
+          content: JSON.stringify(data),
+          lastEdited: now,
+        };
       }
 
-      // Update the user's document with the new or updated documents array
+      // Update the user's document with the new or updated boards array
       await setDoc(
         userDocRef,
-        {
+        isNewBoard ? {
+          boards: boardsArray,
+          hasCreatedBoard: true,
+        } : {
           boards: boardsArray,
         },
         { merge: true }
       );
+      if (isNewBoard && !userDocData.hasCreatedBoard) {
+        showToast('success', 'You have successfully earned a badge for creating your first whiteboard.');
+      }
     } catch (error) {
       console.error("Error saving document:", error);
     }
   };
+
 
   /**
    * For collaborative storage
@@ -464,7 +483,7 @@ const Canvas: React.FC<SuiteProps> = ({
           sharedBoard = boardSnapshot.data() as SuiteData;
           sharedBoard.boardContent = JSON.stringify(data);
           sharedBoard.lastEdited = new Date().toISOString();
-          sharedBoard.title=suiteTitle
+          sharedBoard.title = suiteTitle
 
           if (sharedBoard.user && !sharedBoard.user.includes(user?.email)) {
             sharedBoard.user.push(user?.email);
@@ -558,7 +577,7 @@ const Canvas: React.FC<SuiteProps> = ({
           },
         ]);
 
-        if(ydoc && isSharePage && user?.email){
+        if (ydoc && isSharePage && user?.email) {
           const lineOrder = ydoc.getMap<number>('lineOrder')
           const linesMap = ydoc.getMap<LineType>('lines')
 
@@ -582,7 +601,7 @@ const Canvas: React.FC<SuiteProps> = ({
           },
         ]);
 
-        if(ydoc && isSharePage && user?.email){
+        if (ydoc && isSharePage && user?.email) {
           const lineOrder = ydoc.getMap<number>('lineOrder')
           const linesMap = ydoc.getMap<LineType>('lines')
 
@@ -601,7 +620,7 @@ const Canvas: React.FC<SuiteProps> = ({
         if (text) {
           setTexts([...texts, { tool, x: pos.x, y: pos.y, text }]);
 
-          if(ydoc && isSharePage){
+          if (ydoc && isSharePage) {
             const textArray = ydoc.getArray<TextType>('texts')
             textArray.push([{ tool, x: pos.x, y: pos.y, text } as TextType]);
           }
@@ -625,7 +644,7 @@ const Canvas: React.FC<SuiteProps> = ({
     }
   };
 
-  const handleMouseMove: StageProps["onMouseMove"] & StageProps["onTouchMove"]  = (e) => {
+  const handleMouseMove: StageProps["onMouseMove"] & StageProps["onTouchMove"] = (e) => {
     e.evt.preventDefault();
     if (!isDrawing.current) {
       return;
@@ -649,7 +668,7 @@ const Canvas: React.FC<SuiteProps> = ({
           )
         );
 
-        if(ydoc && user?.email && isSharePage){
+        if (ydoc && user?.email && isSharePage) {
           const linesMap = ydoc.getMap<LineType>('lines')
 
           linesMap.set(user?.email, {
@@ -671,7 +690,7 @@ const Canvas: React.FC<SuiteProps> = ({
         )
       );
 
-      if(ydoc && user?.email && isSharePage){
+      if (ydoc && user?.email && isSharePage) {
         const linesMap = ydoc.getMap<LineType>('lines')
 
         linesMap.set(user?.email, {
@@ -702,14 +721,14 @@ const Canvas: React.FC<SuiteProps> = ({
     // ...
   };
 
-  const handleMouseUp: StageProps["onMouseUp"] & StageProps["onTouchEnd"]  = (e) => {
+  const handleMouseUp: StageProps["onMouseUp"] & StageProps["onTouchEnd"] = (e) => {
     e.evt.preventDefault();
     if (selectedShape === "rectangle" && currentRectangle) {
       if (currentRectangle.width !== 0 && currentRectangle.height !== 0) {
         setRectangles([...rectangles, currentRectangle]);
         console.log("Rectangle drawing finished", currentRectangle);
 
-        if(ydoc && isSharePage){
+        if (ydoc && isSharePage) {
           const rectanglesArray = ydoc.getArray<RectangleType>('rectangles')
           // textArray.push([{ tool, x: pos.x, y: pos.y, text } as TextType]);
           rectanglesArray.push([currentRectangle as RectangleType])
@@ -730,7 +749,7 @@ const Canvas: React.FC<SuiteProps> = ({
       setRectangles([]);
       setCurrentRectangle(null);
 
-      if(ydoc && isSharePage && user?.email){
+      if (ydoc && isSharePage && user?.email) {
         const lineOrder = ydoc.getMap<number>('lineOrder')
         const linesMap = ydoc.getMap<LineType>('lines')
         const textArray = ydoc.getArray<TextType>('texts')
