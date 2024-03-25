@@ -7,6 +7,7 @@ import { ForgotPassword } from "./pages/Auth/ForgotPassword";
 import { SignUpEmail } from "./pages/Auth/SignUpEmail";
 import { SignUpPassword } from "./pages/Auth/SignUpPassword";
 import { NewPassword } from "./pages/Auth/NewPassword";
+import Policies from "./pages/Policies";
 // import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
@@ -33,11 +34,14 @@ import CDetails from "./components/communities/CDetails";
 import { reportWebVitals } from "./utils/WebVitals";
 import { useEffect } from "react";
 import { BadgesPage } from "./pages/BadgesPage";
+import { Calendar } from "./pages/Calendar";
 import SavedPosts from "./components/communities/SavedPosts";
 import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
+import { Friends } from "./pages/Friends";
 import CSettings from "./components/communities/CSettings/CSettings";
 import TSettings from "./components/Teams/Tsettings/TSettings";
+import { useReceivedRequests } from "./context/RecievedRequestsContext";
 
 function App() {
   useEffect(() => {
@@ -56,6 +60,7 @@ function App() {
       <Route path="/signUpEmail" element={<SignUpEmail />} />
       <Route path="/signUpPwd" element={<SignUpPassword />} />
       <Route path="/newPwd" element={<NewPassword />} />
+      <Route path="/policy" element={<Policies />} />
       <Route element={<ProtectedRoutes />}>
         <Route path="/index" element={<Profile />} />
         <Route path="/Settings" element={<Settings />} />
@@ -69,6 +74,8 @@ function App() {
         <Route path="/Teams" element={<Teams />} />
         <Route path="/Social" element={<Social />} />
         <Route path="/badges" element={<BadgesPage />} />
+        <Route path="/friends" element={<Friends />} />
+        <Route path="/calendar" element={<Calendar />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
         <Route path="/board/*" element={<Whiteboard />} />;

@@ -58,7 +58,35 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
 
 
-  // Function to start the call
+  // // Function to start the call
+  // const handleStartCall = () => {
+  //   // Generate the roomID and construct the meeting link
+  //   const roomID = randomID(5);
+  //   const meetingLink =
+  //     window.location.protocol +
+  //     "//" +
+  //     window.location.host +
+  //     "/meeting?roomID=" +
+  //     roomID;
+
+  //   // Navigate to the Zoom meeting page
+  //   navigate(`/meeting?roomID=${roomID}`);
+
+  //   // Now you can send the meeting link to the chat or use it as needed
+  //   // For example, you can add a new message to the chat
+  //   const newMessage: Message = {
+  //     id: Date.now().toString(),
+  //     text: meetingLink,
+  //     userId: user?.email,
+  //     timestamp: serverTimestamp(),
+  //     userPic: user?.photoURL,
+  //     userName: user?.displayName,
+  //   };
+
+  //   // Add the new message to the chat
+
+  // };
+
   const handleStartCall = () => {
     // Generate the roomID and construct the meeting link
     const roomID = randomID(5);
@@ -69,8 +97,8 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       "/meeting?roomID=" +
       roomID;
 
-    // Navigate to the Zoom meeting page
-    navigate(`/meeting?roomID=${roomID}`);
+    // Open the meeting link in a new tab
+    window.open(meetingLink, '_blank');
 
     // Now you can send the meeting link to the chat or use it as needed
     // For example, you can add a new message to the chat
@@ -89,23 +117,8 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
   return (
     <div className="navbarSheet">
-      <IconButton
-        className="menu-icon-button"
-        aria-label="Menu"
-        icon={<HamburgerIcon style={iconStyle} />}
-        onClick={onToggle}
-        colorScheme="purple.100"
-      />
       <div className="nav-items">
         <button className="nav-item" onClick={() => { navigate(-1) }}>Home</button>
-        <div className="nav-item">File</div>
-        <div className="nav-item">Edit</div>
-        <div className="nav-item">View</div>
-        <div className="nav-item">Insert</div>
-        <div className="nav-item">Format</div>
-        <div className="nav-item">Tools</div>
-        <div className="nav-item">Extensions</div>
-        <div className="nav-item">Help</div>
       </div>
       <div className="title-area">
         <input
@@ -133,7 +146,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             onClick={handleStartCall}
           />
         </Tooltip>
-        <Tooltip
+        {/* <Tooltip
           label="Get Analytics"
           className="tooltip-label"
           placement="top"
@@ -145,20 +158,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             icon={<IoBarChartOutline />}
             onClick={onOpen}
           />
-        </Tooltip>
-        <Tooltip
-          label="Share"
-          className="tooltip-label"
-          placement="top"
-          hasArrow
-        >
-          <IconButton
-            className="action-icon share"
-            aria-label="share"
-            icon={<IoShareOutline />}
-            onClick={onOpen}
-          />
-        </Tooltip>
+        </Tooltip> */}
       </div>
     </div >
   );

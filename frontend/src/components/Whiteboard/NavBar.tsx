@@ -1,16 +1,28 @@
 import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  Button,
+  Input,
   IconButton,
   useDisclosure,
   Tooltip,
+  UnorderedList,
+  ListItem,
+  InputGroup,
+  InputRightElement,
+  Text
 } from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { CloseIcon, CopyIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
   IoVideocamOutline,
   IoBarChartOutline,
   IoShareOutline,
 } from "react-icons/io5";
 import "./NavBar.scss";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Message } from "../../interfaces/Message";
 import { serverTimestamp } from "firebase/firestore";
@@ -25,7 +37,9 @@ interface Props {
 }
 
 const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Props) => {
+  const isSharePage = window.location.pathname.includes('/board/share')
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isShareModalOpen, onOpen: onShareModalOpen, onClose: onShareModalClose } = useDisclosure();
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
   const iconStyle = {
@@ -58,6 +72,34 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
 
   // Function to start the call
+  // const handleStartCall = () => {
+  //   // Generate the roomID and construct the meeting link
+  //   const roomID = randomID(5);
+  //   const meetingLink =
+  //     window.location.protocol +
+  //     "//" +
+  //     window.location.host +
+  //     "/meeting?roomID=" +
+  //     roomID;
+
+  //   // Navigate to the Zoom meeting page
+  //   navigate(`/meeting?roomID=${roomID}`);
+
+  //   // Now you can send the meeting link to the chat or use it as needed
+  //   // For example, you can add a new message to the chat
+  //   const newMessage: Message = {
+  //     id: Date.now().toString(),
+  //     text: meetingLink,
+  //     userId: user?.email,
+  //     timestamp: serverTimestamp(),
+  //     userPic: user?.photoURL,
+  //     userName: user?.displayName,
+  //   };
+
+  //   // Add the new message to the chat
+
+  // };
+
   const handleStartCall = () => {
     // Generate the roomID and construct the meeting link
     const roomID = randomID(5);
@@ -68,8 +110,8 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
       "/meeting?roomID=" +
       roomID;
 
-    // Navigate to the Zoom meeting page
-    navigate(`/meeting?roomID=${roomID}`);
+    // Open the meeting link in a new tab
+    window.open(meetingLink, '_blank');
 
     // Now you can send the meeting link to the chat or use it as needed
     // For example, you can add a new message to the chat
@@ -86,28 +128,29 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
   };
 
+  // Function to modify the URL
+  const getShareableLink = () => {
+    const currentUrl = window.location.href;
+    // Replace /doc/ with /doc/share/ in the URL
+    return currentUrl.replace("/board/", "/board/share/");
+  };
 
+  // Function to copy the current URL to the clipboard
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(getShareableLink()).then(() => {
+      // You can add a notification or feedback to the user here
+      console.log("Copied to clipboard");
+      onShareModalClose()
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
 
 
   return (
     <div className="navbar">
-      <IconButton
-        className="menu-icon-button"
-        aria-label="Menu"
-        icon={<HamburgerIcon style={iconStyle} />}
-        onClick={onToggle}
-        colorScheme="purple.100"
-      />
       <div className="nav-items">
-        <button className="nav-item" onClick={() => { navigate(-1) }}>Home</button>
-        <div className="nav-item">File</div>
-        <div className="nav-item">Edit</div>
-        <div className="nav-item">View</div>
-        <div className="nav-item">Insert</div>
-        <div className="nav-item">Format</div>
-        <div className="nav-item">Tools</div>
-        <div className="nav-item">Extensions</div>
-        <div className="nav-item">Help</div>
+        <button className="nav-item" onClick={() => {isSharePage? navigate('/projects') : navigate(-1) }}>Home</button>
       </div>
       <div className="title-area">
         <input
@@ -134,7 +177,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             onClick={handleStartCall}
           />
         </Tooltip>
-        <Tooltip
+        {/* <Tooltip
           label="Get Analytics"
           className="tooltip-label"
           placement="top"
@@ -146,7 +189,7 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             icon={<IoBarChartOutline />}
             onClick={onOpen}
           />
-        </Tooltip>
+        </Tooltip> */}
         <Tooltip
           label="Share"
           className="tooltip-label"
@@ -157,10 +200,56 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             className="action-icon share"
             aria-label="share"
             icon={<IoShareOutline />}
-            onClick={onOpen}
+            onClick={onShareModalOpen}
           />
         </Tooltip>
       </div>
+      <Modal isOpen={isShareModalOpen} onClose={onShareModalClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+            <ModalHeader display="flex" justifyContent="space-between" alignItems="center">
+              <Text fontSize="xl" fontWeight="bold">Share this Document</Text>
+              <IconButton
+                aria-label="Close modal"
+                icon={<CloseIcon />}
+                onClick={onShareModalClose}
+                variant="ghost"
+              />
+            </ModalHeader>
+            <ModalBody p={6}>
+              <Text mb={4}>Please note:</Text>
+              <UnorderedList spacing={2}>
+                <ListItem>This document's shareable link grants access to anyone in possession of it. Handle with care.</ListItem>
+                <ListItem>To ensure no loss of content, the document's owner MUST manually paste this link before the document's shareable link is distributed.</ListItem>
+              </UnorderedList>
+              <InputGroup size="md" mt={4} >
+                <Input
+                    pr="4.5rem"
+                    value={getShareableLink()}
+                    _hover={{cursor: 'pointer' }}
+                    fontFamily="mono"
+                    bgColor={"#f0f4f4"}
+                    onClick={copyToClipboard}
+                    isReadOnly
+                  />
+                <InputRightElement width="4.5rem">
+                  <IconButton
+                      aria-label="Copy link"
+                      icon={<CopyIcon />}
+                      variant="ghost"
+                      onClick={copyToClipboard}
+                    />
+                </InputRightElement>
+              </InputGroup>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="purple" mr={3} onClick={copyToClipboard} _hover={{ bgColor: "purple.600" }}>
+                Copy Link
+              </Button>
+              <Button variant="outline" onClick={onShareModalClose} _hover={{ bgColor: "gray.200" }}>Cancel</Button>
+            </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

@@ -11,6 +11,7 @@ import {
 import "./JoinedC.scss"; // Update the import as per your CSS file
 import { useNavigate } from "react-router-dom";
 import { UseToastNotification } from "../../utils/UseToastNotification";
+import { flexbox } from "@chakra-ui/react";
 
 interface Community {
   id: string;
@@ -206,8 +207,15 @@ const JoinedCommunities: React.FC = () => {
           <div
             key={community.id}
             className="community-card"
+            style={{
+              backgroundImage: `url(${community.image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
             onClick={() => handleCardClick(community.id)}
           >
+            {/*
             {community.image && (
               <img
                 src={community.image}
@@ -215,6 +223,8 @@ const JoinedCommunities: React.FC = () => {
                 className="community-image"
               />
             )}
+            */}
+            
             <h3 className="community-name">{community.name}</h3>
             <p className="community-description">{community.description}</p>
 

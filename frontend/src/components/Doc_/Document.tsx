@@ -17,6 +17,7 @@ import { QuillBinding } from "y-quill";
 import QuillCursors from "quill-cursors";
 import * as Y from "yjs";
 import { FireProvider } from "y-fire";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
 ReactQuill.Quill.register("modules/cursors", QuillCursors);
 
@@ -33,6 +34,7 @@ const Document: React.FC<SuiteProps> = ({
   suiteId,
   suiteTitle,
   setSuiteTitle,
+  team_id
 }: SuiteProps) => {
   //Set the current value of the text editor or the react-quill component
   const [value, setValue] = useState<string>("");
@@ -41,14 +43,16 @@ const Document: React.FC<SuiteProps> = ({
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isSpellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(true);
-  const isSharePage = window.location.pathname.includes("/doc/share");
+  const isSharePage = window.location.pathname.includes("/doc/share") || window.location.pathname.includes("/doc/share-teams");
+  const isTeams = team_id !== "";
 
   const [isLoading, setIsLoading] = useState(true);
   const [latestLastEdited, setLatestLastEdited] = useState<string | null>(null);
-
+  const showToast = UseToastNotification();
   const [user] = useAuthState(auth);
 
   const documentPath = `/sharedDocs/${suiteId}`;
+  const [yDoc, setYDoc] = useState<Y.Doc | null>(null)
 
   useEffect(() => {
     if (isSharePage && !isLoading) {
@@ -76,6 +80,10 @@ const Document: React.FC<SuiteProps> = ({
 
         // Define a shared text type on the document
         const ytext = ydoc.getText("quill");
+        // Define a shared Comment type on the document
+        const yComments = ydoc.getArray<CommentType>('comments')
+        // Define a shared Title type on the document
+        // const yTitle = ydoc.getText('title')
 
         // "Bind" the quill editor to a Yjs text type.
         const binding = new QuillBinding(
@@ -84,10 +92,26 @@ const Document: React.FC<SuiteProps> = ({
           yprovider.awareness
         );
 
+        const updateComments = () => {
+          setComments(yComments.toArray())
+        }
+
+        // const updateTitle =  () => {
+        //   setSuiteTitle(yTitle.toString())
+        // }
+
+        yComments.observe(updateComments)
+        // yTitle.observe(updateTitle)
+
+        setYDoc(ydoc)
+
         return () => {
           yprovider.destroy();
           binding.destroy();
+          yComments.unobserve(updateComments)
+          // yTitle.unobserve(updateTitle)
           ydoc.destroy();
+          yDoc?.destroy()
         };
       }
 
@@ -105,9 +129,16 @@ const Document: React.FC<SuiteProps> = ({
       fetchDocumentFromFirestore(userEmail);
     } else if (userEmail && isSharePage) {
       fetchSharedDocumentFromFirestore();
-      setIsLoading(false);
     }
   }, []);
+
+  // useEffect(() => {
+  //   if(yDoc && isSharePage){
+  //     const yTitle = yDoc.getText('title')
+  //     yTitle.delete(0, yTitle.length)
+  //     yTitle.insert(0, suiteTitle)
+  //   }
+  // }, [suiteTitle])
 
   const fetchDocumentFromFirestore = async (userEmail: string) => {
     try {
@@ -142,7 +173,35 @@ const Document: React.FC<SuiteProps> = ({
           setSuiteTitle(title);
           setComments(comments || []);
         }
+      } else {
+        if (user?.email) {
+          const userDocRef = doc(db, "users", user?.email);
+          const userDocSnapshot = await getDoc(userDocRef);
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            const documentsArray = userData.documents || [];
+            const documentIndex = documentsArray.findIndex((doc: SuiteData) => doc.id === suiteId);
+            if (documentIndex !== -1) {
+              // Display the shared content
+              const document = documentsArray[documentIndex];
+              if (document as SuiteData) {
+                setTimeout(() => {
+                  setValue(document.content)
+                  setSuiteTitle(document.title || "Untitled")
+                  setComments(document.comments || []);
+                  saveSharedDocumentToFirestore(suiteId, suiteTitle, value, comments)
+                }, 2800)
+              }
+              // Remove the document from the array
+              documentsArray.splice(documentIndex, 1);
+              // Update the user's document with the new documents array
+              await setDoc(userDocRef, { documents: documentsArray }, { merge: true });
+            }
+          }
+        }
       }
+
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching document:", error);
     }
@@ -161,7 +220,7 @@ const Document: React.FC<SuiteProps> = ({
         comments
       );
     }
-  }, [value, suiteTitle, comments]); // Only re-run the effect if 'value' changes
+  }, [value, suiteTitle, comments, suiteId, user?.email, isSharePage]); // Only re-run the effect if 'value' changes
 
   useEffect(() => {
     const userEmail = user?.email;
@@ -182,9 +241,13 @@ const Document: React.FC<SuiteProps> = ({
       const userDocRef = doc(db, "users", userEmail);
       const docSnapshot = await getDoc(userDocRef);
       let documentsArray: SuiteData[] = [];
+      let hasCreatedDocument = false; // Initialize to false
 
       if (docSnapshot.exists()) {
-        documentsArray = docSnapshot.data().documents || [];
+        const userData = docSnapshot.data();
+        documentsArray = userData.documents || [];
+        // If the flag is not set, it will remain false
+        hasCreatedDocument = userData.hasCreatedDocument || false;
       }
 
       const now = new Date().toISOString(); // Get current time as ISO string
@@ -194,36 +257,49 @@ const Document: React.FC<SuiteProps> = ({
         (doc) => doc.id === suiteId
       );
 
-      if (existingDocIndex !== -1) {
-        // Update the existing document's title, content, and last edited time
-        documentsArray[existingDocIndex] = {
-          ...documentsArray[existingDocIndex], // Spread existing properties
-          title: suiteTitle,
-          content: text,
-          lastEdited: now, // Update last edited time
-          comments,
-        };
-      } else {
+      const isNewDocument = existingDocIndex === -1;
+
+      if (isNewDocument) {
         // Add a new document with a unique ID and current last edited time
         documentsArray.push({
           id: suiteId,
           title: suiteTitle,
           content: text,
-          lastEdited: now, // Set last edited time for new document
+          lastEdited: now,
           type: "document",
           isTrash: false,
           isShared: false,
           comments,
         });
+      } else {
+        // Update the existing document's title, content, and last edited time
+        documentsArray[existingDocIndex] = {
+          ...documentsArray[existingDocIndex],
+          title: suiteTitle,
+          content: text,
+          lastEdited: now,
+          comments,
+        };
       }
 
       // Update the user's document with the new or updated documents array
-      await setDoc(userDocRef, { documents: documentsArray }, { merge: true });
+      // And set hasCreatedDocument to true if this is their first document
+      await setDoc(userDocRef, {
+        documents: documentsArray,
+        hasCreatedDocument: isNewDocument ? true : hasCreatedDocument // Only update the flag if the document is new
+      }, { merge: true });
+
+      // If the user has never created a document before and the document is new, show the toast
+      if (!hasCreatedDocument && isNewDocument) {
+        showToast('success', 'You have successfully earned a badge for creating a new document.');
+      }
+
       console.log("Document saved successfully");
     } catch (error) {
       console.error("Error saving document:", error);
     }
   };
+
 
   //Save a shared document to firestore
   const saveSharedDocumentToFirestore = async (
@@ -264,7 +340,12 @@ const Document: React.FC<SuiteProps> = ({
             isTrash: false,
             isShared: isSharePage,
             comments: comments,
+            owner: user?.email || ""
           };
+
+          if (isTeams) {
+            sharedDocument.team_id = team_id
+          }
         }
 
         // Save the document with the updated fields
@@ -421,6 +502,11 @@ const Document: React.FC<SuiteProps> = ({
           };
           setComments((prevComments) => [...prevComments, comment]);
 
+          if (yDoc && isSharePage) {
+            const yComments = yDoc.getArray<CommentType>('comments')
+            yComments.push([comment])
+          }
+
           // Apply custom formatting for commented text
           editor.formatText(range.index, range.length, {
             "comment-id": comment.id,
@@ -455,6 +541,14 @@ const Document: React.FC<SuiteProps> = ({
 
       // Remove the comment from the state
       setComments(comments.filter((c) => c.id !== commentId));
+
+      if (yDoc && isSharePage) {
+        const yComments = yDoc.getArray<CommentType>('comments');
+        const commentIndex = yComments.toArray().findIndex((c) => c.id === commentId);
+        if (commentIndex !== -1) {
+          yComments.delete(commentIndex, 1); // Remove the comment from yComments
+        }
+      }
     }
   };
 

@@ -41,3 +41,27 @@
 &:hover {
     background-color: #cdcdff; // Hover effect
   }}
+
+  @media (max-width: 768px) {
+    .containerSheet{
+      width: 100vw;
+      height: 91vh;
+    }
+
+    .fortune-workarea{
+      background-color: #eeeeff;
+      width: 100%;
+  }
+
+    .fortune-toolbar {
+      position: relative;
+      background-color: #bcbcdc; // Example: Change the toolbar background color
+      padding: 0.25rem; // Reduced padding for less space around buttons
+      border-radius: 8px; // Rounded corners
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Shadow effect
+      margin-left: 10px;
+      margin-right: 0rem;
+      width: 95%;
+      left: 0px;
+    }
+  }

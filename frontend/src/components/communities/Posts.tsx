@@ -11,6 +11,8 @@ import {
   MenuList,
 } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
+import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
+import "./Posts.scss";
 import CommentsModal from "./commentsModal";
 import EditPostModal from "./EditPostModal";
 import Linkify from "react-linkify";
@@ -188,18 +190,15 @@ const Posts = ({
           {post.title}
         </Text>
         {post.image ? (
-          <img
-            src={post.image}
-            alt=""
-            style={{
-              width: "400px",
-              height: "300px",
-              objectFit: "cover",
-              marginBottom: "1rem",
-            }}
-          />
+          <img src={post.image} alt="" className="post-image" />
         ) : (
-          <Box bg="gray.200" w="100%" h="300px" mb="4" />
+          <Box
+            bg="gray.200"
+            w="100%"
+            h="300px"
+            mb="4"
+            className="post-placeholder"
+          />
         )}
 
         <Text>
@@ -208,29 +207,31 @@ const Posts = ({
         {/* Like and Dislike buttons */}
         <Flex align="center" mt="2">
           <Button
-            colorScheme={likeClicked ? "green" : "gray"}
+            className="like-button"
             size="sm"
             mr="2"
             onClick={handleLikeClick}
             isDisabled={dislikeClicked}
+            variant="ghost" // Use the 'ghost' variant or another appropriate one
           >
-            Like
+            <FaRegThumbsUp color={likeClicked ? "green" : "gray"} />
           </Button>
           <Text fontSize="sm" mr="2">
-            {likeCount - dislikeCount}
+            {post.like}
           </Text>
           <Button
-            colorScheme={dislikeClicked ? "red" : "gray"}
+            className="dislike-button"
             size="sm"
             mr="2"
             onClick={handleDislikeClick}
             isDisabled={likeClicked}
+            variant="ghost" // Use the 'ghost' variant or another appropriate one
           >
-            Dislike
+            <FaRegThumbsDown color={dislikeClicked ? "red" : "gray"} />
           </Button>
           <Button size="sm" onClick={handleCommentsClick}>
             <Box as="span" mr="1">
-              <Text as="span">{post.comments ? post.comments.length : 0}</Text>{" "}
+              <Text as="span">{post.commentsCount || 0}</Text>
             </Box>
             <Box as="span">
               <Text as="span">Comments</Text>

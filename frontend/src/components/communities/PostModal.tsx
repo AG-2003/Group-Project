@@ -214,7 +214,7 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
         <ModalCloseButton onClick={quickClose} />
         <ModalBody>{renderModalContent()}</ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" onClick={SaveNClose}>
+          <Button colorScheme="purple" onClick={SaveNClose}>
             Complete
           </Button>
         </ModalFooter>

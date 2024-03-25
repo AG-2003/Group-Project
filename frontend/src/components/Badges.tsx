@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Flex, Text, Heading, Divider, Badge, useColorModeValue, IconButton } from '@chakra-ui/react';
+import { Box, Flex, Text, Heading, Divider, Badge, useColorModeValue, IconButton, useToast } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import Navbar from '../components/Dashboard/Navbar';
@@ -8,16 +8,12 @@ import carbBg2 from '../assets/carbBg2.png';
 import { BadgesType } from '../interfaces/BadgesType';
 import { db } from '../firebase-config';
 import { auth } from '../firebase-config';
-import { collection, getDocs, query, where, DocumentData, getDoc, doc, updateDoc } from 'firebase/firestore';
-import { SuiteData } from '../interfaces/SuiteData';
-
-
-
-
-
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
+import { UseToastNotification } from '../utils/UseToastNotification';
 export const Badges: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [tasks, setTasks] = useState<BadgesType[]>([]);
+    const showToast = UseToastNotification();
 
     const email = auth.currentUser?.email;
 
@@ -157,17 +153,37 @@ export const Badges: React.FC = () => {
     }, [updateJoinTeamTask])
 
 
+    const updateJoinCommunityTask = async () => {
+        if (email) {
+            const docRef = doc(db, 'users', email);
+            const userDocData = await getDoc(docRef);
+            if (userDocData.exists()) {
+                const userData = userDocData.data();
+                const badges: BadgesType[] = userData.Badges || [];
+                const joinCommunityTaskIndex: number = badges.findIndex(badge => badge.name === 'join a community');
+
+                if (userDocData.data().communities && !badges[joinCommunityTaskIndex].status && joinCommunityTaskIndex !== -1) {
+                    badges[joinCommunityTaskIndex].status = true;
+                    await updateDoc(docRef, {
+                        Badges: badges
+                    })
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        updateJoinCommunityTask();
+    }, [updateJoinCommunityTask])
+
+
     return (
         <>
-            <div style={{ padding: '10px', background: '#484c6c' }}>
-                <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-            </div>
+            <Box padding="10px" background="#484c6c">
+                <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+            </Box>
             <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
-            <Flex
-                height="calc(100vh - 10px)"
-                bg={bgColor}
-                p={5} // Padding inside the main content box
-            >
+            <Box display="flex" height="calc(100vh - 10px)" width="100%">
                 <AnimatePresence>
                     {isSidebarOpen && (
                         <motion.div
@@ -179,7 +195,7 @@ export const Badges: React.FC = () => {
                             style={{
                                 paddingTop: '10px',
                                 height: 'inherit',
-                                backgroundColor: '#f6f6f6',
+                                backgroundColor: '#f4f1fa',
                                 boxShadow: '2px 0 5px rgba(0, 0, 0, 0.1)',
                                 overflow: 'hidden',
                             }}
@@ -223,7 +239,7 @@ export const Badges: React.FC = () => {
                         </Box>
                     ))}
                 </Box>
-            </Flex>
+            </Box>
         </>
     );
 };

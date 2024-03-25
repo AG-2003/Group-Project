@@ -42,19 +42,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%; 
+  width: 100%;
+  margin-bottom: 2vh;
 }
 
 .profile-body {
   display: flex;
-  flex-direction: row;
-  align-items: center; // Align items along the cross-axis (vertically in this case)
+  flex-direction: column;
+  align-items: stretch; // Align items along the cross-axis (vertically in this case)
+  width: 100%;
   padding: 20px;
 
   .projects-title {
     font-size: 1.2rem;
   }
-  
+
   .invite-button {
     background-color: #63b3ed;
     color: #fff;

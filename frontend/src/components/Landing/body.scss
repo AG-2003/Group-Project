@@ -13,7 +13,7 @@
 // Add z-index to elements that should appear above the background image
 .centered-rectangle,
 .header {
-  z-index: 1; // Above the background image
+  z-index: auto; // Above the background image
   position: relative; // Required to apply z-index
 }
 
@@ -141,3 +141,55 @@
       }
     }
   }
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .header {
+    margin-left: auto;
+    margin-right: auto;
+
+    p {
+      font-size: 20px; // Larger font size for more presence
+      line-height: 1.4; // Increased line height for readability
+    }
+
+    .heading {
+      padding: 15px;
+  
+      h1 {
+        font-size: 40px;  
+        margin-bottom: 15px;  
+      }
+    }
+  }
+
+  .centered-rectangle {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0px;
+    text-align: center;
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+  
+    .feature {
+      padding: 20px;
+
+      h2 {
+          font-size: 35px;
+          margin-bottom: 10px;
+        }
+
+        .text-content-left {
+          margin-right: 1rem;
+        }
+
+      .text-content-right {
+        margin-left: 1rem;
+      }
+    }
+  }
+}

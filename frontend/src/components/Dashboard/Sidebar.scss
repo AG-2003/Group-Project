@@ -1,3 +1,33 @@
+// .body {
+//   .sidebar-button {
+//     // Default state styles
+//     transition: color 0.3s ease-in-out;
+//     font-size: 1.3rem; // Example size, increase as needed
+//     font-weight: 100;
+//     color: #262626;
+//     margin-top: 1rem;
+
+
+//     &:hover {
+//       background: none; // Remove default Chakra-UI hover background change
+//       color: #8460b0; // Change color to a light blue, you can choose any color
+
+//       // Scale up icon and text on hover
+//       .chakra-icon,
+//       .chakra-text {
+//         transform: scale(1.2);
+//       }
+//     }
+//   }
+
+//   // Default state for icon and text
+//   .chakra-icon,
+//   .chakra-text {
+//     transition: transform 0.3s ease-in-out;
+//   }
+// }
+
+
 .body {
   .sidebar-button {
     // Default state styles
@@ -13,11 +43,27 @@
         transform: scale(1.2);
       }
     }
+
+    // Increase the font size for phone dimensions
+    @media (max-width: 768px) {
+      font-size: 1rem; // Larger text for smaller screens
+    }
   }
 
   // Default state for icon and text
   .chakra-icon,
   .chakra-text {
     transition: transform 0.3s ease-in-out;
+  }
+
+  // Media query for phone screen sizes
+  @media (max-width: 768px) {
+    position: fixed; // Fix the sidebar to cover the entire viewport
+    top: 0;
+    left: 0;
+    width: 100vw; // 100% of the viewport width
+    height: 100vh; // 100% of the viewport height
+    overflow-y: auto; // Allow scrolling if the content is too long
+    z-index: 10; // Ensure the sidebar is above other content
   }
 }

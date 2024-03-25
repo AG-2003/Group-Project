@@ -1,11 +1,13 @@
+import { Box, Divider } from "@chakra-ui/react";
+import { CalendarComponent } from "../components/Calendar/CalendarComponent";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import Navbar from "../components/Dashboard/Navbar";
-import { Box, Divider } from "@chakra-ui/react";
-import { AnimatePresence, motion } from "framer-motion";
-import SideBar from "../components/Dashboard/sidebar";
+import Sidebar from "../components/Dashboard/sidebar";
 
-const Calendar= () => {
-    // Dashboard routing
+export const Calendar = () => {
+
+  // Dashboard routing
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const sidebarVariants = {
@@ -16,13 +18,11 @@ const Calendar= () => {
   // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-    return(
-        <>
-      <div style={{ padding: "10px", background: "#484c6c" }}>
-        <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      </div>
+  return (
+    <>
+      <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
-      <Box display="flex" height="calc(100vh - 10px)">
+      <Box display="flex" height="calc(100vh - 10px)" width="100%">
         <AnimatePresence>
           {isSidebarOpen ? (
             <motion.div
@@ -34,17 +34,17 @@ const Calendar= () => {
               style={{
                 paddingTop: "10px",
                 height: "inherit",
-                backgroundColor: "#f6f6f6",
+                backgroundColor: "#f4f1fa",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <Sidebar />
             </motion.div>
           ) : (
             <motion.div
               initial="closed"
-              animate="clsoed"
+              animate="closed"
               exit="open"
               variants={sidebarVariants}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -56,16 +56,17 @@ const Calendar= () => {
                 overflow: "hidden",
               }}
             >
-              <SideBar />
+              <Sidebar />
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
-            
-        </Box>
+
+        <CalendarComponent />
+
+
       </Box>
     </>
-    );
-};
+  )
 
-export default Calendar;
+
+};

@@ -1,22 +1,23 @@
 import { useState } from "react";
 import {
   IconButton,
-  Flex,
   Avatar,
-  Button,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
+  Box,
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { FiFileText, FiGrid, FiClipboard, FiAward } from "react-icons/fi";
 import { LuPresentation } from "react-icons/lu";
-import { FaUserFriends } from "react-icons/fa";
+import { FaPlus, FaUserFriends } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Modal from "./sub-components/Modal";
 import { UseUserProfilePic } from "../../hooks/UseUserProfilePic";
 import { useNavigate } from "react-router-dom";
+import "./NavBarDash.scss"
+import { useReceivedRequests } from "../../context/RecievedRequestsContext";
 
 interface Props {
   isSidebarOpen: boolean;
@@ -28,6 +29,8 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
     transform: isSidebarOpen ? "rotate(90deg)" : "rotate(0deg)",
     transition: "transform 0.3s ease",
   };
+
+  const { receivedRequests } = useReceivedRequests();
 
   // State to control the visibility and type of the modal
   const [modalType, setModalType] = useState("");
@@ -41,96 +44,79 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
   const closeModal = () => setModalType("");
 
   // Function to handle the confirmation (submit) of the modal
-  const handleConfirm = () => closeModal(); // Close the modal after submission
+  // const handleConfirm = () => closeModal(); // Close the modal after submission
 
   const userProfile = UseUserProfilePic();
 
+
+
   return (
-    <Flex
-      width="100%"
-      justifyContent="space-between"
-      alignItems="center"
-      p={1}
-      height="30px"
-      bg={"#484c6c"}
-    >
+    <div className="navBar-Dash">
       <IconButton
-        bg="inherit"
+        className="menuIcon-Dash"
         aria-label="Menu"
-        fontSize="20px"
-        color="white"
-        colorScheme="purple.100"
         icon={<HamburgerIcon style={iconStyle} />}
         onClick={onToggle}
       />
 
-      <Flex alignItems="center">
+      <div className="rightSection-Dash">
         <Modal
           isOpen={modalType !== ""}
           onClose={closeModal}
-          // onConfirm={handleConfirm}
           modalType={modalType}
         />
 
-        {/* <Link to="/chat">
+        <Menu>
+          <MenuButton as={IconButton} aria-label="Options" icon={<FaPlus />} className="menuButton-Dash" />
+          <MenuList>
+            <MenuItem icon={<FiFileText />} onClick={() => openModal("Doc")}>Doc</MenuItem>
+            <MenuItem icon={<FiGrid />} onClick={() => openModal("Spreadsheet")}>Spreadsheet</MenuItem>
+            <MenuItem icon={<FiClipboard />} onClick={() => openModal("Whiteboard")}>Whiteboard</MenuItem>
+          </MenuList>
+        </Menu>
+        <Box position="relative" >
           <IconButton
-            borderRadius="10%" // To make it a circular button
-            bg="white"
-            p={2}
-            mr={4}
+            className="friendsIcon-Dash"
+            onClick={() => navigate('/friends')}
             icon={<FaUserFriends />}
-            cursor="pointer"
-            aria-label={""}
+            aria-label="Friends"
           />
-        </Link> */}
+          {/* Conditionally render the notification dot */}
+          {receivedRequests.length > 0 && (
+            <Box
+              position="absolute"
+              right="8" // Adjust based on your styling and icon size, negative values are allowed
+              top="2" // Adjust based on your styling and icon size, negative values are allowed
+              width="11px"
+              height="11px"
+              borderRadius="50%"
+              bg="red.500"
+            // border="2px solid"
+            // borderColor="gray.800" // Adjust to match your navbar's background color
+            // zIndex="1" // Ensure the dot is above the icon
+            />
+          )}
+        </Box>
+
+
 
         <IconButton
-          size="sm"
-          mr={4}
+          className="badgeIcon-Dash"
           aria-label="badge"
-          colorScheme="purple"
           icon={<FiAward />}
           onClick={() => { navigate('/Badges') }}
         />
-
-        <Menu>
-          <MenuButton as={Button} colorScheme="purple" mr={4} size="sm">
-            Create a design
-          </MenuButton>
-          <MenuList>
-            <MenuItem icon={<FiFileText />} onClick={() => openModal("Doc")}>
-              Doc
-            </MenuItem>
-            <MenuItem
-              icon={<LuPresentation />}
-              onClick={() => openModal("Slide")}
-            >
-              Slide
-            </MenuItem>
-            <MenuItem
-              icon={<FiGrid />}
-              onClick={() => openModal("Spreadsheet")}
-            >
-              Spreadsheet
-            </MenuItem>
-            <MenuItem
-              icon={<FiClipboard />}
-              onClick={() => openModal("Whiteboard")}
-            >
-              Whiteboard
-            </MenuItem>
-          </MenuList>
-        </Menu>
         <Link to="/settings">
           <Avatar
-            size="sm"
-            as="span"
+            className="userAvatar-Dash"
             src={userProfile.photoURL || "fallback_image_url"}
             name={userProfile.displayName}
+            backgroundColor={"#484c6c"}
+            size={"sm"}
           />
         </Link>
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   );
 };
 

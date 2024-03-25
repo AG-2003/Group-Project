@@ -14,6 +14,7 @@ import {
   FaPeopleGroup,
 } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import "./SideBarSocial.scss";
 
 interface Props {
   onNavigate: (arg: string) => void;
@@ -28,6 +29,7 @@ const SideBar = ({ onNavigate }: Props) => {
   return (
     <VStack spacing={4} align="stretch" className="body">
       <Button
+       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaHouse />}
@@ -36,6 +38,7 @@ const SideBar = ({ onNavigate }: Props) => {
         All posts
       </Button>
       <Button
+       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaCircleUser />}
@@ -44,6 +47,7 @@ const SideBar = ({ onNavigate }: Props) => {
         Your posts
       </Button>
       <Button
+       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaBookmark />}
@@ -51,7 +55,9 @@ const SideBar = ({ onNavigate }: Props) => {
       >
         Saved posts
       </Button>
+      className="sidebar-button" // Added className for SCSS targeting
       <Button
+      className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<FaPeopleGroup />}
@@ -61,6 +67,7 @@ const SideBar = ({ onNavigate }: Props) => {
       </Button>
       <Spacer /> {/* This will push your go back button to the bottom */}
       <Button
+       className="sidebar-button" // Added className for SCSS targeting
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<ArrowBackIcon />}

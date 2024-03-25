@@ -21,7 +21,7 @@ $color-dropdown-arrow: #ffffff; // Adjust based on design
 .nav-bar {
   font-family: 'Comfortaa', sans-serif;
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
   background-color: $color-dark-purple;
@@ -45,10 +45,29 @@ $color-dropdown-arrow: #ffffff; // Adjust based on design
 
   .nav-items {
     display: flex;
+    margin-left: 20rem;
 
     .nav-item {
       margin-right: 5rem;
       cursor: pointer;
+    }
+  }
+
+  .buttonList{
+    margin-left: 18rem;
+  }
+
+  .policies {
+    background-color: #806cac; // Button background color
+    margin-right: 2rem;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-family: 'Comfortaa', sans-serif;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: rgb(106, 93, 146);
     }
   }
 
@@ -76,9 +95,14 @@ $color-dropdown-arrow: #ffffff; // Adjust based on design
   .nav-bar {
     flex-direction: column;
     align-items: flex-start;
+    padding: 1rem 0.5rem;
 
     .logo-and-name {
-      margin-bottom: 1rem;
+      margin-bottom: 0rem;
+
+      .name {
+        margin-left: 0rem;
+      }
     }
 
     .nav-items {
@@ -92,8 +116,8 @@ $color-dropdown-arrow: #ffffff; // Adjust based on design
     }
 
     .get-started {
-      align-self: center;
-      margin-top: 1rem;
+      //align-self: center;
+      margin-top: 0rem;
     }
   }
 }
