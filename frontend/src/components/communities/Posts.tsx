@@ -190,7 +190,11 @@ const Posts = ({
           {post.title}
         </Text>
         {post.image ? (
-          <img src={post.image} alt="" className="post-image" />
+          <img
+            src={post.image}
+            alt="https://firebasestorage.googleapis.com/v0/b/f29so-group-project-85f3b.appspot.com/o/teamImages%2Fno%20image.jpg?alt=media&token=c258f9e1-c593-476e-b9cc-274483d25edd"
+            className="post-image"
+          />
         ) : (
           <Box
             bg="gray.200"
@@ -198,6 +202,11 @@ const Posts = ({
             h="300px"
             mb="4"
             className="post-placeholder"
+            style={{
+              backgroundImage: `url('https://firebasestorage.googleapis.com/v0/b/f29so-group-project-85f3b.appspot.com/o/teamImages%2Fno%20image.jpg?alt=media&token=c258f9e1-c593-476e-b9cc-274483d25edd')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           />
         )}
 
@@ -217,7 +226,7 @@ const Posts = ({
             <FaRegThumbsUp color={likeClicked ? "green" : "gray"} />
           </Button>
           <Text fontSize="sm" mr="2">
-            {post.like}
+            {likeCount - dislikeCount}
           </Text>
           <Button
             className="dislike-button"
