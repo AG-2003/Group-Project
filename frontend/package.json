@@ -26,6 +26,7 @@
     "@types/react-dom": "^18.0.0",
     "@types/react-icons": "^3.0.0",
     "@zegocloud/zego-uikit-prebuilt": "^1.10.0",
+    "date-fns": "^3.6.0",
     "draft-js": "^0.11.7",
     "es6-shim": "^0.35.8",
     "firebase": "^10.8.1",
@@ -86,6 +87,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/date-fns": "^2.6.0",
     "@types/draft-js": "^0.11.17",
     "@types/firebase": "^3.2.1",
     "@types/react-linkify": "^1.0.4",

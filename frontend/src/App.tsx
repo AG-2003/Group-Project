@@ -40,6 +40,8 @@ import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
 import { Friends } from "./pages/Friends";
 import CSettings from "./components/communities/CSettings/CSettings";
+import ChatRoom from "./components/UserChat/ChatRoom";
+
 
 
 
@@ -75,7 +77,7 @@ function App() {
         <Route path="/Social" element={<Social />} />
         <Route path="/badges" element={<BadgesPage />} />
         <Route path="/friends" element={<Friends />} />
-
+        <Route path="/chat/:chatId" element={<ChatRoom />} />
         <Route path="/calendar" element={<Calendar />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />

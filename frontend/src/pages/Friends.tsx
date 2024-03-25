@@ -15,6 +15,7 @@ import cardBg2 from '../assets/carbBg2.png'
 import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
 import { useReceivedRequests } from "../context/RecievedRequestsContext";
 import { useNavigate } from "react-router-dom";
+import { getOrCreateChatId } from "../chatService";
 
 
 
@@ -374,6 +375,21 @@ export const Friends: React.FC = () => {
         fetchUserFriends();
     }, []);
 
+    const startChat = async (friendEmail: string) => {
+        if (!userEmail) {
+            showToast('error', 'You must be logged in to start a chat.');
+            return;
+        }
+
+        try {
+            const chatId = await getOrCreateChatId(userEmail, friendEmail);
+            navigate(`/chat/${chatId}`);
+        } catch (error) {
+            console.error("Error getting or creating chatId:", error);
+            showToast('error', 'Error starting chat.');
+        }
+    };
+
 
     const menuBg = useColorModeValue('white', 'gray.700');
     const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
@@ -469,7 +485,7 @@ export const Friends: React.FC = () => {
                                             <Button isDisabled>Request Sent</Button>
                                         ) : (
                                             <Button
-                                                onClick={() => result.email && addFriend(result.email ?? result.id)}
+                                                onClick={() => result.email && addFriend(result.email)}
                                                 bg="purple.400"
                                                 _hover={{ bg: 'purple.500' }}
                                                 color="white"
@@ -513,7 +529,7 @@ export const Friends: React.FC = () => {
                                                             </MenuItem>
                                                             <MenuItem
                                                                 _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => console.log('chats')}
+                                                                onClick={() => startChat(friendEmail)}
                                                             >
                                                                 Chat
                                                             </MenuItem>
