@@ -109,6 +109,14 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const noOfDaysBeforeDeletion = (lastEdited: string) => {
+    const projectDate = new Date(lastEdited)
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - projectDate.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+    return daysDifference;
+  }
+
   useEffect(() => {
     fetchProjects();
   }, [user]);
@@ -124,12 +132,22 @@ const Dashboard: React.FC = () => {
         return timeDifference >= thirtyDaysInMilliseconds;
       });
 
+      const sharedProjectsToDelete = sharedProjects.filter((sharedProject) => {
+        const projectDate = new Date(sharedProject.lastEdited);
+        const timeDifference = currentDate.getTime() - projectDate.getTime();
+        return timeDifference >= thirtyDaysInMilliseconds;
+      })
+
       for (const project of projectsToDelete) {
         await handleTrashIconClick(project.id, project.type);
       }
 
+      for (const sharedProject of sharedProjectsToDelete){
+        await handleSharedTrashIconClick(sharedProject.id, sharedProject.type)
+      }
+
       // If any projects were deleted, fetch the updated list of projects
-      if (projectsToDelete.length > 0) {
+      if (projectsToDelete.length > 0 || sharedProjectsToDelete.length > 0) {
         fetchProjects();
       }
     };
@@ -144,34 +162,6 @@ const Dashboard: React.FC = () => {
        setToastShown(true);
     }
    }, [toastShown]);
-
-  const stripHtml = (html: string): string => {
-    // Create a new div element and set its innerHTML to the HTML string
-    const temporalDivElement = document.createElement("div");
-    temporalDivElement.innerHTML = html;
-    // Retrieve the text content from the div, which will be the plain text without HTML tags
-    return temporalDivElement.textContent || temporalDivElement.innerText || "";
-  };
-
-  const formatDate = (dateString: string): string => {
-    const date: Date = new Date(dateString);
-    const hours: number = date.getHours();
-    const minutes: number = date.getMinutes();
-    const day: number = date.getDate();
-    const month: number = date.getMonth() + 1; // Month is 0-indexed
-    const year: number = date.getFullYear();
-
-    // Convert 24hr time to 12hr time and set am/pm
-    const hours12: number = hours % 12 || 12; // Convert hour to 12-hour format
-    const amPm: string = hours < 12 ? "AM" : "PM";
-
-    // Format minutes to always be two digits
-    const formattedMinutes: string | number =
-      minutes < 10 ? `0${minutes}` : minutes;
-
-    // Format the date string
-    return `${hours12}:${formattedMinutes} ${amPm}, ${day}/${month}/${year}`;
-  };
 
   const handleTrashIconClick = async (
     id: string,
@@ -428,7 +418,7 @@ const Dashboard: React.FC = () => {
                               {project.title}
                             </Text>
                             <Text fontSize="sm" color="gray.300">
-                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                              {30 - noOfDaysBeforeDeletion(project.lastEdited)} days left
                             </Text>
                             <Text fontSize="sm" color="gray.300">
                               Type: {project.type}, unshared
@@ -547,7 +537,7 @@ const Dashboard: React.FC = () => {
                               {project.title}
                             </Text>
                             <Text fontSize="sm" color="gray.300">
-                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                              {30 - noOfDaysBeforeDeletion(project.lastEdited)} days left
                             </Text>
                             <Text fontSize="sm" color="gray.300">
                               Type: {project.type}, shared

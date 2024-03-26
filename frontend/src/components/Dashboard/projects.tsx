@@ -439,7 +439,7 @@ const Projects: React.FC = () => {
                           </MenuList>
                         </Menu>
                       </div>
-                      <Box textAlign="center" mt="20px">
+                      <Box textAlign="center" mt="20px" display="flex" justifyContent="flex-end">
                         <img
                           className="ProjImage"
                           src={NoProj}
@@ -450,7 +450,7 @@ const Projects: React.FC = () => {
                   )}
                   <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6}>
                     {projects.map((project) => (
-                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-5px)", shadow: "lg"}}>
+                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-1px)", shadow: "lg"}}>
                         <Box
                           h="150px"
                           bgImage={`url(${getImageForType(project.type )})`}
@@ -507,7 +507,7 @@ const Projects: React.FC = () => {
                               marginRight: "8px", // Add margin to separate icons
                             }}
                             transition="transform 0.3s ease-in-out"
-                            _hover={{ transform: "scale(1.1)", color: "red" }}
+                            _hover={{ transform: "scale(1.1)", border: "black" }}
                             aria-label="Delete Project"
                             onClick={(event) => {
                               event.stopPropagation();
@@ -548,7 +548,7 @@ const Projects: React.FC = () => {
                   <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6}>
                     {sharedProjects.map((project) => (
 
-                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-5px)", shadow: "lg"}}>
+                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-1px)", shadow: "lg"}}>
                         <Box
                           h="150px"
                           bgImage={`url(${getImageForType(project.type )})`}
@@ -605,7 +605,7 @@ const Projects: React.FC = () => {
                               marginRight: "8px", // Add margin to separate icons
                             }}
                             transition="transform 0.3s ease-in-out"
-                            _hover={{ transform: "scale(1.1)", color: "red" }}
+                            _hover={{ transform: "scale(1.1)" }}
                             aria-label="Delete Project"
                             onClick={(event) => {
                               event.stopPropagation();
