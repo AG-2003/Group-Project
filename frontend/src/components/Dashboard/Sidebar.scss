@@ -55,15 +55,4 @@
   .chakra-text {
     transition: transform 0.3s ease-in-out;
   }
-
-  // Media query for phone screen sizes
-  @media (max-width: 768px) {
-    position: fixed; // Fix the sidebar to cover the entire viewport
-    top: 0;
-    left: 0;
-    width: 100vw; // 100% of the viewport width
-    height: 100vh; // 100% of the viewport height
-    overflow-y: auto; // Allow scrolling if the content is too long
-    z-index: 10; // Ensure the sidebar is above other content
-  }
 }

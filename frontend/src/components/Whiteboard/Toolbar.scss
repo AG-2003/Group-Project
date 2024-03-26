@@ -133,3 +133,11 @@
   z-index: 10;
   display: block;
 }
+
+@media (max-width: 768px) {
+  .toolbarBoard {
+    overflow-x: auto;
+    flex-wrap: wrap;
+    width: 80%;
+  }
+}

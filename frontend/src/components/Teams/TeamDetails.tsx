@@ -65,9 +65,21 @@ const TeamDetails: React.FC = () => {
 
   // Dashboard routing
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    // Check screen width or user agent to determine if it's desktop or mobile
+    const screenWidth = window.innerWidth;
+    setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+  }, []);
 
   const sidebarVariants = {
     open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  const sidebarVariantsMobile = {
+    open: { width: "100%" },
     closed: { width: "0px" },
   };
 
@@ -205,43 +217,90 @@ const TeamDetails: React.FC = () => {
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
-        <AnimatePresence>
-          {isSidebarOpen ? (
-            <motion.div
-              initial="open"
-              animate="open"
-              exit="closed"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f6f6f6",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          ) : (
-            <motion.div
-              initial="closed"
-              animate="clsoed"
-              exit="open"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f6f6f6",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {!isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="clsoed"
+                exit="open"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+        {isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  flexShrink: "0",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="clsoed"
+                exit="open"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  flexShrink: "0",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
         <Box flexGrow={1} padding="10px" marginLeft={5}>
           <div className="team-details-container">
             {teamDetails ? (
