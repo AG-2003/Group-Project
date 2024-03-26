@@ -24,6 +24,9 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Grid,
+  GridItem,
+  Text
 } from "@chakra-ui/react";
 import { FaTrash } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
@@ -345,7 +348,31 @@ const Projects: React.FC = () => {
           )}
         </AnimatePresence>
         {/* Code is contained in this box */}
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box
+          flexGrow={1}
+          padding="10px"
+          marginLeft={5}
+          overflow="scroll"
+          sx={{
+              '&::-webkit-scrollbar': {
+                width: '10px',
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-button': {
+                display: 'none', // Hide scrollbar arrows
+              },
+              '&:hover::-webkit-scrollbar-thumb': {
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+              },
+              '&:hover': {
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+              },
+          }}
+          >
           {isLoadingProjects ? (
             <Flex
               height="100vh" // Adjust this to the desired height or use "100%" for full container height
@@ -366,67 +393,7 @@ const Projects: React.FC = () => {
                 {projects.length !== 0 && (
                   <h2 className="projects-heading">Recent Designs</h2>
                 )}
-                <div className="projects-list">
-                  {projects.map((project: SuiteData) => (
-                    <div
-                      key={project.id}
-                      className="project-card"
-                      onClick={() =>
-                        handleCardClick(project.id, project.title, project.type)
-                      }
-                    >
-                      <div
-                        className="card-top"
-                        style={{
-                          backgroundImage: `url(${getImageForType(
-                            project.type
-                          )})`,
-                        }}
-                      >
-                        <h3 className="project-title">{project.title}</h3>
-                      </div>
-                      <div className="card-bottom">
-                        <p className="last-edited">
-                          Last edited: {formatDate(project.lastEdited)}
-                        </p>
-                        <IconButton
-                          icon={<Icon as={FaTrash} color="#484c6c" />}
-                          size="sm"
-                          aria-label="Delete Project"
-                          className="delete-icon"
-                          onClick={(event) => {
-                              event.stopPropagation();
-                              setProjectToDelete({ id: project.id, type: project.type, event });
-                              setIsModalOpen(true);
-                          }}
-                          />
-                          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                            <ModalOverlay />
-                            <ModalContent>
-                                <ModalHeader>Confirm Deletion</ModalHeader>
-                                <ModalCloseButton />
-                                <ModalBody>
-                                  Are you sure you want to delete this project? This action cannot be undone.
-                                </ModalBody>
-                                <ModalFooter>
-                                  <Button colorScheme="red" mr={3} onClick={() => {
-                                    if (projectToDelete) {
-                                      handleTrashIconClick(projectToDelete.id, projectToDelete.type, projectToDelete.event);
-                                    }
-                                    setIsModalOpen(false);
-                                  }}>
-                                    Confirm
-                                  </Button>
-                                  <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
-                                    Cancel
-                                  </Button>
-                                </ModalFooter>
-                            </ModalContent>
-                          </Modal>
-                      </div>
-                    </div>
-                  ))}
-                  {projects.length === 0 && sharedProjects.length === 0 && (
+                {projects.length === 0 && sharedProjects.length === 0 && (
                     <>
                       <div className="no-projects">
                         <h3 className="no-projects-title">
@@ -472,7 +439,7 @@ const Projects: React.FC = () => {
                           </MenuList>
                         </Menu>
                       </div>
-                      <Box textAlign="center" mt="20px">
+                      <Box textAlign="center" mt="20px" display="flex" justifyContent="flex-end">
                         <img
                           className="ProjImage"
                           src={NoProj}
@@ -481,10 +448,201 @@ const Projects: React.FC = () => {
                       </Box>
                     </>
                   )}
-                </div>
-              </div>
+                  <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6}>
+                    {projects.map((project) => (
+                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-1px)", shadow: "lg"}}>
+                        <Box
+                          h="150px"
+                          bgImage={`url(${getImageForType(project.type )})`}
+                          onClick={ () => handleCardClick(project.id, project.title, project.type)}
+                          bgPosition="center"
+                          bgRepeat="no-repeat"
+                          bgSize="cover"
+                          p={3}
+                          borderTopLeftRadius="md"
+                          borderTopRightRadius="md"
+                          borderWidth="1px"
+                          borderColor="gray.200"
+                          position="relative"
+                          overflow="hidden"
+                        >
+                          <Box
+                            bg="rgba(0, 0, 0, 0.6)"
+                            position="absolute"
+                            top="0"
+                            right="0"
+                            bottom="0"
+                            left="0"
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="end"
+                            p={3}
+                          >
+                            <Text fontWeight="500" fontSize="1.2rem" color="white" noOfLines={1}>
+                              {project.title}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Type: {project.type}, unshared
+                            </Text>
+                          </Box>
+                        </Box>
+                        <Box // Container for icons
+                          p={2}
+                          backgroundColor="white" // Set the background to white
+                          borderBottomLeftRadius="md"
+                          borderBottomRightRadius="md"
+                          display="flex"
+                          justifyContent="flex-end"
+                          alignItems="center"
+                          boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+                        >
+                          <IconButton
+                            icon={<Icon as={FaTrash} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                              marginRight: "8px", // Add margin to separate icons
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)", border: "black" }}
+                            aria-label="Delete Project"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setProjectToDelete({ id: project.id, type: project.type, event });
+                              setIsModalOpen(true);
+                          }}
+                          />
+                        </Box>
+                        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                            <ModalOverlay />
+                            <ModalContent>
+                                <ModalHeader>Confirm Deletion</ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody>
+                                  Are you sure you want to delete this project? This action cannot be undone.
+                                </ModalBody>
+                                <ModalFooter>
+                                  <Button colorScheme="red" mr={3} onClick={() => {
+                                    if (projectToDelete) {
+                                      handleTrashIconClick(projectToDelete.id, projectToDelete.type, projectToDelete.event);
+                                    }
+                                    setIsModalOpen(false);
+                                  }}>
+                                    Confirm
+                                  </Button>
+                                  <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
+                                    Cancel
+                                  </Button>
+                                </ModalFooter>
+                            </ModalContent>
+                          </Modal>
+                      </GridItem>
+                    ))}
+                  </Grid>
+                  {sharedProjects.length !== 0 && (
+                  <h2 className="projects-heading">Shared</h2>
+                  )}
+                  <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6}>
+                    {sharedProjects.map((project) => (
 
-              {sharedProjects.length !== 0 &&
+                      <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-1px)", shadow: "lg"}}>
+                        <Box
+                          h="150px"
+                          bgImage={`url(${getImageForType(project.type )})`}
+                          onClick={ () => handleSharedCardClick(project.id, project.title, project.type)}
+                          bgPosition="center"
+                          bgRepeat="no-repeat"
+                          bgSize="cover"
+                          p={3}
+                          borderTopLeftRadius="md"
+                          borderTopRightRadius="md"
+                          borderWidth="1px"
+                          borderColor="gray.200"
+                          position="relative"
+                          overflow="hidden"
+                        >
+                          <Box
+                            bg="rgba(0, 0, 0, 0.6)"
+                            position="absolute"
+                            top="0"
+                            right="0"
+                            bottom="0"
+                            left="0"
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="end"
+                            p={3}
+                          >
+                            <Text fontWeight="500" fontSize="1.2rem" color="white" noOfLines={1}>
+                              {project.title}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              Type: {project.type}, shared
+                            </Text>
+                          </Box>
+                        </Box>
+                        <Box // Container for icons
+                          p={2}
+                          backgroundColor="white" // Set the background to white
+                          borderBottomLeftRadius="md"
+                          borderBottomRightRadius="md"
+                          display="flex"
+                          justifyContent="flex-end"
+                          alignItems="center"
+                          boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+                        >
+                          <IconButton
+                            icon={<Icon as={FaTrash} color="#484c6c" />}
+                            size="sm"
+                            style={{
+                              backgroundColor: "transparent",
+                              marginRight: "8px", // Add margin to separate icons
+                            }}
+                            transition="transform 0.3s ease-in-out"
+                            _hover={{ transform: "scale(1.1)" }}
+                            aria-label="Delete Project"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setSharedProjectToDelete({ id: project.id, type: project.type });
+                              setIsSharedModalOpen(true);
+                          }}
+                          />
+                        </Box>
+                        <Modal isOpen={isSharedModalOpen} onClose={() => setIsSharedModalOpen(false)}>
+                            <ModalOverlay />
+                            <ModalContent>
+                                <ModalHeader>Confirm Deletion</ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody>
+                                  Are you sure you want to delete this shared project? This action cannot be undone.
+                                </ModalBody>
+                                <ModalFooter>
+                                  <Button colorScheme="red" mr={3} onClick={() => {
+                                    if (sharedProjectToDelete) {
+                                      handleSharedTrashIconClick(sharedProjectToDelete.id, sharedProjectToDelete.type,);
+                                    }
+                                    setIsSharedModalOpen(false);
+                                  }}>
+                                    Confirm
+                                  </Button>
+                                  <Button variant="ghost" onClick={() => setIsSharedModalOpen(false)}>
+                                    Cancel
+                                  </Button>
+                                </ModalFooter>
+                            </ModalContent>
+                          </Modal>
+                      </GridItem>
+                    ))}
+                  </Grid>
+                </div>
+
+              {/* {sharedProjects.length !== 0 &&
                 <div className="projects-container">
                   <h2 className="projects-heading">Shared</h2>
                   <div className="projects-list">
@@ -546,7 +704,7 @@ const Projects: React.FC = () => {
                       </div>
                     ))}
                   </div>
-                </div>}
+                </div>} */}
             </>
           )}
 

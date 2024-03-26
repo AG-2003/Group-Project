@@ -7,15 +7,15 @@ import {
   Stack,
   Badge,
   Divider,
+  Button,
   Menu,
   MenuButton,
   MenuItem,
-  Button,
   MenuList,
   Icon,
   IconButton,
   Grid,
-  GridItem
+  GridItem,
 } from "@chakra-ui/react";
 import { auth, db } from "../../firebase-config";
 import {
@@ -33,6 +33,7 @@ import InvModal from "./InvModal";
 import Navbar from "../Dashboard/Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "../Dashboard/sidebar";
+import { SettingsIcon } from "@chakra-ui/icons";
 import { SuiteData } from "../../interfaces/SuiteData";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FiFileText, FiClipboard } from "react-icons/fi";
@@ -46,7 +47,7 @@ const TeamDetails: React.FC = () => {
   const [teamDetails, setTeamDetails] = useState<DocumentData | null>(null);
   const [user] = useAuthState(auth);
   const [sharedProjects, setSharedProjects] = useState<SuiteData[]>([]);
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true)
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   let { team_id } = useParams();
   const navigate = useNavigate();
 
@@ -95,15 +96,17 @@ const TeamDetails: React.FC = () => {
         const sharedBoardsSnapshot = await getDocs(sharedBoardsRef);
 
         // Filter shared documents and shared boards based on the user's email
-        const filteredSharedDocs = sharedDocsSnapshot.docs.filter(doc =>
-          doc.data().team_id === team_id
-        ).map(doc => doc.data() as SuiteData);
+        const filteredSharedDocs = sharedDocsSnapshot.docs
+          .filter((doc) => doc.data().team_id === team_id)
+          .map((doc) => doc.data() as SuiteData);
         // const filteredSharedBoards = sharedBoardsSnapshot.docs.filter(doc =>
         //   doc.data().user?.includes(user.email) && doc.data().isTrash === false
         // ).map(doc => doc.data() as SuiteData);
 
-        setSharedProjects([...filteredSharedDocs/*, ...filteredSharedBoards*/]);
-        setIsLoadingProjects(false)
+        setSharedProjects([
+          ...filteredSharedDocs /*, ...filteredSharedBoards*/,
+        ]);
+        setIsLoadingProjects(false);
       }
     }
   };
@@ -130,7 +133,7 @@ const TeamDetails: React.FC = () => {
     };
 
     fetchTeamDetails();
-    fetchProjects()
+    fetchProjects();
   }, [team_id]);
 
   // inv stuff
@@ -262,35 +265,43 @@ const TeamDetails: React.FC = () => {
                   <Stack className="profile-stats">
                     <Badge className="badge">0 Projects</Badge>
                     <Badge className="badge">
-                      {teamDetails.members.length + 1} Members
+                      {teamDetails.members.length || 0} Members
                     </Badge>
-                    <Badge className="badge">0 Awards</Badge>
+                    <Button
+                      colorScheme="gray"
+                      size="sm"
+                      ml="2"
+                      leftIcon={<SettingsIcon />}
+                      onClick={() =>
+                        navigate(`/Teams/In_teams/${team_id}/settings`)
+                      }
+                    />
                   </Stack>
                 </Flex>
                 <Flex className="profile-body">
                   <Flex className="top-titles">
-                  <Modal
-                    isOpen={modalType !== ""}
-                    onClose={closeModal}
-                    // onConfirm={handleConfirm}
-                    modalType={modalType}
-                    team_id={`${team_id}`}
-                  />
-                  <Menu>
-                    <MenuButton
+                    <Modal
+                      isOpen={modalType !== ""}
+                      onClose={closeModal}
+                      // onConfirm={handleConfirm}
+                      modalType={modalType}
+                      team_id={`${team_id}`}
+                    />
+                    <Menu>
+                      <MenuButton
                         as={Button}
                         colorScheme="purple"
                         mr={4}
                         size="sm"
-                     >
-                      Create a design
-                    </MenuButton>
+                      >
+                        Create a design
+                      </MenuButton>
                       <MenuList>
                         <MenuItem
-                           icon={<FiFileText />}
-                           onClick={() => openModal("Doc")}
+                          icon={<FiFileText />}
+                          onClick={() => openModal("Doc")}
                         >
-                           Doc
+                          Doc
                         </MenuItem>
                         {/* <MenuItem
                           icon={<FiClipboard />}
@@ -304,54 +315,70 @@ const TeamDetails: React.FC = () => {
                       Invite Members
                     </button>
                   </Flex>
-                  {isLoadingProjects || sharedProjects.length===0 ? (<p className="no-documents-message">
-                    There are no documents yet.
-                  </p>) : (
-                    <Grid templateColumns="repeat(auto-fit, minmax(240px, 1fr))" gap={6} w="100%">
-                    {sharedProjects.map((project) => (
-                      <GridItem key={project.id} w="100%" >
-                        <Box
-                          h="140px"
-                          bgImage={`url(${getImageForType(project.type)})`}
-                          bgPosition="center"
-                          bgRepeat="no-repeat"
-                          bgSize="cover"
-                          p={3}
-                          borderRadius="lg"
-                          borderWidth="1px"
-                          borderColor="gray.200"
-                          position="relative"
-                          overflow="hidden"
-                          _hover={{
-                            transform: "translateY(-5px)",
-                            shadow: "lg",
-                          }}
-                          onClick={() =>
-                            handleSharedCardClick(project.id, project.title, project.type)
-                          }
-                        >
+                  {isLoadingProjects || sharedProjects.length === 0 ? (
+                    <p className="no-documents-message">
+                      There are no documents yet.
+                    </p>
+                  ) : (
+                    <Grid
+                      templateColumns="repeat(auto-fit, minmax(240px, 1fr))"
+                      gap={6}
+                      w="100%"
+                    >
+                      {sharedProjects.map((project) => (
+                        <GridItem key={project.id} w="100%">
                           <Box
-                            bg="rgba(0, 0, 0, 0.6)"
-                            position="absolute"
-                            top="0"
-                            right="0"
-                            bottom="0"
-                            left="0"
-                            display="flex"
-                            flexDirection="column"
-                            justifyContent="end"
+                            h="140px"
+                            bgImage={`url(${getImageForType(project.type)})`}
+                            bgPosition="center"
+                            bgRepeat="no-repeat"
+                            bgSize="cover"
                             p={3}
+                            borderRadius="lg"
+                            borderWidth="1px"
+                            borderColor="gray.200"
+                            position="relative"
+                            overflow="hidden"
+                            _hover={{
+                              transform: "translateY(-5px)",
+                              shadow: "lg",
+                            }}
+                            onClick={() =>
+                              handleSharedCardClick(
+                                project.id,
+                                project.title,
+                                project.type
+                              )
+                            }
                           >
-                            <Text fontWeight="bold" fontSize="lg" color="white" noOfLines={1}>
-                              {project.title}
-                            </Text>
-                            <Text fontSize="sm" color="gray.300">
-                              Last edited: {new Date(project.lastEdited).toLocaleString()}
-                            </Text>
+                            <Box
+                              bg="rgba(0, 0, 0, 0.6)"
+                              position="absolute"
+                              top="0"
+                              right="0"
+                              bottom="0"
+                              left="0"
+                              display="flex"
+                              flexDirection="column"
+                              justifyContent="end"
+                              p={3}
+                            >
+                              <Text
+                                fontWeight="bold"
+                                fontSize="lg"
+                                color="white"
+                                noOfLines={1}
+                              >
+                                {project.title}
+                              </Text>
+                              <Text fontSize="sm" color="gray.300">
+                                Last edited:{" "}
+                                {new Date(project.lastEdited).toLocaleString()}
+                              </Text>
+                            </Box>
                           </Box>
-                        </Box>
-                      </GridItem>
-                    ))}
+                        </GridItem>
+                      ))}
                     </Grid>
                   )}
                 </Flex>
