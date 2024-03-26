@@ -142,6 +142,7 @@ const CommentModal: React.FC<Props> = ({
 
         console.log("Comment saved successfully");
         setCommentDescription("");
+        fetchComments();
       }
     } catch (error) {
       console.error("Error saving comment:", error);
