@@ -19,6 +19,7 @@ import { auth, db } from "../../firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { RxCross2 } from "react-icons/rx";
+import { UseToastNotification } from "../../utils/UseToastNotification";
 
 interface Props {
   isOpen: boolean;
@@ -26,9 +27,22 @@ interface Props {
   onClose: () => void;
 }
 
+interface TeamData {
+  id: string;
+  name: string;
+  description: string;
+  role: string;
+  members: string[];
+  image: string | null; // Store image URL instead of File
+  chatId: string;
+  creator: string;
+  admins: string[];
+}
+
 const InvModal: React.FC<Props> = ({ isOpen, onClose, teamId }: Props) => {
   const [emailInputs, setEmailInputs] = useState([""]);
   const [user] = useAuthState(auth);
+  const showToast = UseToastNotification();
 
   const removeField = (RemoveIndex: Number) => {
     setEmailInputs((prevEmails) => {
@@ -43,7 +57,6 @@ const InvModal: React.FC<Props> = ({ isOpen, onClose, teamId }: Props) => {
     try {
       // get the user
       const userMail = user?.email;
-
       // create the team
       if (userMail) {
         // for invite
@@ -59,12 +72,31 @@ const InvModal: React.FC<Props> = ({ isOpen, onClose, teamId }: Props) => {
               teams: [...(memberDocSnapshot.data()?.teams || []), teamId],
             });
           }
+
+          try {
+            const teamRef = doc(db, "teams", teamId || "");
+            const teamSnap = await getDoc(teamRef);
+
+            if (teamSnap.exists()) {
+              const teamData = teamSnap.data() as TeamData;
+              const updatedMembers = [...teamData.members, email];
+
+              await updateDoc(teamRef, { members: updatedMembers });
+              console.log("Member added to the team successfully.");
+            } else {
+              console.error("Team does not exist.");
+            }
+          } catch (error) {
+            console.error("Error adding member to the team:", error);
+          }
         }
 
         console.log("invite done successfully");
+        showToast("success", "Invite done successfully");
       }
     } catch (error) {
       console.error("Error inviting team:", error);
+      showToast("error", "Error in inviting");
     }
   };
 
@@ -89,6 +121,32 @@ const InvModal: React.FC<Props> = ({ isOpen, onClose, teamId }: Props) => {
   const handleAddInvitation = () => {
     setEmailInputs((prevEmails) => [...prevEmails, ""]);
   };
+  const generateCode = (length: number) => {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const handleGenerateCode = async () => {
+    try {
+      const newSpecialID = generateCode(8); // Generate a new special ID
+      const teamRef = doc(db, "teams", teamId || "");
+      await updateDoc(teamRef, { specialID: newSpecialID });
+
+      // Copy the generated code to the clipboard
+      await navigator.clipboard.writeText(newSpecialID);
+
+      console.log("New special ID generated:", newSpecialID);
+      showToast("success", "Code copied into the clipboard");
+    } catch (error) {
+      console.error("Error generating special ID:", error);
+      showToast("error", "Error generating special ID");
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
@@ -101,9 +159,9 @@ const InvModal: React.FC<Props> = ({ isOpen, onClose, teamId }: Props) => {
           <Text mb={4} marginTop={5} marginBottom={5}>
             Bring your whole team to collaborate on your projects.
           </Text>
-          <Link mb={4} onClick={() => console.log("Get invite link clicked")}>
+          <Link mb={4} onClick={handleGenerateCode}>
             <Flex align="center" mb={5}>
-              Get invite link
+              Generate code
             </Flex>
           </Link>
           {emailInputs.map((email, index) => (

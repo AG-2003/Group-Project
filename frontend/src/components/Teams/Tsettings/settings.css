@@ -1,0 +1,58 @@
+.head {
+    text-align: left; /* Align the header text to the left */
+    padding-left: 1rem; /* Add padding to align with the body content */
+    padding-bottom: 1rem;
+  }
+  
+  .body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem; /* Add padding around the content */
+  }
+  
+  .body .flex {
+    align-items: center; /* Align items to the center vertically */
+    justify-content: flex-start; /* Align items to the start of the flex container (left side) */
+  }
+  
+  .body .avatar {
+    margin-right: 1rem; /* Space after the avatar */
+    margin-bottom:  1rem;
+    width: 70px; /* Make the avatar larger */
+    height: 70px; /* Make the avatar larger */
+  }
+  
+  .button {
+    margin-left: 1rem; 
+    background-color: #805AD5; 
+    color: white;
+  }
+  
+  .upload-section {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    gap: 5rem; /* Add space between text and button */
+  }
+  
+  /* Ensure the button has no left margin */
+  .button-upload {
+    background-color: #805AD5; /* Chakra purple color */
+    color: white;
+  }
+  
+  .button-edit {
+    background-color: transparent; /* Make the edit button transparent */
+    color: #805AD5; /* Match the text color to the purple theme */
+    border: 1px solid #805AD5; /* Add border to the edit button */
+  }
+  
+  .select {
+    max-width: 240px; /* Or any other fixed width or max-width */
+  }
+  
+  /* Add style for the text next to the avatar */
+  .text {
+    align-self: center; /* Vertically center with the avatar */
+    margin-right: auto; /* Align text to the left */
+  }
+  

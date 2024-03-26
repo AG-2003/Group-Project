@@ -37,6 +37,18 @@ interface Post {
 const AllPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const user = await auth.currentUser;
+      if (user) {
+        setUserId(user?.email || "");
+      }
+    };
+
+    fetchUserId();
+  }, []);
 
   useEffect(() => {
     const fetchAllPosts = async () => {
@@ -148,7 +160,7 @@ const AllPosts = () => {
   const handleDeletePost = async (postId: string, postUid: string) => {
     try {
       const user = auth.currentUser;
-      if (user && user.uid === postUid) {
+      if (user && user.email === postUid) {
         // Check if current user is the owner of the post
         const postRef = doc(db, "communityPosts", postId);
         await deleteDoc(postRef);
@@ -236,7 +248,7 @@ const AllPosts = () => {
       if (postDocSnapshot.exists()) {
         // Check if current user is the owner of the post
 
-        if (postDocSnapshot.data()?.Uid === user.uid) {
+        if (postDocSnapshot.data()?.Uid === user.email) {
           // Update post document in Firestore with new title and description
           await updateDoc(postRef, {
             title: newTitle,
@@ -318,12 +330,13 @@ const AllPosts = () => {
                   <Posts
                     key={index}
                     post={post}
-                    userId={post.Uid}
+                    userId={userId}
                     onLike={handleLike}
                     onDislike={handleDislike}
                     deletePost={handleDeletePost}
                     savePost={savePost}
                     editPost={editPost}
+                    admin={false}
                   />
                 ))}
               </div>

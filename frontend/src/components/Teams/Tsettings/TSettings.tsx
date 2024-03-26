@@ -1,11 +1,10 @@
 import { useRef } from "react";
-import Account from "../components/Settings_/account";
-import Security from "../components/Settings_/security";
-import Preference from "../components/Settings_/preference";
-import SideBar from "../components/Settings_/sideBar";
+
+import SideBar from "./sidebar";
+import Account from "./inTSettings";
 // import Privacy from './components/privacy';
 
-function Settings() {
+function TSettings() {
   const accountRef = useRef(null);
   const securityRef = useRef(null);
   const preferenceRef = useRef(null);
@@ -45,15 +44,15 @@ function Settings() {
         <div ref={accountRef}>
           <Account />
         </div>
-        <div ref={securityRef}>
+        {/* <div ref={securityRef}>
           <Security />
-        </div>
-        <div ref={preferenceRef}>
+        </div> */}
+        {/* <div ref={preferenceRef}>
           <Preference />
-        </div>
+        </div> */}
       </div>
     </div>
   );
 }
 
-export default Settings;
+export default TSettings;
