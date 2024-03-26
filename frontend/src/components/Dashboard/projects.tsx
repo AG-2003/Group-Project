@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, getDoc, setDoc, collection, getDocs, DocumentReference, DocumentData } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  getDocs,
+  DocumentReference,
+  DocumentData,
+} from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "./Projects.scss";
 import Navbar from "./Navbar";
@@ -71,8 +79,21 @@ const Projects: React.FC = () => {
   // Function to handle the confirmation (submit) of the modal
   const handleConfirm = () => closeModal(); // Close the modal after submission
 
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    // Check screen width or user agent to determine if it's desktop or mobile
+    const screenWidth = window.innerWidth;
+    setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+  }, []);
+
   const sidebarVariants = {
     open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  const sidebarVariantsMobile = {
+    open: { width: "100%" },
     closed: { width: "0px" },
   };
 
@@ -132,12 +153,21 @@ const Projects: React.FC = () => {
         const sharedBoardsSnapshot = await getDocs(sharedBoardsRef);
 
         // Filter shared documents and shared boards based on the user's email
-        const filteredSharedDocs = sharedDocsSnapshot.docs.filter(doc =>
-          doc.data().user?.includes(user.email) && doc.data().isTrash === false && !doc.data().hasOwnProperty('team_id')
-        ).map(doc => doc.data() as SuiteData);
-        const filteredSharedBoards = sharedBoardsSnapshot.docs.filter(doc =>
-          doc.data().user?.includes(user.email) && doc.data().isTrash === false
-        ).map(doc => doc.data() as SuiteData);
+        const filteredSharedDocs = sharedDocsSnapshot.docs
+          .filter(
+            (doc) =>
+              doc.data().user?.includes(user.email) &&
+              doc.data().isTrash === false &&
+              !doc.data().hasOwnProperty("team_id")
+          )
+          .map((doc) => doc.data() as SuiteData);
+        const filteredSharedBoards = sharedBoardsSnapshot.docs
+          .filter(
+            (doc) =>
+              doc.data().user?.includes(user.email) &&
+              doc.data().isTrash === false
+          )
+          .map((doc) => doc.data() as SuiteData);
 
         // Use the existing lastEdited field from Firestore data, don't generate a new one
         let combinedProjects: SuiteData[] = [
@@ -274,15 +304,15 @@ const Projects: React.FC = () => {
   const handleSharedTrashIconClick = async (id: string, type: string) => {
     if (user?.email) {
       try {
-        let sharedDocRef: DocumentReference<DocumentData, DocumentData>
-        if (type === 'document') {
-          sharedDocRef = doc(db, "sharedDocs", id)
+        let sharedDocRef: DocumentReference<DocumentData, DocumentData>;
+        if (type === "document") {
+          sharedDocRef = doc(db, "sharedDocs", id);
         } else {
-          sharedDocRef = doc(db, "sharedBoards", id)
+          sharedDocRef = doc(db, "sharedBoards", id);
         }
 
         if (sharedDocRef) {
-          const docSnapshot = await getDoc(sharedDocRef)
+          const docSnapshot = await getDoc(sharedDocRef);
 
           if (docSnapshot.exists()) {
             // Fetch the document data
@@ -303,57 +333,106 @@ const Projects: React.FC = () => {
     }
 
     fetchProjects();
-  }
+  };
 
   return (
-    <>
+    <div style={{ position: "fixed", width: "100%"}}>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
-      <Box display="flex" height="calc(100vh - 10px)">
-        <AnimatePresence>
-          {isSidebarOpen ? (
-            <motion.div
-              initial="open"
-              animate="open"
-              exit="closed"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f4f1fa",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          ) : (
-            <motion.div
-              initial="closed"
-              animate="clsoed"
-              exit="open"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f6f6f6",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <Box display="flex" height="calc(100vh - 10px)" position="relative">
+        {!isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f4f1fa",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="clsoed"
+                exit="open"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+        {isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f4f1fa",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="clsoed"
+                exit="open"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
         {/* Code is contained in this box */}
         <Box
+         
           flexGrow={1}
+         
           padding="10px"
+         
           marginLeft={5}
-          overflowY="scroll"
-          overflowX="hidden"
+          overflowY="auto"
+          position="relative"
+          zIndex="1"
           sx={{
               '&::-webkit-scrollbar': {
                 width: '10px',
@@ -652,13 +731,19 @@ const Projects: React.FC = () => {
                         key={project.id}
                         className="project-card"
                         onClick={() =>
-                          handleSharedCardClick(project.id, project.title, project.type)
+                          handleSharedCardClick(
+                            project.id,
+                            project.title,
+                            project.type
+                          )
                         }
                       >
                         <div
                           className="card-top"
                           style={{
-                            backgroundImage: `url(${getImageForType(project.type)})`,
+                            backgroundImage: `url(${getImageForType(
+                              project.type
+                            )})`,
                           }}
                         >
                           <h3 className="project-title">{project.title}</h3>
@@ -708,10 +793,9 @@ const Projects: React.FC = () => {
                 </div>} */}
             </>
           )}
-
         </Box>
       </Box>
-    </>
+    </div>
   );
 };
 

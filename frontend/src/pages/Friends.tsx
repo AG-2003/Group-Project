@@ -39,7 +39,13 @@ export const Friends: React.FC = () => {
     const [favorites, setFavorites] = useState<string[]>([]);
     const { receivedRequests, setReceivedRequests } = useReceivedRequests();
     const navigate = useNavigate();
+    const [isDesktop, setIsDesktop] = useState(true);
 
+    useEffect(() => {
+        // Check screen width or user agent to determine if it's desktop or mobile
+        const screenWidth = window.innerWidth;
+        setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+    }, []);
 
 
     // State for managing modal visibility and the current selected friend
@@ -66,6 +72,10 @@ export const Friends: React.FC = () => {
     const sidebarVariants = {
         open: { width: '200px' },
         closed: { width: '0px' },
+    };
+    const sidebarVariantsMobile = {
+        open: { width: "100%" },
+        closed: { width: "0px" },
     };
 
     const bgColor = useColorModeValue('gray.50', 'gray.800');
@@ -392,33 +402,60 @@ export const Friends: React.FC = () => {
     const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
     const menuItemHoverColor = useColorModeValue('purple.700', 'purple.100');
     return (
-        <>
-            <Box padding="10px" background="#484c6c">
-                <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
-            </Box>
+
+        <div style={{ position: "fixed", width: "100%" }}>
+            <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+
             <Divider borderColor="lightgrey" borderWidth="1px" maxWidth="98.5vw" />
-            <Box display="flex" height="calc(100vh - 10px)" width="100%">
-                <AnimatePresence>
-                    {isSidebarOpen ? (
-                        <motion.div
-                            initial="closed"
-                            animate="open"
-                            exit="closed"
-                            variants={sidebarVariants}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            style={{
-                                paddingTop: "10px",
-                                height: "inherit",
-                                backgroundColor: "#f4f1fa",
-                                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                                overflow: "hidden",
-                            }}
-                        >
-                            <SideBar />
-                        </motion.div>
-                    ) : null}
-                </AnimatePresence>
-                <Box flex="1" display="flex" flexDirection="column" p="4" bgColor='white'>
+            <Box display="flex" height="calc(100vh - 10px)" width="100%" position="relative">
+                {isDesktop && (
+                    <AnimatePresence>
+                        {isSidebarOpen ? (
+                            <motion.div
+                                initial="closed"
+                                animate="open"
+                                exit="closed"
+                                variants={sidebarVariants}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                style={{
+                                    paddingTop: "10px",
+                                    height: "inherit",
+                                    backgroundColor: "#f4f1fa",
+                                    boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                                    overflow: "hidden",
+                                }}
+                            >
+                                <SideBar />
+                            </motion.div>
+                        ) : null}
+                    </AnimatePresence>
+                )}
+                {!isDesktop && (
+                    <AnimatePresence>
+                        {isSidebarOpen ? (
+                            <motion.div
+                                initial="closed"
+                                animate="open"
+                                exit="closed"
+                                variants={sidebarVariantsMobile}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                style={{
+                                    paddingTop: "10px",
+                                    height: "inherit",
+                                    backgroundColor: "#f4f1fa",
+                                    boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                                    overflow: "hidden",
+                                    position: "absolute",
+                                    zIndex: "2",
+                                }}
+                            >
+                                <SideBar />
+                            </motion.div>
+                        ) : null}
+                    </AnimatePresence>
+                )}
+
+                <Box flex="1" display="flex" flexDirection="column" p="4" bgColor='white' overflowY="auto" position="relative" zIndex='1'>
 
                     {receivedRequests.length > 0 && (
                         <Flex direction="column" mb={6} align="center" >
@@ -613,6 +650,6 @@ export const Friends: React.FC = () => {
                     </Flex>
                 </Box >
             </Box >
-        </>
+        </div >
     )
 }

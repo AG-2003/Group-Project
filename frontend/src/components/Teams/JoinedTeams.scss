@@ -19,56 +19,80 @@
   // gap: 20px;
 }
 
-  .team-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+.team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 138px; // Adjust width as needed
+  height: 160px; // Adjust height as needed
+  padding: 10px;
+  border: 1px solid #e2e8f0; // Use the color from the image border
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #dcdcf6; // Use the color from the image background
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-right: 2rem;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15); // Adjust hover shadow
+    transform: translateY(-5px); // Moves the box up by 5 pixels on hover
+  }
+
+  img.team-image {
     width: 138px; // Adjust width as needed
-    height: 160px; // Adjust height as needed
-    padding: 10px;
-    border: 1px solid #e2e8f0; // Use the color from the image border
-    border-radius: 8px;
-    cursor: pointer;
-    background-color: #dcdcf6; // Use the color from the image background
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    margin-right: 2rem;
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    height: 70px; // Adjust height as needed
+    border-radius: 10px;
+  }
 
-    &:hover {
-      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15); // Adjust hover shadow
-      transform: translateY(-5px); // Moves the box up by 5 pixels on hover
-    }
-
-    img.team-image {
-      width: 138px; // Adjust width as needed
-      height: 70px; // Adjust height as needed
-      border-radius: 10px;
-    }
-
-    h3.team-name {
-      font-size: 18px; // Adjust font-size to match the image
-      color: inherit; // Use the color from the image text
-      font-weight: 500;
-      margin-top: 8px;
-      margin-bottom: 8px;
-    }
+  h3.team-name {
+    font-size: 18px; // Adjust font-size to match the image
+    color: inherit; // Use the color from the image text
+    font-weight: 500;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+  }
 
   p.team-description {
     font-size: 10.5px;
     color: #555;
     margin-bottom: 12px;
     width: 100%;
-
   }
 
-.no-team-message-container {
-  margin-top: 16px;
+  .no-team-message-container {
+    margin-top: 16px;
 
     .message {
       font-size: 24px;
       color: silver;
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .teams-list {
+    flex-direction: column;
+  }
+
+  .team-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 178px; // Adjust width as needed-
+    height: 200px; // Adjust height as needed-
+    padding: 10px;
+    border: 1px solid #e2e8f0; // Use the color from the image border
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #dcdcf6; // Use the color from the image background
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
 }
