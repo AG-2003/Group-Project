@@ -15,6 +15,7 @@ import cardBg2 from '../assets/carbBg2.png'
 import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
 import { useReceivedRequests } from "../context/RecievedRequestsContext";
 import { useNavigate } from "react-router-dom";
+import { getOrCreateChatId } from "../chatService";
 
 
 
@@ -131,61 +132,58 @@ export const Friends: React.FC = () => {
         }
     }, [searchTerm, users]);
 
-    // TODO: use batch
     const addFriend = async (friendEmail: string) => {
         if (!userEmail || userEmail === friendEmail) return;
 
         const userDocRef = doc(db, 'users', userEmail);
-
-        // Get the visibility status of the user to be added
         const friendDocRef = doc(db, 'users', friendEmail);
+
+        // First, get the friend's user visibility
         const friendDocSnap = await getDoc(friendDocRef);
+        if (!friendDocSnap.exists()) {
+            showToast('error', `User not found.`);
+            return;
+        }
 
-        if (friendDocSnap.exists() && friendDocSnap.data()) {
-            const friendData = friendDocSnap.data();
+        const friendData = friendDocSnap.data();
+        if (friendData.userVisibility === 'public') {
+            // If the friend's profile is public, proceed with adding them directly
+            const batch = writeBatch(db);
+            batch.update(userDocRef, {
+                userFriends: arrayUnion(friendEmail)
+            });
+            batch.update(friendDocRef, {
+                userFriends: arrayUnion(userEmail)
+            });
 
-            // If friend's profile is public, add directly as friends
-            if (friendData.userVisibility === 'public') {
-
-                try {
-                    // Transaction or batch could be used here for atomicity, ensuring both operations succeed or fail together
-                    // Add friend to current user's list
-                    await updateDoc(userDocRef, {
-                        userFriends: arrayUnion(friendEmail)
-                    });
-
-                    // Add current user to friend's list
-                    await updateDoc(friendDocRef, {
-                        userFriends: arrayUnion(userEmail)
-                    });
-
-                    setFriends(prev => [...prev, friendEmail]);
-                    showToast('info', 'Added new friend');
-                } catch (error) {
-                    console.error("Error adding friend:", error);
-                    showToast('error', `${error}`);
-                }
-
-            } else if (friendData.userVisibility === 'private') {
-                // Send a friend request instead
-                // For User A (current user sending the request)
-                const userDocRef = doc(db, 'users', userEmail);
+            try {
+                await batch.commit();
+                setFriends(prev => [...prev, friendEmail]);
+                showToast('info', 'Added new friend');
+            } catch (error) {
+                console.error("Error adding friend:", error);
+                showToast('error', `${error}`);
+            }
+        } else {
+            // If the friend's profile is private, send a friend request instead
+            try {
                 await updateDoc(userDocRef, {
                     sentRequests: arrayUnion(friendEmail)
                 });
-                setSentRequests(prev => [...prev, friendEmail]);
-
-                // For User B (receiving the request)
                 await updateDoc(friendDocRef, {
                     receivedRequests: arrayUnion(userEmail)
                 });
 
+                // Update the sentRequests state
+                setSentRequests(prev => [...prev, friendEmail]);
                 showToast('info', `Friend request sent to ${friendEmail}`);
+            } catch (error) {
+                console.error("Error sending friend request:", error);
+                showToast('error', `${error}`);
             }
-        } else {
-            showToast('error', `User not found.`);
         }
     };
+
 
     const fetchRecievedRequests = async () => {
         if (!userEmail) return;
@@ -374,6 +372,21 @@ export const Friends: React.FC = () => {
         fetchUserFriends();
     }, []);
 
+    const startChat = async (friendEmail: string) => {
+        if (!userEmail) {
+            showToast('error', 'You must be logged in to start a chat.');
+            return;
+        }
+
+        try {
+            const chatId = await getOrCreateChatId(userEmail, friendEmail);
+            navigate(`/chat/${chatId}`);
+        } catch (error) {
+            console.error("Error getting or creating chatId:", error);
+            showToast('error', 'Error starting chat.');
+        }
+    };
+
 
     const menuBg = useColorModeValue('white', 'gray.700');
     const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
@@ -469,7 +482,7 @@ export const Friends: React.FC = () => {
                                             <Button isDisabled>Request Sent</Button>
                                         ) : (
                                             <Button
-                                                onClick={() => result.email && addFriend(result.email ?? result.id)}
+                                                onClick={() => result.email && addFriend(result.email)}
                                                 bg="purple.400"
                                                 _hover={{ bg: 'purple.500' }}
                                                 color="white"
@@ -507,20 +520,14 @@ export const Friends: React.FC = () => {
                                                             </MenuItem>
                                                             <MenuItem
                                                                 _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => console.log("View Profile")}
-                                                            >
-                                                                View User Profile
-                                                            </MenuItem>
-                                                            <MenuItem
-                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => console.log('chats')}
+                                                                onClick={() => startChat(friendEmail)}
                                                             >
                                                                 Chat
                                                             </MenuItem>
                                                             {favorites.includes(friendEmail) ? (
                                                                 <MenuItem
                                                                     _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                    onClick={() => handleRemoveFavorite(friendEmail)} // Implement this function similar to handleAddFavorite
+                                                                    onClick={() => handleRemoveFavorite(friendEmail)}
                                                                 >
                                                                     Remove from Favorites
                                                                 </MenuItem>
