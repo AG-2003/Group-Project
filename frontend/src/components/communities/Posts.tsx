@@ -12,9 +12,10 @@ import {
 } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
 import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
-import "./Posts.scss"
+import "./Posts.scss";
 import CommentsModal from "./commentsModal";
 import EditPostModal from "./EditPostModal";
+import Linkify from "react-linkify";
 
 interface Props {
   post: DocumentData;
@@ -24,6 +25,7 @@ interface Props {
   deletePost: (postId: string, postUid: string) => void;
   savePost: (post: string) => void;
   editPost: (postId: string, newTitle: string, newDescription: string) => void;
+  admin: boolean;
 }
 
 const Posts = ({
@@ -34,6 +36,7 @@ const Posts = ({
   deletePost,
   savePost,
   editPost,
+  admin,
 }: Props) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -141,11 +144,6 @@ const Posts = ({
     }
   };
 
-  const handleShareClick = () => {
-    // Logic to share the post link
-    console.log("Share clicked");
-  };
-
   const handleCommentsClick = () => {
     setIsCommentsModalOpen(true);
   };
@@ -178,14 +176,13 @@ const Posts = ({
               ...
             </MenuButton>
             <MenuList>
-              {post.Uid === userId && (
+              {(post.Uid === userId || admin) && (
                 <>
                   <MenuItem onClick={handlePostDelete}>Delete</MenuItem>
                   <MenuItem onClick={handleEditModalOpen}>Edit</MenuItem>
                 </>
               )}
               <MenuItem onClick={handleSave}>Save</MenuItem>
-              <MenuItem color="red">Report</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
@@ -195,7 +192,7 @@ const Posts = ({
         {post.image ? (
           <img
             src={post.image}
-            alt=""
+            alt="https://firebasestorage.googleapis.com/v0/b/f29so-group-project-85f3b.appspot.com/o/teamImages%2Fno%20image.jpg?alt=media&token=c258f9e1-c593-476e-b9cc-274483d25edd"
             className="post-image"
           />
         ) : (
@@ -205,16 +202,19 @@ const Posts = ({
             h="300px"
             mb="4"
             className="post-placeholder"
+            style={{
+              backgroundImage: `url('https://firebasestorage.googleapis.com/v0/b/f29so-group-project-85f3b.appspot.com/o/teamImages%2Fno%20image.jpg?alt=media&token=c258f9e1-c593-476e-b9cc-274483d25edd')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           />
         )}
-        <Text className="post-title" fontSize="lg" fontWeight="bold" mb="2">
-          {post.title}
+
+        <Text>
+          <Linkify>{post.description}</Linkify>
         </Text>
-        <Text className="post-date" fontSize="sm" color="gray.500" mb="2">
-          Date Posted: {post.date}
-        </Text>
-        <Text className="post-description">{post.description}</Text>
-        <Flex className="post-actions" align="center" mt="2">
+        {/* Like and Dislike buttons */}
+        <Flex align="center" mt="2">
           <Button
             className="like-button"
             size="sm"
@@ -226,7 +226,7 @@ const Posts = ({
             <FaRegThumbsUp color={likeClicked ? "green" : "gray"} />
           </Button>
           <Text fontSize="sm" mr="2">
-            {post.like}
+            {likeCount - dislikeCount}
           </Text>
           <Button
             className="dislike-button"
@@ -238,16 +238,7 @@ const Posts = ({
           >
             <FaRegThumbsDown color={dislikeClicked ? "red" : "gray"} />
           </Button>
-          <Button
-            className="share-button"
-            // colorScheme="blue"
-            size="sm"
-            mr="2"
-            onClick={handleShareClick}
-          >
-            Share
-          </Button>
-          <Button className="comments-button" size="sm" onClick={handleCommentsClick}>
+          <Button size="sm" onClick={handleCommentsClick}>
             <Box as="span" mr="1">
               <Text as="span">{post.commentsCount || 0}</Text>
             </Box>
@@ -278,5 +269,3 @@ const Posts = ({
 };
 
 export default Posts;
-
-

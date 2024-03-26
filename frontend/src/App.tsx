@@ -7,7 +7,7 @@ import { ForgotPassword } from "./pages/Auth/ForgotPassword";
 import { SignUpEmail } from "./pages/Auth/SignUpEmail";
 import { SignUpPassword } from "./pages/Auth/SignUpPassword";
 import { NewPassword } from "./pages/Auth/NewPassword";
-import Policies from "./pages/Policies"
+import Policies from "./pages/Policies";
 // import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
@@ -40,8 +40,8 @@ import AllPosts from "./components/communities/AllPosts";
 import YourPosts from "./components/communities/YourPosts";
 import { Friends } from "./pages/Friends";
 import CSettings from "./components/communities/CSettings/CSettings";
-
-
+import TSettings from "./components/Teams/Tsettings/TSettings";
+import { useReceivedRequests } from "./context/RecievedRequestsContext";
 
 function App() {
   useEffect(() => {
@@ -75,7 +75,6 @@ function App() {
         <Route path="/Social" element={<Social />} />
         <Route path="/badges" element={<BadgesPage />} />
         <Route path="/friends" element={<Friends />} />
-
         <Route path="/calendar" element={<Calendar />} />
         {/* <Route path="/Templates" element={<Templates />} /> */}
         <Route path="/Trash" element={<Trash />} />
@@ -83,6 +82,10 @@ function App() {
         <Route path="/Sheet" element={<Spreadsheet />} />;
         <Route path="/Teams/In_teams/:team_id" element={<TeamDetails />} />
         <Route path="/In_teams/chat/:team_id" element={<TeamsChat />} />
+        <Route
+          path="Teams/In_teams/:team_id/settings"
+          element={<TSettings />}
+        />
         <Route path="/meeting" element={<Call />} />
         <Route path="/communities" element={<Communities />} />
         <Route

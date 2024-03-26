@@ -297,8 +297,11 @@ interface TeamData {
   description: string;
   role: string;
   members: string[];
-  image: string | null; // Store image URL instead of File
+  image: string | null;
   chatId: string;
+  admins: string[];
+  creator: string;
+  specialID: string;
 }
 
 interface Props {
@@ -476,9 +479,15 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
           name: teamName,
           description: teamDescription,
           role: teamRole,
-          members: emailInputs.filter((email) => email.trim() !== ""),
-          image: null, // Initialize with null value
+          members: [
+            ...emailInputs.filter((email) => email.trim() !== ""),
+            userMail,
+          ],
+          image: null,
           chatId: chatID,
+          admins: [userMail],
+          creator: userMail,
+          specialID: "",
         };
 
         // go to the firestore and into the collection "teams" and into that specific team
@@ -511,6 +520,9 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
 
         // for invite
         for (const email of newTeam.members) {
+          if (email === userMail) {
+            continue;
+          }
           const memberDocRef = doc(db, "users", email);
           const memberDocSnapshot = await getDoc(memberDocRef);
 
@@ -600,11 +612,7 @@ const TeamModal: React.FC<Props> = ({ isOpen, onClose }: Props) => {
             <Text mb={4} marginTop={5} marginBottom={5}>
               Bring your whole team to collaborate on your projects.
             </Text>
-            <Link mb={4} onClick={() => console.log("Get invite link clicked")}>
-              <Flex align="center" mb={5}>
-                Get invite link
-              </Flex>
-            </Link>
+
             {emailInputs.map((email, index) => (
               <Flex align="center">
                 <Input

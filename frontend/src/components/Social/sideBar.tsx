@@ -24,7 +24,7 @@ const SideBar = ({ onNavigate }: Props) => {
 
   // Function to go back
   const goBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate("/index"); // Go back to previous page
   };
   return (
     <VStack spacing={4} align="stretch" className="body">
