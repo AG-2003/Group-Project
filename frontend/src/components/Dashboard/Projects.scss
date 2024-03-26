@@ -1,7 +1,7 @@
 .projects-container {
   margin-top: 1rem;
     // Overflow handling for the whole container
-    overflow: hidden;
+    // overflow: hidden;
 
   .projects-heading {
     font-size: 2rem;
@@ -17,72 +17,72 @@
     justify-content: center;
   }
 
-  .project-card {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 0.5rem;
-    width: 250px; // Set the card width to be smaller
-    // margin: 1rem; // Adjust margin as needed for layout
-    overflow: hidden; // Ensure the border-radius is applied to child elements
-    max-width: 100%; // Ensure card is not wider than the screen
+  // .project-card {
+  //   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  //   border-radius: 0.5rem;
+  //   width: 250px; // Set the card width to be smaller
+  //   // margin: 1rem; // Adjust margin as needed for layout
+  //   overflow: hidden; // Ensure the border-radius is applied to child elements
+  //   max-width: 100%; // Ensure card is not wider than the screen
 
-    .card-top {
-      background-size: cover;
-      background-position: center;
-      color: white;
-      position: relative;
+  //   .card-top {
+  //     background-size: cover;
+  //     background-position: center;
+  //     color: white;
+  //     position: relative;
 
-      &::after {
-        content: '';
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
-        pointer-events: none;
-        z-index: 1;
-      }
+  //     &::after {
+  //       content: '';
+  //       display: block;
+  //       position: absolute;
+  //       top: 0;
+  //       left: 0;
+  //       right: 0;
+  //       bottom: 0;
+  //       background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+  //       pointer-events: none;
+  //       z-index: 1;
+  //     }
 
-      .project-title {
-        font-size: 1.5rem;
-        margin-left: 5px;
-        padding: 0.5rem;
-        padding-top: 2.5rem;
-        border-radius: 0.25rem;
-        font-weight: 500;
-        position: relative;
-        z-index: 2; // Make sure this is higher than the ::after pseudo-element
-      }
-    }
+  //     .project-title {
+  //       font-size: 1.5rem;
+  //       margin-left: 5px;
+  //       padding: 0.5rem;
+  //       padding-top: 2.5rem;
+  //       border-radius: 0.25rem;
+  //       font-weight: 500;
+  //       position: relative;
+  //       z-index: 2; // Make sure this is higher than the ::after pseudo-element
+  //     }
+  //   }
 
-    .card-bottom {
-      padding: .75rem;
-      // background-color: #f8f8f8; // Lighter background for the bottom part
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative; // Relative positioning for the absolute trash icon
+  //   .card-bottom {
+  //     padding: .75rem;
+  //     // background-color: #f8f8f8; // Lighter background for the bottom part
+  //     display: flex;
+  //     justify-content: space-between;
+  //     align-items: center;
+  //     position: relative; // Relative positioning for the absolute trash icon
 
-      .last-edited {
-        font-size: 0.75rem; // Make the "Last edited" text much smaller
-        margin: 0;
-      }
+  //     .last-edited {
+  //       font-size: 0.75rem; // Make the "Last edited" text much smaller
+  //       margin: 0;
+  //     }
 
-      .delete-icon {
-        position: absolute;
-        // bottom: 5px; // Position at the bottom corner
-        right: 5px;
-        background-color: transparent;
-        border: none;
-        cursor: pointer; // Ensure it's clear the icon is clickable
+  //     .delete-icon {
+  //       position: absolute;
+  //       // bottom: 5px; // Position at the bottom corner
+  //       right: 5px;
+  //       background-color: transparent;
+  //       border: none;
+  //       cursor: pointer; // Ensure it's clear the icon is clickable
 
-        &:hover {
-          transform: scale(1.1);
-        }
-      }
-    }
-  }
+  //       &:hover {
+  //         transform: scale(1.1);
+  //       }
+  //     }
+  //   }
+  // }
 
   .no-projects {
     text-align: center;

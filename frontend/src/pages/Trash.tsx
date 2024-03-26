@@ -109,6 +109,14 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const noOfDaysBeforeDeletion = (lastEdited: string) => {
+    const projectDate = new Date(lastEdited)
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - projectDate.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+    return daysDifference;
+  }
+
   useEffect(() => {
     fetchProjects();
   }, [user]);
@@ -124,12 +132,22 @@ const Dashboard: React.FC = () => {
         return timeDifference >= thirtyDaysInMilliseconds;
       });
 
+      const sharedProjectsToDelete = sharedProjects.filter((sharedProject) => {
+        const projectDate = new Date(sharedProject.lastEdited);
+        const timeDifference = currentDate.getTime() - projectDate.getTime();
+        return timeDifference >= thirtyDaysInMilliseconds;
+      })
+
       for (const project of projectsToDelete) {
         await handleTrashIconClick(project.id, project.type);
       }
 
+      for (const sharedProject of sharedProjectsToDelete){
+        await handleSharedTrashIconClick(sharedProject.id, sharedProject.type)
+      }
+
       // If any projects were deleted, fetch the updated list of projects
-      if (projectsToDelete.length > 0) {
+      if (projectsToDelete.length > 0 || sharedProjectsToDelete.length > 0) {
         fetchProjects();
       }
     };
@@ -144,34 +162,6 @@ const Dashboard: React.FC = () => {
        setToastShown(true);
     }
    }, [toastShown]);
-
-  const stripHtml = (html: string): string => {
-    // Create a new div element and set its innerHTML to the HTML string
-    const temporalDivElement = document.createElement("div");
-    temporalDivElement.innerHTML = html;
-    // Retrieve the text content from the div, which will be the plain text without HTML tags
-    return temporalDivElement.textContent || temporalDivElement.innerText || "";
-  };
-
-  const formatDate = (dateString: string): string => {
-    const date: Date = new Date(dateString);
-    const hours: number = date.getHours();
-    const minutes: number = date.getMinutes();
-    const day: number = date.getDate();
-    const month: number = date.getMonth() + 1; // Month is 0-indexed
-    const year: number = date.getFullYear();
-
-    // Convert 24hr time to 12hr time and set am/pm
-    const hours12: number = hours % 12 || 12; // Convert hour to 12-hour format
-    const amPm: string = hours < 12 ? "AM" : "PM";
-
-    // Format minutes to always be two digits
-    const formattedMinutes: string | number =
-      minutes < 10 ? `0${minutes}` : minutes;
-
-    // Format the date string
-    return `${hours12}:${formattedMinutes} ${amPm}, ${day}/${month}/${year}`;
-  };
 
   const handleTrashIconClick = async (
     id: string,
@@ -253,7 +243,6 @@ const Dashboard: React.FC = () => {
                 { merge: true }
               );
               setCurrentProjectToDelete({ id: "", type: "", isShared: false });
-              fetchProjects();
             }
           }
         } catch (error) {
@@ -289,6 +278,8 @@ const Dashboard: React.FC = () => {
         }
       }
     }
+
+    fetchProjects();
   };
 
   const {
@@ -361,7 +352,31 @@ const Dashboard: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box
+          flexGrow={1}
+          padding="10px"
+          marginLeft={5}
+          overflow="scroll"
+          sx={{
+              '&::-webkit-scrollbar': {
+                width: '10px',
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: 'transparent',
+              },
+              '&::-webkit-scrollbar-button': {
+                display: 'none', // Hide scrollbar arrows
+              },
+              '&:hover::-webkit-scrollbar-thumb': {
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+              },
+              '&:hover': {
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+              },
+          }}
+          >
           <div className="tprojects-container">
             <h2 className="tprojects-heading">Recently Deleted</h2>
               {projects.length === 0 && sharedProjects.length===0 ? (
@@ -403,7 +418,7 @@ const Dashboard: React.FC = () => {
                               {project.title}
                             </Text>
                             <Text fontSize="sm" color="gray.300">
-                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                              {30 - noOfDaysBeforeDeletion(project.lastEdited)} days left
                             </Text>
                             <Text fontSize="sm" color="gray.300">
                               Type: {project.type}, unshared
@@ -522,7 +537,7 @@ const Dashboard: React.FC = () => {
                               {project.title}
                             </Text>
                             <Text fontSize="sm" color="gray.300">
-                              Last edited: {new Date(project.lastEdited).toLocaleString()}
+                              {30 - noOfDaysBeforeDeletion(project.lastEdited)} days left
                             </Text>
                             <Text fontSize="sm" color="gray.300">
                               Type: {project.type}, shared
@@ -551,6 +566,7 @@ const Dashboard: React.FC = () => {
                             aria-label="Restore Project"
                             onClick={() => {
                               handleRecoveryIconClick(project.id, project.type, project.isShared);
+
                             }}
                           />
                           <IconButton
