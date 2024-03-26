@@ -41,7 +41,7 @@ import YourPosts from "./components/communities/YourPosts";
 import { Friends } from "./pages/Friends";
 import CSettings from "./components/communities/CSettings/CSettings";
 import ChatRoom from "./components/UserChat/ChatRoom";
-import { UserChats } from "./pages/Auth/UserChats";
+import { UserChats } from "./pages/UserChats";
 
 
 

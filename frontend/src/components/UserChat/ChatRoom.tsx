@@ -6,7 +6,8 @@ import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy,
 import { Box, VStack, Input, Button } from '@chakra-ui/react';
 import { formatDistanceToNow } from 'date-fns';
 import MessageItem from './MessageItem';
-import add from '../../assets/add.png';
+import chatBG from '../../assets/chatBG.png'
+
 
 interface Message {
     id: string;
@@ -84,14 +85,14 @@ const ChatRoom: React.FC = () => {
 
 
     return (
-        <Box p={4} bg="purple.50" height="95vh" width="100%">
+        <Box p={4} bg="white" height="94vh" width="100%">
             <VStack spacing={4} align="stretch" height='full' overflow='auto'>
                 <VStack
                     spacing={4}
                     overflowY="auto"
                     height="full"
                     p={4}
-                    bg="white"
+                    bg="purple.50"
                     borderRadius="lg"
                     boxShadow="md"
                 >
