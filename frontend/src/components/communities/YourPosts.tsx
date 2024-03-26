@@ -336,12 +336,38 @@ const YourPosts = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box
+          flexGrow={1}
+          padding="10px"
+          marginLeft={5}
+          overflowY="auto"
+          overflowX="hidden"
+          sx={{
+                '&::-webkit-scrollbar': {
+                  width: '10px',
+                  backgroundColor: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'transparent',
+                },
+                '&::-webkit-scrollbar-button': {
+                  display: 'none', // Hide scrollbar arrows
+                },
+                '&:hover::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+                },
+                '&:hover': {
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+                },
+            }}
+        >
           <Flex
             className="containerTeams"
             direction="column"
             marginLeft={5}
             marginTop={3}
+            height="100vh"
           >
             <Flex className="profile-body" justify="center">
               <div className="posts-container">

@@ -352,7 +352,8 @@ const Projects: React.FC = () => {
           flexGrow={1}
           padding="10px"
           marginLeft={5}
-          overflow="scroll"
+          overflowY="scroll"
+          overflowX="hidden"
           sx={{
               '&::-webkit-scrollbar': {
                 width: '10px',
