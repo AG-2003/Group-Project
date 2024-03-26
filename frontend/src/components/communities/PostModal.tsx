@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../../firebase-config";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, Firestore, collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import {useParams } from "react-router-dom";
 import {
   Heading,
   Button,
@@ -43,11 +44,13 @@ interface Props {
   onClose: () => void;
   Cid: string;
   Uid: string;
+  setCommunityPosts: React.Dispatch<React.SetStateAction<any[]>>
 }
 
-const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
+const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid, setCommunityPosts }: Props) => {
   const [postTitle, setPostTitle] = useState("");
   const [postDescription, setPostDescription] = useState("");
+  let { community_id } = useParams();
   const [postType, setPostType] = useState("");
   const [image, setImage] = useState<File | null>(null); // State to store the selected image
   const [page, setPage] = useState(1);
@@ -87,6 +90,28 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
 
   const quickClose = () => {
     setPage(1);
+  };
+
+
+  const fetchCommunityPosts = async () => {
+    try {
+      if (community_id) {
+        const firestoreDB = db as Firestore;
+
+        const communityPostsRef = collection(firestoreDB, "communityPosts");
+        const q = query(
+          communityPostsRef,
+          where("Cid", "==", community_id),
+          orderBy("date", "desc") // Order posts by date in descending order
+        );
+        const snapshot = await getDocs(q);
+
+        const postsData = snapshot.docs.map((doc) => doc.data());
+        setCommunityPosts(postsData.reverse()); // Reverse the order of the posts
+      }
+    } catch (error) {
+      console.error("Error fetching community posts:", error);
+    }
   };
 
   const savePostToFirestore = async () => {
@@ -161,13 +186,14 @@ const PostModal: React.FC<Props> = ({ isOpen, onClose, Cid, Uid }: Props) => {
         }
 
         console.log("Post saved successfully");
-
-        window.location.reload();
+        fetchCommunityPosts()
       }
     } catch (error) {
       console.error("Error saving post:", error);
     }
   };
+
+
 
   const renderModalContent = () => {
     return (
