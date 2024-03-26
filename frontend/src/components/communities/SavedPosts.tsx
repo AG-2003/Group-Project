@@ -289,7 +289,32 @@ const SavedPosts: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box
+          flexGrow={1}
+          padding="10px"
+          marginLeft={5}
+          overflowY="scroll"
+          overflowX="hidden"
+          sx={{
+                '&::-webkit-scrollbar': {
+                  width: '10px',
+                  backgroundColor: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'transparent',
+                },
+                '&::-webkit-scrollbar-button': {
+                  display: 'none', // Hide scrollbar arrows
+                },
+                '&:hover::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+                },
+                '&:hover': {
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+                },
+            }}
+        >
           <Flex direction="column" alignItems="flex-start">
             <Flex justify="space-between" width="100%" marginBottom="20px">
               <Input
