@@ -96,6 +96,13 @@ const Profile: React.FC = () => {
   const [totalNoOfCommunities, setTotalNoOfCommunities] = useState<number>(0);
   const [lastAccessedProjects, setLastAccessedProjects] = useState<SuiteData[]>([]);
   const [todaysEvents, setTodaysEvents] = useState<EventType[]>();
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    // Check screen width or user agent to determine if it's desktop or mobile
+    const screenWidth = window.innerWidth;
+    setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+  }, []);
 
 
   //@daawar TODO: this can be used
@@ -116,6 +123,11 @@ const Profile: React.FC = () => {
 
   const sidebarVariants = {
     open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  const sidebarVariantsMobile = {
+    open: { width: "100%" },
     closed: { width: "0px" },
   };
 
@@ -373,10 +385,54 @@ const Profile: React.FC = () => {
 
 
   return (
-    <>
+    <div style={{ position: "fixed", width: "100%"}}>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
-      <Box display="flex" height="calc(100vh - 10px)">
+      <Box display="flex" height="calc(100vh - 10px)" position="relative">
+      {!isDesktop && (
+        <AnimatePresence>
+          {isSidebarOpen ? (
+            <motion.div
+              initial="open"
+              animate="open"
+              exit="closed"
+              variants={sidebarVariantsMobile}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f4f1fa",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+                position: "absolute",
+                zIndex: "2",
+              }}
+            >
+              <SideBar />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial="closed"
+              animate="clsoed"
+              exit="open"
+              variants={sidebarVariantsMobile}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f6f6f6",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+                position: "absolute",
+                zIndex: "2",
+              }}
+            >
+              <SideBar />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+      {isDesktop && (
         <AnimatePresence>
           {isSidebarOpen ? (
             <motion.div
@@ -391,6 +447,7 @@ const Profile: React.FC = () => {
                 backgroundColor: "#f4f1fa",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
+                flexShrink: "0",
               }}
             >
               <SideBar />
@@ -408,13 +465,15 @@ const Profile: React.FC = () => {
                 backgroundColor: "#f6f6f6",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
+                flexShrink: "0",
               }}
             >
               <SideBar />
             </motion.div>
           )}
         </AnimatePresence>
-        <Box width="full" m={4} overflowY='auto'>
+      )}
+        <Box width="full" m={4} overflowY='auto' position="relative" zIndex='1'>
           {/* User Info Box */}{" "}
           {/* <Heading size="sm" mb={3} p={4} pl={4}>
             Dashboard
@@ -685,7 +744,7 @@ const Profile: React.FC = () => {
           </Flex>
         </Box>
       </Box>
-    </>
+    </div>
   );
 };
 

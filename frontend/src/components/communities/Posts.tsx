@@ -13,6 +13,7 @@ import {
 import { DocumentData } from "firebase/firestore";
 import { FaRegThumbsUp, FaRegThumbsDown } from "react-icons/fa";
 import "./Posts.scss";
+import "./Posts.scss";
 import CommentsModal from "./commentsModal";
 import EditPostModal from "./EditPostModal";
 import Linkify from "react-linkify";
@@ -162,7 +163,14 @@ const Posts = ({
 
   return (
     <Box>
-      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4">
+      <Box
+        borderWidth="1px"
+        borderRadius="lg"
+        p="4"
+        mb="4"
+        backgroundColor="#bcbcdc"
+        justifyContent={"center"}
+      >
         <Flex justify="space-between" align="center" mb="2">
           <Flex align="center">
             <Avatar size="sm" name={post.Uname} src={post.Upic} mr="2" />

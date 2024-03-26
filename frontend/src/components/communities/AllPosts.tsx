@@ -36,7 +36,9 @@ interface Post {
 
 const AllPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(true);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
+
   const [userId, setUserId] = useState("");
 
   useEffect(() => {
@@ -48,6 +50,13 @@ const AllPosts = () => {
     };
 
     fetchUserId();
+  }, []);
+
+
+  useEffect(() => {
+    // Check screen width or user agent to determine if it's desktop or mobile
+    const screenWidth = window.innerWidth;
+    setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
   }, []);
 
   useEffect(() => {
@@ -75,6 +84,11 @@ const AllPosts = () => {
 
   const sidebarVariants = {
     open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  const sidebarVariantsMobile = {
+    open: { width: "100%" },
     closed: { width: "0px" },
   };
 
@@ -268,7 +282,7 @@ const AllPosts = () => {
   };
 
   return (
-    <>
+    <div style={{ position: "fixed", width: '100%' }}>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
@@ -346,7 +360,7 @@ const AllPosts = () => {
           <Flex
             className="containerTeams"
             direction="column"
-            marginLeft={5}
+            marginLeft={0}
             marginTop={3}
             height="100vh"
           >
@@ -374,7 +388,7 @@ const AllPosts = () => {
           </Flex>
         </Box>
       </Box>
-    </>
+    </div>
   );
 };
 

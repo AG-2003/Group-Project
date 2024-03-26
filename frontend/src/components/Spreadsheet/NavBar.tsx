@@ -10,7 +10,7 @@ import {
   IoShareOutline,
 } from "react-icons/io5";
 import "./NavBar.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../firebase-config";
@@ -115,8 +115,24 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
 
   };
 
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    // Check screen width or user agent to determine if it's desktop or mobile
+    const screenWidth = window.innerWidth;
+    setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+  }, []);
+
   return (
     <div className="navbarSheet">
+      {!isDesktop && (
+      <IconButton
+        className="menuIcon-Dash"
+        aria-label="Menu"
+        icon={<HamburgerIcon style={iconStyle} />}
+        onClick={onToggle}
+      />
+      )}
       <div className="nav-items">
         <button className="nav-item" onClick={() => { navigate(-1) }}>Home</button>
       </div>
@@ -146,19 +162,19 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             onClick={handleStartCall}
           />
         </Tooltip>
-        {/* <Tooltip
-          label="Get Analytics"
+        <Tooltip
+          label="Share"
           className="tooltip-label"
           placement="top"
           hasArrow
         >
           <IconButton
-            className="action-icon analytics"
-            aria-label="Analyse"
-            icon={<IoBarChartOutline />}
+            className="action-icon share"
+            aria-label="share"
+            icon={<IoShareOutline />}
             onClick={onOpen}
           />
-        </Tooltip> */}
+        </Tooltip>
       </div>
     </div >
   );

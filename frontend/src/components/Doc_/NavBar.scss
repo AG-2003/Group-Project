@@ -1,4 +1,4 @@
-.navbar {
+.navbarD {
   width: 100%;
   display: flex;
   align-items: center;
@@ -83,8 +83,9 @@
 
 // Responsive adjustments
 @media (max-width: 768px) {
+  .navbarD {
   .menu-icon-button {
-    display: none;
+    margin-left: 0px;
   }
 
   .nav-items {
@@ -94,4 +95,9 @@
   .title-area {
     margin-left: 1rem;
   }
+
+  .action-buttons {
+    display: none;
+  }
+}
 }

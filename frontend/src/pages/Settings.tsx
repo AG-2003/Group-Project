@@ -24,20 +24,8 @@ function Settings() {
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <div
         style={{
-          width: "250px",
-          position: "fixed", // Fixed position
-          height: "100vh",
-          overflowY: "auto", // Allows scrolling within the sidebar if content overflows
-          backgroundColor: "#dcdcf6",
-          boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <SideBar onNavigate={scrollToSection} />
-      </div>
-      <div
-        style={{
           flexGrow: 1,
-          marginLeft: "250px", // Same as sidebar width to prevent overlap
+          //marginLeft: "250px", // Same as sidebar width to prevent overlap
           padding: "20px",
           overflowY: "auto",
         }}
