@@ -14,7 +14,7 @@ export const UserChats: React.FC = () => {
     };
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
+    const otherUserName: string = 'test';
     return (
         <>
             <NavBar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />

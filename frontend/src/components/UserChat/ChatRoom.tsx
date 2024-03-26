@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { db, auth } from '../../firebase-config';
-import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, Timestamp, getDoc, doc } from 'firebase/firestore';
 // import { AuthContext } from '../../context/AuthContext';
-import { Box, VStack, Input, Button } from '@chakra-ui/react';
+import { Box, VStack, Input, Button, Flex, Heading, Text, Image } from '@chakra-ui/react';
 import { formatDistanceToNow } from 'date-fns';
 import MessageItem from './MessageItem';
 import chatBG from '../../assets/chatBG.png'
@@ -23,6 +23,8 @@ const ChatRoom: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const { chatId } = useParams<{ chatId: string }>();
+    const [otherUserName, setOtherUserName] = useState('');
+    const [otherUserPhoto, setOtherUserPhoto] = useState('');
     const currentUser = auth.currentUser;
 
     useEffect(() => {
@@ -46,22 +48,58 @@ const ChatRoom: React.FC = () => {
                     text: data.text,
                     createdAt,
                     senderPhotoURL: data.photoUrl
-                }; // Add senderPhotoURL to the message object
+                };
             });
             setMessages(msgs);
         });
-        return unsubscribe; // This is the cleanup function to unsubscribe from the listener when the component unmounts
+        return unsubscribe;
     }, [chatId]);
+
+    useEffect(() => {
+        const getOtherUserName = async () => {
+            if (!chatId || !currentUser) return;
+
+            const chatRef = doc(db, 'chats', chatId);
+            const chatSnap = await getDoc(chatRef);
+
+            if (chatSnap.exists()) {
+                const participants: string[] = chatSnap.data().participants;
+                const otherUserEmail = participants.find(email => email !== currentUser.email);
+
+                if (otherUserEmail) {
+                    const userRef = doc(db, 'users', otherUserEmail);
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+                        // Assuming the user document has a field 'username' that holds their username
+                        const otherUserName = userSnap.data().displayName;
+                        const otherUserPhotoURL = userSnap.data().photoURL;
+                        setOtherUserName(otherUserName);
+                        setOtherUserPhoto(otherUserPhotoURL);
+
+                    } else {
+                        console.log('No such user found!');
+                    }
+                } else {
+                    console.log('No other user in chat!');
+                }
+            } else {
+                console.log('No such chat found!');
+            }
+        };
+
+        getOtherUserName();
+    }, [currentUser, chatId]);
+
+
 
     const sendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newMessage.trim()) return;
         if (!chatId) return;
 
-        // Check if currentUser and currentUser.email exist
+
         if (!currentUser || !currentUser.email) {
-            console.error("No user email found");
-            // Optionally, handle this error with user feedback
             return;
         }
 
@@ -69,13 +107,12 @@ const ChatRoom: React.FC = () => {
         try {
             await addDoc(messagesRef, {
                 text: newMessage,
-                senderId: currentUser.email, // Use email instead of uid
+                senderId: currentUser.email,
                 createdAt: serverTimestamp(),
                 photoUrl: auth.currentUser?.photoURL
             });
             setNewMessage('');
         } catch (error) {
-            // Handle your error here
             console.error("Error sending message:", error);
         }
     };
@@ -85,14 +122,32 @@ const ChatRoom: React.FC = () => {
 
 
     return (
-        <Box p={4} bg="white" height="94vh" width="100%">
+        <Box p={4} bg="white" height="87vh" width="100%">
+            <Flex
+
+                justifyContent='flex-start'
+                alignItems='center'
+                p={3}
+                bg="purple.200"
+                // bgOpacity="0.85"
+                boxShadow="md"
+                borderTopRadius='lg'
+            >
+                <Image src={otherUserPhoto ?? chatBG} alt='photo' boxSize={10} borderRadius={50} />
+                <Text fontSize="xl" fontWeight={500} color="black" ml={3}>
+                    {otherUserName || 'Fetching user...'}
+                </Text>
+            </Flex>
             <VStack spacing={4} align="stretch" height='full' overflow='auto'>
                 <VStack
                     spacing={4}
                     overflowY="auto"
-                    height="full"
+                    height="100%"
                     p={4}
-                    bg="purple.50"
+                    bgImage={`url(${chatBG})`}
+                    bgPosition='center'
+                    bgRepeat='no-repeat'
+                    bgSize='cover'
                     borderRadius="lg"
                     boxShadow="md"
                 >

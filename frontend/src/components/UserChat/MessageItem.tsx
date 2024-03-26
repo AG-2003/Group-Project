@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, HStack, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, HStack, Text, VStack, useColorModeValue } from '@chakra-ui/react';
 import { formatDistanceToNow } from 'date-fns';
 import firebase from 'firebase/compat/app'; // Ensure you have the Firebase SDK imported
 import { Timestamp } from 'firebase/firestore';
@@ -23,28 +23,34 @@ const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, cu
     const color = isCurrentUser ? colorCurrentUser : colorOtherUser;
 
 
-    // If createdAt is a Timestamp, convert it to Date, otherwise, handle as null
+
     const date = createdAt ? createdAt : null;
+
+    const imageElement = (
+        <Image
+            borderRadius='full'
+            boxSize='20px'
+            src={senderPhotoURL}
+            alt={senderId}
+            mr={isCurrentUser ? 0 : 2}
+            ml={isCurrentUser ? 2 : 0}
+        />
+    );
 
 
     return (
-        <Box alignSelf={align} bg={bg} p={3} my={2} mx={1} borderRadius={borderRadius} maxWidth="80%">
-            <HStack >
-                <Text align='center' fontSize="lg">{text}</Text>
-                <Image
-                    borderRadius='full'
-                    boxSize='20px'
-                    src={senderPhotoURL}
-                    alt='photo'
-                />
-            </HStack>
-
-            {createdAt && (
-                <Text fontSize="xs" color="gray.500">
-                    {formatDistanceToNow(createdAt, { addSuffix: true })}
-                </Text>
-            )}
-        </Box>
+        <HStack alignSelf={align} bg={bg} p={3} my={2} mx={1} borderRadius={borderRadius} maxWidth="40%">
+            {!isCurrentUser && imageElement}
+            <VStack align={isCurrentUser ? 'end' : 'start'} spacing={1}>
+                <Text fontSize="lg" textAlign='center'>{text}</Text>
+                {createdAt && (
+                    <Text fontSize="xs" color="gray.500">
+                        {formatDistanceToNow(createdAt, { addSuffix: true })}
+                    </Text>
+                )}
+            </VStack>
+            {isCurrentUser && imageElement}
+        </HStack>
     );
 };
 
