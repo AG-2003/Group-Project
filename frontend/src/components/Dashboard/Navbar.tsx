@@ -64,7 +64,7 @@ const NavBar = ({ onToggle, isSidebarOpen }: Props) => {
 
         <Menu>
         <MenuButton as={IconButton} aria-label="Options" icon={<FaPlus />} className="menuButton-Dash" />
-          <MenuList>
+          <MenuList position="fixed" zIndex={999}>
             <MenuItem icon={<FiFileText />} onClick={() => openModal("Doc")}>Doc</MenuItem>
             <MenuItem icon={<LuPresentation />} onClick={() => openModal("Slide")}>Slide</MenuItem>
             <MenuItem icon={<FiGrid />} onClick={() => openModal("Spreadsheet")}>Spreadsheet</MenuItem>

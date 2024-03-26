@@ -1,484 +1,598 @@
 import SideBar from "../components/Dashboard/sidebar";
 import { useCallback, useEffect, useState } from "react";
 import {
-    Box, Button, Divider, Flex, Input, useColorModeValue, Text, HStack, VStack, IconButton, StackDivider,
-    Container, Menu, MenuButton, MenuList, MenuItem, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
-    ModalBody, ModalCloseButton, useDisclosure, Heading, ButtonGroup
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Input,
+  useColorModeValue,
+  Text,
+  HStack,
+  VStack,
+  IconButton,
+  StackDivider,
+  Container,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Heading,
+  ButtonGroup,
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Dashboard/Navbar";
 import { db, auth } from "../firebase-config";
-import { doc, getDoc, collection, getDocs, updateDoc, arrayUnion, arrayRemove, writeBatch } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  writeBatch,
+} from "firebase/firestore";
 import { debounce } from "../utils/Time";
 import { UseToastNotification } from "../utils/UseToastNotification";
-import cardBg2 from '../assets/carbBg2.png'
-import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
-
-
+import cardBg2 from "../assets/carbBg2.png";
+import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy
 
 interface User {
-    id: string;
-    username?: string;
-    email?: string
-    userVisibility?: 'public' | 'private';
-    // add other properties as needed
+  id: string;
+  username?: string;
+  email?: string;
+  userVisibility?: "public" | "private";
+  // add other properties as needed
 }
-
 
 export const Friends: React.FC = () => {
-    const [users, setUsers] = useState<User[]>();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState<User[]>([]);
-    const [friends, setFriends] = useState<string[]>([]);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [sentRequests, setSentRequests] = useState<string[]>([]);
-    const [receivedRequests, setReceivedRequests] = useState<string[]>([]);
+  const [users, setUsers] = useState<User[]>();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [friends, setFriends] = useState<string[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [sentRequests, setSentRequests] = useState<string[]>([]);
+  const [receivedRequests, setReceivedRequests] = useState<string[]>([]);
+  const [isDesktop, setIsDesktop] = useState(true);
 
+  useEffect(() => {
+    // Check screen width or user agent to determine if it's desktop or mobile
+    const screenWidth = window.innerWidth;
+    setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+  }, []);
 
-    // State for managing modal visibility and the current selected friend
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
+  // State for managing modal visibility and the current selected friend
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
 
-    const userEmail = auth.currentUser?.email;
-    const showToast = UseToastNotification();
+  const userEmail = auth.currentUser?.email;
+  const showToast = UseToastNotification();
 
+  // Function to open modal with the selected friend's details
+  const openModal = (friend: User) => {
+    setSelectedFriend(friend);
+    setIsModalOpen(true);
+  };
 
-    // Function to open modal with the selected friend's details
-    const openModal = (friend: User) => {
-        setSelectedFriend(friend);
-        setIsModalOpen(true);
+  // Function to close the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedFriend(null);
+  };
+
+  const sidebarVariants = {
+    open: { width: "200px" },
+    closed: { width: "0px" },
+  };
+
+  const sidebarVariantsMobile = {
+    open: { width: "100%" },
+    closed: { width: "0px" },
+  };
+
+  const bgColor = useColorModeValue("gray.50", "gray.800");
+  const searchBoxBg = useColorModeValue("purple.50", "purple.700");
+  const addButtonBg = useColorModeValue("purple.200", "purple.500");
+  const addButtonHoverBg = useColorModeValue("purple.100", "purple.700");
+  const inputTextColor = useColorModeValue("gray.800", "white");
+  const resultTextColor = useColorModeValue("gray.700", "gray.200");
+
+  // Function to toggle the sidebar
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const debouncedSearchTerm = useCallback(
+    debounce(handleSearchChange, 500),
+    []
+  );
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const usersColRef = collection(db, "users");
+      try {
+        const usersSnapshot = await getDocs(usersColRef);
+        const usersData = usersSnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() } as User))
+          .filter((user) => user.email !== auth.currentUser?.email);
+        setUsers(usersData);
+      } catch (error) {
+        console.error("Error fetching users: ", error);
+      }
     };
 
-    // Function to close the modal
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSelectedFriend(null);
-    };
+    fetchUsers();
+  }, []);
 
-
-    const sidebarVariants = {
-        open: { width: '200px' },
-        closed: { width: '0px' },
-    };
-
-    const bgColor = useColorModeValue('gray.50', 'gray.800');
-    const searchBoxBg = useColorModeValue('purple.50', 'purple.700');
-    const addButtonBg = useColorModeValue('purple.200', 'purple.500');
-    const addButtonHoverBg = useColorModeValue('purple.100', 'purple.700');
-    const inputTextColor = useColorModeValue('gray.800', 'white');
-    const resultTextColor = useColorModeValue('gray.700', 'gray.200');
-
-
-    // Function to toggle the sidebar
-    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const debouncedSearchTerm = useCallback(debounce(handleSearchChange, 500), []);
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            const usersColRef = collection(db, 'users');
-            try {
-                const usersSnapshot = await getDocs(usersColRef);
-                const usersData = usersSnapshot.docs
-                    .map(doc => ({ id: doc.id, ...doc.data() } as User))
-                    .filter(user => user.email !== auth.currentUser?.email);
-                setUsers(usersData);
-            } catch (error) {
-                console.error("Error fetching users: ", error);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
-
-
-
-    useEffect(() => {
-        if (searchTerm !== '') {
-            const filteredUsers = (users || []).filter(user =>
-                user.id.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
-                (user.username && user.username.toLowerCase().startsWith(searchTerm.toLowerCase()))
-            );
-            setSearchResults(filteredUsers);
-        } else {
-            setSearchResults([]);
-        }
-    }, [searchTerm, users]);
-
-    // TODO: use batch
-    const addFriend = async (friendEmail: string) => {
-        if (!userEmail || userEmail === friendEmail) return;
-
-        const userDocRef = doc(db, 'users', userEmail);
-
-        // Get the visibility status of the user to be added
-        const friendDocRef = doc(db, 'users', friendEmail);
-        const friendDocSnap = await getDoc(friendDocRef);
-
-        if (friendDocSnap.exists() && friendDocSnap.data()) {
-            const friendData = friendDocSnap.data();
-
-            // If friend's profile is public, add directly as friends
-            if (friendData.userVisibility === 'public') {
-
-                try {
-                    // Transaction or batch could be used here for atomicity, ensuring both operations succeed or fail together
-                    // Add friend to current user's list
-                    await updateDoc(userDocRef, {
-                        userFriends: arrayUnion(friendEmail)
-                    });
-
-                    // Add current user to friend's list
-                    await updateDoc(friendDocRef, {
-                        userFriends: arrayUnion(userEmail)
-                    });
-
-                    setFriends(prev => [...prev, friendEmail]);
-                    showToast('info', 'Added new friend');
-                } catch (error) {
-                    console.error("Error adding friend:", error);
-                    showToast('error', `${error}`);
-                }
-
-            } else if (friendData.userVisibility === 'private') {
-                // Send a friend request instead
-                // For User A (current user sending the request)
-                const userDocRef = doc(db, 'users', userEmail);
-                await updateDoc(userDocRef, {
-                    sentRequests: arrayUnion(friendEmail)
-                });
-                setSentRequests(prev => [...prev, friendEmail]);
-
-                // For User B (receiving the request)
-                await updateDoc(friendDocRef, {
-                    receivedRequests: arrayUnion(userEmail)
-                });
-
-                showToast('info', `Friend request sent to ${friendEmail}`);
-            }
-        } else {
-            showToast('error', `User not found.`);
-        }
-    };
-
-    const fetchRecievedRequests = async () => {
-        if (!userEmail) return;
-
-        const userDocRef = doc(db, 'users', userEmail);
-        const userDocSnapshot = await getDoc(userDocRef);
-        try {
-            if (userDocSnapshot.exists() && userDocSnapshot.data()) {
-                setReceivedRequests(userDocSnapshot.data().receivedRequests || []);
-            }
-
-        } catch (err) {
-            showToast('error', `${err}`)
-        }
+  useEffect(() => {
+    if (searchTerm !== "") {
+      const filteredUsers = (users || []).filter(
+        (user) =>
+          user.id.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
+          (user.username &&
+            user.username.toLowerCase().startsWith(searchTerm.toLowerCase()))
+      );
+      setSearchResults(filteredUsers);
+    } else {
+      setSearchResults([]);
     }
+  }, [searchTerm, users]);
 
+  // TODO: use batch
+  const addFriend = async (friendEmail: string) => {
+    if (!userEmail || userEmail === friendEmail) return;
 
-    // fetch the received requests from Firestore and setReceivedRequests
-    useEffect(() => {
-        fetchRecievedRequests();
-    }, []);
+    const userDocRef = doc(db, "users", userEmail);
 
-    // TODO: use batch
-    const acceptFriendRequest = async (requesterEmail: string) => {
-        if (!receivedRequests.length) return;
+    // Get the visibility status of the user to be added
+    const friendDocRef = doc(db, "users", friendEmail);
+    const friendDocSnap = await getDoc(friendDocRef);
 
-        if (!userEmail) return;
+    if (friendDocSnap.exists() && friendDocSnap.data()) {
+      const friendData = friendDocSnap.data();
 
-        const userDocRef = doc(db, 'users', userEmail);
-        const friendDocRef = doc(db, 'users', requesterEmail);
-
+      // If friend's profile is public, add directly as friends
+      if (friendData.userVisibility === "public") {
         try {
+          // Transaction or batch could be used here for atomicity, ensuring both operations succeed or fail together
+          // Add friend to current user's list
+          await updateDoc(userDocRef, {
+            userFriends: arrayUnion(friendEmail),
+          });
 
+          // Add current user to friend's list
+          await updateDoc(friendDocRef, {
+            userFriends: arrayUnion(userEmail),
+          });
 
-            await updateDoc(userDocRef, {
-                userFriends: arrayUnion(requesterEmail),
-                receivedRequests: arrayRemove(requesterEmail)
-            });
-
-            // Add current user to friend's list
-            await updateDoc(friendDocRef, {
-                userFriends: arrayUnion(userEmail),
-                sentRequests: arrayRemove(userEmail)
-
-            });
-
-            setFriends(prev => [...prev, requesterEmail]);
-            setReceivedRequests(prev => prev.filter(req => req !== requesterEmail));
-
-            showToast('info', 'Added new friend');
+          setFriends((prev) => [...prev, friendEmail]);
+          showToast("info", "Added new friend");
         } catch (error) {
-            console.error("Error adding friend:", error);
-            showToast('error', `Error accepting friend request: ${error}`);
+          console.error("Error adding friend:", error);
+          showToast("error", `${error}`);
         }
+      } else if (friendData.userVisibility === "private") {
+        // Send a friend request instead
+        // For User A (current user sending the request)
+        const userDocRef = doc(db, "users", userEmail);
+        await updateDoc(userDocRef, {
+          sentRequests: arrayUnion(friendEmail),
+        });
+        setSentRequests((prev) => [...prev, friendEmail]);
+
+        // For User B (receiving the request)
+        await updateDoc(friendDocRef, {
+          receivedRequests: arrayUnion(userEmail),
+        });
+
+        showToast("info", `Friend request sent to ${friendEmail}`);
+      }
+    } else {
+      showToast("error", `User not found.`);
     }
+  };
 
-    // TODO: use batch 
-    const rejectFriendRequest = async (requesterEmail: string) => {
-        if (!userEmail) return;
+  const fetchRecievedRequests = async () => {
+    if (!userEmail) return;
 
-        const userDocRef = doc(db, 'users', userEmail);
-        const requesterDocRef = doc(db, 'users', requesterEmail);
+    const userDocRef = doc(db, "users", userEmail);
+    const userDocSnapshot = await getDoc(userDocRef);
+    try {
+      if (userDocSnapshot.exists() && userDocSnapshot.data()) {
+        setReceivedRequests(userDocSnapshot.data().receivedRequests || []);
+      }
+    } catch (err) {
+      showToast("error", `${err}`);
+    }
+  };
 
-        try {
+  // fetch the received requests from Firestore and setReceivedRequests
+  useEffect(() => {
+    fetchRecievedRequests();
+  }, []);
 
-            await updateDoc(userDocRef, {
-                receivedRequests: arrayRemove(requesterEmail)
-            });
+  // TODO: use batch
+  const acceptFriendRequest = async (requesterEmail: string) => {
+    if (!receivedRequests.length) return;
 
+    if (!userEmail) return;
 
-            await updateDoc(requesterDocRef, {
-                sentRequests: arrayRemove(userEmail)
-            });
+    const userDocRef = doc(db, "users", userEmail);
+    const friendDocRef = doc(db, "users", requesterEmail);
 
+    try {
+      await updateDoc(userDocRef, {
+        userFriends: arrayUnion(requesterEmail),
+        receivedRequests: arrayRemove(requesterEmail),
+      });
 
-            setReceivedRequests(prev => prev.filter(req => req !== requesterEmail));
+      // Add current user to friend's list
+      await updateDoc(friendDocRef, {
+        userFriends: arrayUnion(userEmail),
+        sentRequests: arrayRemove(userEmail),
+      });
 
-            showToast('info', 'Friend request rejected');
-        } catch (error) {
-            console.error("Error rejecting friend request:", error);
-            showToast('error', `Error rejecting friend request: ${error}`);
-        }
-    };
+      setFriends((prev) => [...prev, requesterEmail]);
+      setReceivedRequests((prev) =>
+        prev.filter((req) => req !== requesterEmail)
+      );
 
+      showToast("info", "Added new friend");
+    } catch (error) {
+      console.error("Error adding friend:", error);
+      showToast("error", `Error accepting friend request: ${error}`);
+    }
+  };
 
-    const removeFriend = async (friendEmail: string) => {
-        if (!userEmail || !friendEmail) return;
+  // TODO: use batch
+  const rejectFriendRequest = async (requesterEmail: string) => {
+    if (!userEmail) return;
 
-        const userDocRef = doc(db, 'users', userEmail);
-        const friendDocRef = doc(db, 'users', friendEmail);
+    const userDocRef = doc(db, "users", userEmail);
+    const requesterDocRef = doc(db, "users", requesterEmail);
 
-        try {
+    try {
+      await updateDoc(userDocRef, {
+        receivedRequests: arrayRemove(requesterEmail),
+      });
 
-            const batch = writeBatch(db);
+      await updateDoc(requesterDocRef, {
+        sentRequests: arrayRemove(userEmail),
+      });
 
+      setReceivedRequests((prev) =>
+        prev.filter((req) => req !== requesterEmail)
+      );
 
-            batch.update(userDocRef, {
-                userFriends: arrayRemove(friendEmail)
-            });
+      showToast("info", "Friend request rejected");
+    } catch (error) {
+      console.error("Error rejecting friend request:", error);
+      showToast("error", `Error rejecting friend request: ${error}`);
+    }
+  };
 
+  const removeFriend = async (friendEmail: string) => {
+    if (!userEmail || !friendEmail) return;
 
-            batch.update(friendDocRef, {
-                userFriends: arrayRemove(userEmail)
-            });
+    const userDocRef = doc(db, "users", userEmail);
+    const friendDocRef = doc(db, "users", friendEmail);
 
+    try {
+      const batch = writeBatch(db);
 
-            await batch.commit();
+      batch.update(userDocRef, {
+        userFriends: arrayRemove(friendEmail),
+      });
 
+      batch.update(friendDocRef, {
+        userFriends: arrayRemove(userEmail),
+      });
 
-            setFriends(friends => friends.filter(email => email !== friendEmail));
+      await batch.commit();
 
-            showToast('info', `Successfully removed ${friendEmail} from friends.`);
-        } catch (error) {
-            console.error("Error removing friend:", error);
-            showToast('error', `Error removing friend: ${error}`);
-        }
-    };
+      setFriends((friends) => friends.filter((email) => email !== friendEmail));
 
+      showToast("info", `Successfully removed ${friendEmail} from friends.`);
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      showToast("error", `Error removing friend: ${error}`);
+    }
+  };
 
+  const fetchUserFriends = async () => {
+    if (!userEmail) return;
+    const userDocRef = doc(db, "users", userEmail);
+    try {
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        setFriends(userData.userFriends || []);
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error fetching user friends: ", error);
+      showToast("error", `Error fetching friends: ${error}`);
+    }
+  };
 
-    const fetchUserFriends = async () => {
-        if (!userEmail) return;
-        const userDocRef = doc(db, 'users', userEmail);
-        try {
-            const userDocSnap = await getDoc(userDocRef);
-            if (userDocSnap.exists()) {
-                const userData = userDocSnap.data();
-                setFriends(userData.userFriends || []);
-            } else {
-                console.log("No such document!");
-            }
-        } catch (error) {
-            console.error("Error fetching user friends: ", error);
-            showToast('error', `Error fetching friends: ${error}`);
-        }
-    };
+  useEffect(() => {
+    fetchUserFriends();
+  }, []);
 
-    useEffect(() => {
-        fetchUserFriends();
-    }, []);
-
-    // Calls fetchUserFriends whenever you add a friend
-    const addFriendAndUpdate = async (friendEmail: string) => {
-        await addFriend(friendEmail);
-        await fetchUserFriends();
-    };
-    const menuBg = useColorModeValue('white', 'gray.700');
-    const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
-    const menuItemHoverColor = useColorModeValue('purple.700', 'purple.100');
-    return (
-        <>
-            <Box padding="10px" background="#484c6c">
-                <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
-            </Box>
-            <Divider borderColor="lightgrey" borderWidth="1px" maxWidth="98.5vw" />
-            <Box display="flex" height="calc(100vh - 10px)" width="100%">
-                <AnimatePresence>
-                    {isSidebarOpen ? (
-                        <motion.div
-                            initial="closed"
-                            animate="open"
-                            exit="closed"
-                            variants={sidebarVariants}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            style={{
-                                paddingTop: "10px",
-                                height: "inherit",
-                                backgroundColor: "#f4f1fa",
-                                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                                overflow: "hidden",
-                            }}
+  // Calls fetchUserFriends whenever you add a friend
+  const addFriendAndUpdate = async (friendEmail: string) => {
+    await addFriend(friendEmail);
+    await fetchUserFriends();
+  };
+  const menuBg = useColorModeValue("white", "gray.700");
+  const menuItemHoverBg = useColorModeValue("purple.100", "purple.700");
+  const menuItemHoverColor = useColorModeValue("purple.700", "purple.100");
+  return (
+    <div style={{ position: "fixed", width: "100%" }}>
+        <Navbar
+          onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+          isSidebarOpen={isSidebarOpen}
+        />
+      <Divider borderColor="lightgrey" borderWidth="1px" maxWidth="98.5vw" />
+      <Box display="flex" height="calc(100vh - 10px)" width="100%" position="relative">
+      {!isDesktop && (
+        <AnimatePresence>
+          {isSidebarOpen ? (
+            <motion.div
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={sidebarVariantsMobile}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f4f1fa",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+                position: "absolute",
+                  zIndex: "2",
+              }}
+            >
+              <SideBar />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      )}
+      {isDesktop && (
+        <AnimatePresence>
+          {isSidebarOpen ? (
+            <motion.div
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={sidebarVariants}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f4f1fa",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+              }}
+            >
+              <SideBar />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      )}
+        <Box
+          flex="1"
+          display="flex"
+          flexDirection="column"
+          p="4"
+          bgColor="white"
+          overflowY="auto" position="relative" zIndex='1'
+        >
+          {receivedRequests.length > 0 && (
+            <Flex direction="column" mb={6} align="center">
+              <Box
+                width="100%"
+                maxWidth="1500px"
+                maxHeight="90vh"
+                borderRadius="lg"
+                overflowY="auto"
+                p={6}
+                bgColor="#f4f1fa"
+              >
+                <Text fontSize="2xl" my={4}>
+                  Friend requests
+                </Text>
+                <VStack spacing={5} align="stretch">
+                  {receivedRequests.map((requestEmail) => (
+                    <Flex
+                      key={requestEmail}
+                      justifyContent="space-between"
+                      alignItems="center"
+                      p="4"
+                      bgImage={cardBg2}
+                      borderRadius="md"
+                      shadow="base"
+                    >
+                      <Text>{requestEmail}</Text>
+                      <ButtonGroup size="sm">
+                        <Button
+                          colorScheme="green"
+                          onClick={() => acceptFriendRequest(requestEmail)}
                         >
-                            <SideBar />
-                        </motion.div>
-                    ) : null}
-                </AnimatePresence>
-                <Box flex="1" display="flex" flexDirection="column" p="4" bgColor='white'>
-
-                    {receivedRequests.length > 0 && (
-                        <Flex direction="column" mb={6} align="center" >
-                            <Box width="100%" maxWidth="1500px" maxHeight="90vh" borderRadius="lg" overflowY="auto" p={6} bgColor='#f4f1fa'>
-                                <Text fontSize="2xl" my={4}>
-                                    Friend requests
-                                </Text>
-                                <VStack spacing={5} align="stretch">
-                                    {receivedRequests.map((requestEmail) => (
-                                        <Flex key={requestEmail} justifyContent="space-between" alignItems="center" p="4" bgImage={cardBg2} borderRadius="md" shadow="base" >
-                                            <Text>{requestEmail}</Text>
-                                            <ButtonGroup size="sm">
-                                                <Button colorScheme="green" onClick={() => acceptFriendRequest(requestEmail)}>Accept</Button>
-                                                <Button colorScheme="red" onClick={() => rejectFriendRequest(requestEmail)}>Reject</Button>
-                                            </ButtonGroup>
-                                        </Flex>
-                                    ))}
-                                </VStack>
-                            </Box>
-                        </Flex>
-                    )}
-                    <Flex direction="column" align="center" h="100vh" >
-                        <Box width="100%" maxWidth="1500px" maxHeight="90vh" p={6} boxShadow="xl" borderRadius="lg" overflowY="auto" bgColor='#f4f1fa'>
-                            <Text fontSize="2xl" my={4}>
-                                Add Friends
-                            </Text>
-                            <Input
-                                placeholder="Search by email"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                mb={4}
-                                size="lg"
-                                borderColor='purple.400'
-                                _focus={{ borderColor: 'purple.500' }}
-                                _hover={{ borderColor: 'none' }}
-                            />
-
-                            <VStack
-                                divider={<StackDivider borderColor="gray.200" />}
-                                spacing={4}
-                                align="stretch"
-                            >
-                                {searchResults.map((result) => (
-                                    <Flex
-                                        key={result.id}
-                                        justifyContent="space-between"
-                                        alignItems="center"
-                                        p="4"
-                                        bg="white"
-                                        borderRadius="md"
-                                        shadow="base"
-                                        bgImage={cardBg2}
-                                    >
-                                        <Text>{result.email ?? result.username ?? result.id}</Text>
-                                        {/* Conditional rendering depending on the friendship and request status */}
-                                        {friends.includes(result.email ?? '') ? (
-                                            // Show a message or a disabled button for existing friends
-                                            <Button isDisabled>Already friends</Button>
-                                        ) : sentRequests.includes(result.email ?? '') ? (
-                                            // Indicate that a friend request has been sent
-                                            <Button isDisabled>Request Sent</Button>
-                                        ) : (
-                                            <Button
-                                                onClick={() => result.email && addFriend(result.email ?? result.id)}
-                                                bg="purple.400"
-                                                _hover={{ bg: 'purple.500' }}
-                                                color="white"
-                                            >
-                                                {result.userVisibility === 'public' ? 'Add Friend' : 'Request to Add'}
-                                            </Button>
-                                        )}
-                                    </Flex>
-                                ))}
-                            </VStack>
-                            <Text fontSize="2xl" my={4}>
-                                My Friends
-                            </Text>
-                            <Divider my={4} />
-                            <VStack
-                                divider={<StackDivider borderColor="gray.200" />}
-                                spacing={4}
-                                align="stretch"
-                            >
-                                {friends.map((friendEmail) => (
-                                    <Flex key={friendEmail} justifyContent="space-between" alignItems="center" p="4" bg="white" borderRadius="md" shadow="base" bgImage={cardBg2}>
-                                        <Text>{friendEmail}</Text>
-                                        <Menu placement="bottom-start" gutter={4} strategy="fixed">
-
-                                            <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
-                                            <MenuList bg={menuBg} zIndex={10} minW="240px">
-                                                <MenuItem
-                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                    onClick={() => removeFriend(friendEmail)}
-                                                >
-                                                    Remove Friend
-                                                </MenuItem>
-                                                <MenuItem
-                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                    onClick={() => console.log("View Profile")}
-                                                >
-                                                    View User Profile
-                                                </MenuItem>
-                                                <MenuItem
-                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                    onClick={() => console.log("Chat")}
-                                                >
-                                                    Chat
-                                                </MenuItem>
-
-                                            </MenuList>
-                                        </Menu>
-                                    </Flex>
-                                ))}
-                                {selectedFriend && (
-                                    <Modal isOpen={isModalOpen} onClose={closeModal} isCentered>
-                                        <ModalOverlay />
-                                        <ModalContent
-                                            // bg={useColorModeValue('white', 'gray.800')} // Background color
-                                            boxShadow="xl" // Shadow for depth
-                                            rounded="lg" // Rounded corners
-                                        >
-                                            <ModalHeader>{selectedFriend.username || selectedFriend.email}</ModalHeader>
-                                            <ModalCloseButton />
-                                            <ModalBody>
-                                                {/* Content here */}
-                                            </ModalBody>
-                                        </ModalContent>
-                                    </Modal>
-                                )}
-                            </VStack>
-
-                        </Box>
+                          Accept
+                        </Button>
+                        <Button
+                          colorScheme="red"
+                          onClick={() => rejectFriendRequest(requestEmail)}
+                        >
+                          Reject
+                        </Button>
+                      </ButtonGroup>
                     </Flex>
-                </Box >
-            </Box >
-        </>
-    )
-}
+                  ))}
+                </VStack>
+              </Box>
+            </Flex>
+          )}
+          <Flex direction="column" align="center" h="100vh">
+            <Box
+              width="100%"
+              maxWidth="1500px"
+              maxHeight="90vh"
+              p={6}
+              boxShadow="xl"
+              borderRadius="lg"
+              overflowY="auto"
+              bgColor="#f4f1fa"
+            >
+              <Text fontSize="2xl" my={4}>
+                Add Friends
+              </Text>
+              <Input
+                placeholder="Search by email"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                mb={4}
+                size="lg"
+                borderColor="purple.400"
+                _focus={{ borderColor: "purple.500" }}
+                _hover={{ borderColor: "none" }}
+              />
 
+              <VStack
+                divider={<StackDivider borderColor="gray.200" />}
+                spacing={4}
+                align="stretch"
+              >
+                {searchResults.map((result) => (
+                  <Flex
+                    key={result.id}
+                    justifyContent="space-between"
+                    alignItems="center"
+                    p="4"
+                    bg="white"
+                    borderRadius="md"
+                    shadow="base"
+                    bgImage={cardBg2}
+                  >
+                    <Text>{result.email ?? result.username ?? result.id}</Text>
+                    {/* Conditional rendering depending on the friendship and request status */}
+                    {friends.includes(result.email ?? "") ? (
+                      // Show a message or a disabled button for existing friends
+                      <Button isDisabled>Already friends</Button>
+                    ) : sentRequests.includes(result.email ?? "") ? (
+                      // Indicate that a friend request has been sent
+                      <Button isDisabled>Request Sent</Button>
+                    ) : (
+                      <Button
+                        onClick={() =>
+                          result.email && addFriend(result.email ?? result.id)
+                        }
+                        bg="purple.400"
+                        _hover={{ bg: "purple.500" }}
+                        color="white"
+                      >
+                        {result.userVisibility === "public"
+                          ? "Add Friend"
+                          : "Request to Add"}
+                      </Button>
+                    )}
+                  </Flex>
+                ))}
+              </VStack>
+              <Text fontSize="2xl" my={4}>
+                My Friends
+              </Text>
+              <Divider my={4} />
+              <VStack
+                divider={<StackDivider borderColor="gray.200" />}
+                spacing={4}
+                align="stretch"
+              >
+                {friends.map((friendEmail) => (
+                  <Flex
+                    key={friendEmail}
+                    justifyContent="space-between"
+                    alignItems="center"
+                    p="4"
+                    bg="white"
+                    borderRadius="md"
+                    shadow="base"
+                    bgImage={cardBg2}
+                  >
+                    <Text>{friendEmail}</Text>
+                    <Menu placement="bottom-start" gutter={4} strategy="fixed">
+                      <MenuButton
+                        as={IconButton}
+                        icon={<HamburgerIcon />}
+                        variant="none"
+                      />
+                      <MenuList bg={menuBg} zIndex={10} minW="240px">
+                        <MenuItem
+                          _hover={{
+                            bg: menuItemHoverBg,
+                            color: menuItemHoverColor,
+                          }}
+                          onClick={() => removeFriend(friendEmail)}
+                        >
+                          Remove Friend
+                        </MenuItem>
+                        <MenuItem
+                          _hover={{
+                            bg: menuItemHoverBg,
+                            color: menuItemHoverColor,
+                          }}
+                          onClick={() => console.log("View Profile")}
+                        >
+                          View User Profile
+                        </MenuItem>
+                        <MenuItem
+                          _hover={{
+                            bg: menuItemHoverBg,
+                            color: menuItemHoverColor,
+                          }}
+                          onClick={() => console.log("Chat")}
+                        >
+                          Chat
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </Flex>
+                ))}
+                {selectedFriend && (
+                  <Modal isOpen={isModalOpen} onClose={closeModal} isCentered>
+                    <ModalOverlay />
+                    <ModalContent
+                      // bg={useColorModeValue('white', 'gray.800')} // Background color
+                      boxShadow="xl" // Shadow for depth
+                      rounded="lg" // Rounded corners
+                    >
+                      <ModalHeader>
+                        {selectedFriend.username || selectedFriend.email}
+                      </ModalHeader>
+                      <ModalCloseButton />
+                      <ModalBody>{/* Content here */}</ModalBody>
+                    </ModalContent>
+                  </Modal>
+                )}
+              </VStack>
+            </Box>
+          </Flex>
+        </Box>
+      </Box>
+    </div>
+  );
+};

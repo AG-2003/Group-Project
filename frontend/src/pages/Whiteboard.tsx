@@ -32,7 +32,7 @@ const Whiteboard: React.FC = () => {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   return (
-    <div>
+    <div style={{ position: "fixed", width: "100%" }}>
       <NavBar
         onToggle={toggleSidebar}
         isSidebarOpen={isSidebarOpen}
