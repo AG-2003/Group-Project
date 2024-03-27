@@ -207,8 +207,8 @@ const ChattingPage: React.FC = () => {
       "/meeting?roomID=" +
       roomID;
 
-    // Navigate to the Zoom meeting page
-    history(`/meeting?roomID=${roomID}`);
+    // Open the meeting link in a new tab
+    window.open(meetingLink, '_blank');
 
     // Now you can send the meeting link to the chat or use it as needed
     // For example, you can add a new message to the chat
@@ -232,6 +232,12 @@ const ChattingPage: React.FC = () => {
       addDoc(messagesCollection, newMessage);
     }
   };
+
+  const componentDecorator = (href: string | undefined, text: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined, key: React.Key | null | undefined) => (
+    <a href={href} key={key} target="_blank" rel="noopener noreferrer">
+      {text}
+    </a>
+  );
 
   return (
     <>
@@ -346,7 +352,9 @@ const ChattingPage: React.FC = () => {
                   ) : (
                     // It's a text message
                     <Text className="message-text">
-                      <Linkify>{message.text}</Linkify>
+                      <Linkify componentDecorator={componentDecorator}>
+                        {message.text}
+                      </Linkify>
                     </Text>
                   )}
                 </Flex>
