@@ -267,7 +267,7 @@ export const Badges: React.FC = () => {
         )}
         <Box flex="1" overflowY="auto" position="relative" zIndex="1">
           <Flex direction="column" align="flex-start" mb={4} ml={4}>
-            <Heading size="xl" mb={2}>
+            <Heading size="xl" mb={2} mt={8}>
               BADGES
             </Heading>
             <Text fontSize="lg">
