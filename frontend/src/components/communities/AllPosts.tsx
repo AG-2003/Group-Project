@@ -13,6 +13,8 @@ import {
   doc,
   deleteDoc,
   getDoc,
+  collectionGroup,
+  where,
 } from "firebase/firestore";
 import Posts from "./Posts";
 import "./Posts.scss";
@@ -83,11 +85,24 @@ const AllPosts = () => {
   }, [wasManuallyClosed]);
 
   useEffect(() => {
-    const fetchAllPosts = async () => {
+    const fetchCommunityPosts = async () => {
       try {
-        // Fetch all community posts
+        // Get the communities the user is part of
+        const userCommunitiesQuery = query(
+          collection(db, "communities"),
+          where("members", "array-contains", userId)
+        );
+        const userCommunitiesSnapshot = await getDocs(userCommunitiesQuery);
+        const userCommunities = userCommunitiesSnapshot.docs.map(
+          (doc) => doc.id
+        );
+
+        console.log(userCommunities[3]);
+
+        // Fetch posts from the communities the user is part of
         const communityPostsQuery = query(
-          collection(db, "communityPosts"),
+          collectionGroup(db, "communityPosts"),
+          where("Cid", "in", userCommunities),
           orderBy("date", "desc")
         );
         const communityPostsSnapshot = await getDocs(communityPostsQuery);
@@ -98,12 +113,12 @@ const AllPosts = () => {
 
         setAllPosts(communityPostsData);
       } catch (error) {
-        console.error("Error fetching all posts:", error);
+        console.error("Error fetching community posts:", error);
       }
     };
 
-    fetchAllPosts();
-  }, []);
+    fetchCommunityPosts();
+  }, [userId]);
 
   const sidebarVariants = {
     open: { width: "200px" },
