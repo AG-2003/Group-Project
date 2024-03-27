@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Dashboard/Navbar";
 import Sidebar from "../components/Dashboard/sidebar";
+import "./Calendar.scss"
 
 export const Calendar = () => {
   // Dashboard routing
