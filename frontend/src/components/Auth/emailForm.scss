@@ -1,46 +1,52 @@
 .login-form-container {
-  position: relative; // This creates a new stacking context
+  position: relative;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url('../../assets/auth-bg.png'); // Path to your image file
-  background-size: cover; // Cover the entire area of the container
-  background-position: center; // Center the background image
-  background-repeat: no-repeat; // Do not repeat the image
+  background-image: url('../../assets/auth-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column; /* Start with a column layout for smaller screens */
 
   .form-stack {
     z-index: 1;
-    max-width: 400px; // Adjust the width as necessary
-    height: 400px;
+    max-width: 90%; /* Start with a higher max-width for smaller screens */
+    width: auto; /* Adjust width based on the content */
+    min-height: 200px; /* Minimum height to accommodate smaller screens */
     padding: 2rem;
-    background-color: #ffffff; // Assuming this is purple.100 in Chakra UI
-    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15); // Shadow only on the left edge    
-    border-radius: 8px 0px 0px 8px;
-    align-items: flex-start; // Align children to the start of the cross axis
+    background-color: #ffffff;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px; /* Rounded corners for smaller screens */
+    margin: 1rem; /* Add margin for smaller screens */
+    align-items: center; /* Center children for smaller screens */
+    display: flex;
+    flex-direction: column;
   }
 
   .form-title {
-    font-size: 24px; // Convert Chakra UI token to px
+    font-size: 24px;
     font-weight: bold;
-    color: #1a202c; // Assuming this is blackAlpha.800 in Chakra UI
+    color: #1a202c;
     margin-bottom: 16px;
   }
 
   .form-subtitle {
     font-size: 16px;
-    color: #1a202c; // Assuming this is blackAlpha.800 in Chakra UI
+    color: #1a202c;
     margin-bottom: 24px;
   }
 
   .auth-button {
     width: 100%;
-    height: 50px; // Adjust as needed
+    height: 50px;
     margin-bottom: 16px;
     border: solid 1px #484c6c;
-    justify-content: flex-start; // Align icon and text to the start
+    justify-content: center; /* Center content for smaller screens */
 
     &:hover {
-      background-color: #c4c4ff; // Assuming this is purple.300 in Chakra UI
+      background-color: #c4c4ff;
       color: black;
       transform: scale(1.05);
     }
@@ -49,26 +55,47 @@
   .email-input {
     margin-top: 1rem;
     margin-bottom: 1rem;
-    height: 50px; // Adjust as needed
+    height: 50px;
 
     &:hover {
-      box-shadow: 0 0 0 1px #a3a3a3; // This replicates the Chakra UI focus border effect    }
+      box-shadow: 0 0 0 1px #a3a3a3;
     }
 
     &:focus {
-      border-color: #805ad5; // This is an example purple color, replace with the specific purple you use
-      box-shadow: 0 0 0 1px #805ad5; // This replicates the Chakra UI focus border effect
+      border-color: #805ad5;
+      box-shadow: 0 0 0 1px #805ad5;
     }
   }
 
+  .empty-stack {
+    z-index: 1;
+    width: 90%; /* Adjust width for smaller screens */
+    min-height: 200px; /* Minimum height for smaller screens */
+    padding: 2rem;
+    background-color: #484c6c;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px; /* Rounded corners for smaller screens */
+    margin: 1rem; /* Add margin for smaller screens */
+    display: none; /* Hide by default on smaller screens */
+  }
+}
+
+/* Media Queries for Larger Screens */
+@media (min-width: 768px) {
+  .login-form-container {
+    flex-direction: row; /* Use row layout for larger screens */
+
+    .form-stack,
     .empty-stack {
-      z-index: 1; // Also ensure this is above the pseudo-element
-      width: 400px; // Adjust the width as necessary
-      height: 400px;
-      padding: 2rem;
-      background-color: #484c6c; // Assuming this is purple.100 in Chakra UI
-      box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15); // Shadow only on the right edge    
-      border-radius: 0px 8px 8px 0px;
+      max-width: 400px; /* Set fixed width for larger screens */
+      height: 400px; /* Set fixed height for larger screens */
+      margin: 0; /* Remove margin for larger screens */
+      border-radius: 8px 0px 0px 8px; /* Specific border-radius for form-stack */
     }
 
+    .empty-stack {
+      display: block; /* Show the empty-stack on larger screens */
+      border-radius: 0px 8px 8px 0px; /* Specific border-radius for empty-stack */
+    }
+  }
 }
