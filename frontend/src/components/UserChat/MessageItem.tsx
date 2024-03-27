@@ -5,7 +5,7 @@ import firebase from 'firebase/compat/app'; // Ensure you have the Firebase SDK 
 import { Timestamp } from 'firebase/firestore';
 import { MessageItemProps } from '../../interfaces/MessageItemProps';
 import { Image } from '@chakra-ui/react'
-
+import Linkify from 'react-linkify';
 
 const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, currentUserId, senderPhotoURL }) => {
     const isCurrentUser = senderId === currentUserId;
@@ -39,6 +39,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, cu
 
 
     return (
+        <Linkify>
         <HStack alignSelf={align} bg={bg} p={3} my={2} mx={1} borderRadius={borderRadius} maxWidth="40%">
             {!isCurrentUser && imageElement}
             <VStack align={isCurrentUser ? 'end' : 'start'} spacing={1}>
@@ -51,6 +52,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, cu
             </VStack>
             {isCurrentUser && imageElement}
         </HStack>
+        </Linkify>
     );
 };
 

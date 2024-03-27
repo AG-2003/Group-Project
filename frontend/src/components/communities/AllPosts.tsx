@@ -464,19 +464,30 @@ const AllPosts = () => {
               padding="0px"
             >
               <div className="posts-container">
-                {allPosts.map((post, index) => (
-                  <Posts
-                    key={index}
-                    post={post}
-                    userId={userId}
-                    onLike={handleLike}
-                    onDislike={handleDislike}
-                    deletePost={handleDeletePost}
-                    savePost={savePost}
-                    editPost={editPost}
-                    admin={false}
-                  />
-                ))}
+                {allPosts.length === 0 ? (
+                  <Box
+                    textAlign="center"
+                    fontSize="lg"
+                    fontWeight="bold"
+                    mt={10}
+                  >
+                    No posts available
+                  </Box>
+                ) : (
+                  allPosts.map((post, index) => (
+                    <Posts
+                      key={index}
+                      post={post}
+                      userId={userId}
+                      onLike={handleLike}
+                      onDislike={handleDislike}
+                      deletePost={handleDeletePost}
+                      savePost={savePost}
+                      editPost={editPost}
+                      admin={false}
+                    />
+                  ))
+                )}
               </div>
             </Flex>
           </Flex>
