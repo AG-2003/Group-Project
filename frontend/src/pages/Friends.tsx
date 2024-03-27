@@ -15,7 +15,7 @@ import cardBg2 from '../assets/carbBg2.png'
 import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
 import { useReceivedRequests } from "../context/RecievedRequestsContext";
 import { useNavigate } from "react-router-dom";
-import { getOrCreateChatId } from "../chatService";
+import { getOrCreateChatId } from "../utils/chatService";
 
 
 
@@ -25,7 +25,6 @@ interface User {
     username?: string;
     email?: string
     userVisibility?: 'public' | 'private';
-    // add other properties as needed
 }
 
 
