@@ -9,6 +9,7 @@ export const Calendar = () => {
   // Dashboard routing
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDesktop, setIsDesktop] = useState(true);
+  const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
 
   useEffect(() => {
     // Check screen width or user agent to determine if it's desktop or mobile
@@ -26,6 +27,28 @@ export const Calendar = () => {
     closed: { width: "0px" },
   };
 
+  useEffect(() => {
+    // Function to automatically check the sidebar status on window resize
+    const checkSidebar = () => {
+      const mobileBreakpoint = 768;
+      // Close the sidebar if window size is less than the breakpoint and it was not manually closed
+      if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
+        setIsSidebarOpen(false);
+      } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
+        // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
+        setIsSidebarOpen(true);
+      }
+    };
+    // Set up the event listener
+    window.addEventListener("resize", checkSidebar);
+
+    // Check the initial size of the window
+    checkSidebar();
+
+    // Clean up the event listener when the component unmounts
+    return () => window.removeEventListener("resize", checkSidebar);
+  }, [wasManuallyClosed]);
+
   // Function to toggle the sidebar
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -41,7 +64,7 @@ export const Calendar = () => {
                 initial="open"
                 animate="open"
                 exit="closed"
-                variants={sidebarVariants}
+                variants={sidebarVariantsMobile}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 style={{
                   paddingTop: "10px",
@@ -60,7 +83,7 @@ export const Calendar = () => {
                 initial="closed"
                 animate="closed"
                 exit="open"
-                variants={sidebarVariants}
+                variants={sidebarVariantsMobile}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 style={{
                   paddingTop: "10px",

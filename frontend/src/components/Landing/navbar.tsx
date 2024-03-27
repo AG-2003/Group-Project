@@ -12,6 +12,7 @@ export const Navbar: React.FC = () => {
         <img src={logo} alt="Joints Logo" className="logo" />
         <img src={name} alt="Joints" className="name" />
       </div>
+      {/*
       <div className="nav-items">
         <NavItem label="Tutorials">
           <a href="#docs">Docs</a>
@@ -43,6 +44,7 @@ export const Navbar: React.FC = () => {
           <a href="#whiteboards">Curriculum Vitae</a>
         </NavItem>
       </div>
+  */}
 
       <Link to="/auth">
         <button className="get-started">Get Started</button>
