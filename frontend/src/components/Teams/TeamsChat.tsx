@@ -28,6 +28,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import Linkify from "react-linkify";
 import { Message } from "../../interfaces/Message";
+import chatBG from '../../assets/chatBG.png'
 
 // import { FaFilePdf } from "react-icons/fa";
 import Navbar from "../Dashboard/Navbar";
@@ -186,7 +187,7 @@ const ChattingPage: React.FC = () => {
     let result = "";
     if (result) return result;
     var chars =
-        "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
+      "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
       maxPos = chars.length,
       i;
     len = len || 5;
@@ -235,7 +236,7 @@ const ChattingPage: React.FC = () => {
 
   return (
     <>
-        <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
         <AnimatePresence>
@@ -275,7 +276,7 @@ const ChattingPage: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box bgImage={chatBG} bgRepeat='no-repeat' content="cover" bgPosition='center' bgSize='cover' flexGrow={1} padding="10px" marginLeft={5}>
           <Box className="chatting-page">
             {/* Team Header */}
             <Flex className="team-header">
