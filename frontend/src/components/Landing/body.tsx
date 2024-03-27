@@ -28,7 +28,6 @@ export const Body: React.FC = () => {
             <p>
               Design beautiful documents, slides, spreadsheets, and whiteboards.
             </p>
-            <button>Discover now</button>
           </div>
           <div className="image-content-left">
             <img src={create} />
@@ -41,7 +40,6 @@ export const Body: React.FC = () => {
           <div className="text-content-right">
             <h2>Collaborate Effortlessly</h2>
             <p>Work with others in real-time to bring your ideas to life.</p>
-            <button>Discover now</button>
           </div>
           <div className="image-content-right">
             <img src={collaborate} />
@@ -53,7 +51,6 @@ export const Body: React.FC = () => {
           <div className="text-content-left">
             <h2>Join Communities</h2>
             <p>Connect with like-minded creators in communities and teams.</p>
-            <button>Discover now</button>
           </div>
           <div className="image-content-left">
             <img src={communities} />
@@ -65,7 +62,6 @@ export const Body: React.FC = () => {
           <div className="text-content-right">
             <h2>Share Your Work</h2>
             <p>Showcase your designs and posts to the world.</p>
-            <button>Discover now</button>
           </div>
           <div className="image-content-right">
             <img src={share} />
@@ -77,7 +73,6 @@ export const Body: React.FC = () => {
           <div className="text-content-left">
             <h2>Compete on the Leaderboard</h2>
             <p>Rise to the top and earn recognition for your creativity.</p>
-            <button>Discover now</button>
           </div>
           <div className="image-content-left">
             <img src={leaderboard} />

@@ -205,8 +205,6 @@ const Posts = ({
           // />
           <Box
             bg="gray.200"
-            w="350px"
-            h="300px"
             mb="4"
             className="post-placeholder"
             style={{
@@ -218,8 +216,6 @@ const Posts = ({
         ) : (
           <Box
             bg="gray.200"
-            w="350px"
-            h="300px"
             mb="4"
             className="post-placeholder"
             style={{
@@ -230,7 +226,8 @@ const Posts = ({
           />
         )}
 
-        <Text>
+        <Text
+         className="post-description">
           <Linkify>{post.description}</Linkify>
         </Text>
         {/* Like and Dislike buttons */}

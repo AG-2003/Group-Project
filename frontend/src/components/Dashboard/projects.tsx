@@ -519,11 +519,12 @@ const Projects: React.FC = () => {
                           </MenuList>
                         </Menu>
                       </div>
-                      <Box textAlign="center" mt="20px" display="flex" justifyContent="flex-end">
+                      <Box textAlign="center" mt="20px" display="flex" justifyContent="center">
                         <img
                           className="ProjImage"
                           src={NoProj}
                           alt="No Projects"
+                          
                         />
                       </Box>
                     </>
