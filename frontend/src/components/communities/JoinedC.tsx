@@ -100,10 +100,17 @@ const JoinedCommunities: React.FC = () => {
             );
           }
         }
+        // Disable the request button after the request is sent
+        const joinButton = document.getElementById(
+          `join-button-${communityId}`
+        );
+        if (joinButton) {
+          joinButton.setAttribute("disabled", "disabled");
+          joinButton.classList.add("disabled-button");
+        }
       }
     }
   };
-
   const handleJoinClick = async (communityId: string) => {
     if (!user) return;
 
@@ -209,9 +216,9 @@ const JoinedCommunities: React.FC = () => {
             className="community-card"
             style={{
               backgroundImage: `url(${community.image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
             onClick={() => handleCardClick(community.id)}
           >
@@ -224,11 +231,12 @@ const JoinedCommunities: React.FC = () => {
               />
             )}
             */}
-            
+
             <h3 className="community-name">{community.name}</h3>
             <p className="community-description">{community.description}</p>
 
             <button
+              id={`join-button-${community.id}`} // Add an id attribute here
               onClick={(e) => {
                 e.stopPropagation();
                 if (community.status === "Public") {

@@ -106,6 +106,12 @@
       margin-top: 10px;
     }
 
+    .disabled-button {
+      background-color: #ccc; 
+      color: #666;
+      cursor: not-allowed; 
+    }
+
     .joined-button-private {
       background-color: darkblue;
       color: #fff;

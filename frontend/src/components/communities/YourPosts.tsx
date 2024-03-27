@@ -299,7 +299,7 @@ const YourPosts = () => {
   };
 
   return (
-    <div style={{ position: "fixed", width: '100%' }}>
+    <div style={{ position: "fixed", width: "100%" }}>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
@@ -408,22 +408,22 @@ const YourPosts = () => {
           overflowY="auto"
           overflowX="hidden"
           sx={{
-            '&::-webkit-scrollbar': {
-              width: '10px',
-              backgroundColor: 'transparent',
+            "&::-webkit-scrollbar": {
+              width: "10px",
+              backgroundColor: "transparent",
             },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'transparent',
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "transparent",
             },
-            '&::-webkit-scrollbar-button': {
-              display: 'none', // Hide scrollbar arrows
+            "&::-webkit-scrollbar-button": {
+              display: "none", // Hide scrollbar arrows
             },
-            '&:hover::-webkit-scrollbar-thumb': {
-              backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+            "&:hover::-webkit-scrollbar-thumb": {
+              backgroundColor: "rgba(0, 0, 0, 0.5)", // Change this to the color you want
             },
-            '&:hover': {
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+            "&:hover": {
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(0, 0, 0, 0.5) transparent", // Change this to the color you want
             },
           }}
         >
@@ -436,26 +436,36 @@ const YourPosts = () => {
           >
             <Flex className="profile-body" justify="center">
               <div className="posts-container">
-                {yourPosts.map((post, index) => (
-                  <Posts
-                    key={index}
-                    post={post}
-                    userId={userId}
-                    onLike={handleLike}
-                    onDislike={handleDislike}
-                    deletePost={handleDeletePost}
-                    savePost={savePost}
-                    editPost={editPost}
-                    admin={false}
-                  />
-                ))}
+                {yourPosts.length === 0 ? (
+                  <Box
+                    textAlign="center"
+                    fontSize="lg"
+                    fontWeight="bold"
+                    mt={10}
+                  >
+                    You haven't made any posts yet.
+                  </Box>
+                ) : (
+                  yourPosts.map((post, index) => (
+                    <Posts
+                      key={index}
+                      post={post}
+                      userId={userId}
+                      onLike={handleLike}
+                      onDislike={handleDislike}
+                      deletePost={handleDeletePost}
+                      savePost={savePost}
+                      editPost={editPost}
+                      admin={false}
+                    />
+                  ))
+                )}
               </div>
             </Flex>
           </Flex>
         </Box>
       </Box>
-
-    </div >
+    </div>
   );
 };
 
