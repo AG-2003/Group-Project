@@ -109,7 +109,7 @@ const CreateJoin = () => {
           </div>
         </div>
 
-        <div className="team-box">
+        {/*<div className="team-box">
           <div className="icon-container">
             <HiMiniUserGroup />
           </div>
@@ -129,7 +129,7 @@ const CreateJoin = () => {
               }}
             />
           </div>
-        </div>
+        </div>*/}
         <CreateTeamModal
           isOpen={isCreateTeamModalOpen}
           onClose={handleCloseCreateTeamModal}

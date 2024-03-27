@@ -40,12 +40,35 @@ export const Friends: React.FC = () => {
     const { receivedRequests, setReceivedRequests } = useReceivedRequests();
     const navigate = useNavigate();
     const [isDesktop, setIsDesktop] = useState(true);
+    const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
 
     useEffect(() => {
         // Check screen width or user agent to determine if it's desktop or mobile
         const screenWidth = window.innerWidth;
         setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
     }, []);
+
+    useEffect(() => {
+        // Function to automatically check the sidebar status on window resize
+        const checkSidebar = () => {
+          const mobileBreakpoint = 768;
+          // Close the sidebar if window size is less than the breakpoint and it was not manually closed
+          if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
+            setIsSidebarOpen(false);
+          } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
+            // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
+            setIsSidebarOpen(true);
+          }
+        };
+        // Set up the event listener
+        window.addEventListener("resize", checkSidebar);
+    
+        // Check the initial size of the window
+        checkSidebar();
+    
+        // Clean up the event listener when the component unmounts
+        return () => window.removeEventListener("resize", checkSidebar);
+      }, [wasManuallyClosed]);
 
 
     // State for managing modal visibility and the current selected friend
