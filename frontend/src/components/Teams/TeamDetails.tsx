@@ -322,7 +322,7 @@ const TeamDetails: React.FC = () => {
                   </Flex>
 
                   <Stack className="profile-stats">
-                    <Badge className="badge">0 Projects</Badge>
+                    <Badge className="badge">{sharedProjects.length || 0} Project(s)</Badge>
                     <Badge className="badge">
                       {teamDetails.members.length || 0} Members
                     </Badge>
@@ -362,12 +362,12 @@ const TeamDetails: React.FC = () => {
                         >
                           Doc
                         </MenuItem>
-                        {/* <MenuItem
+                        <MenuItem
                           icon={<FiClipboard />}
                           onClick={() => openModal("Whiteboard")}
                         >
                             Whiteboard
-                        </MenuItem> */}
+                        </MenuItem>
                       </MenuList>
                     </Menu>
                     <button className="invite-button" onClick={handleInvClick}>
