@@ -459,20 +459,31 @@ const YourPosts = () => {
             height="100vh"
           >
             <Flex className="profile-body" justify="center">
-              <div className="posts-container">
-                {yourPosts.map((post, index) => (
-                  <Posts
-                    key={index}
-                    post={post}
-                    userId={userId}
-                    onLike={handleLike}
-                    onDislike={handleDislike}
-                    deletePost={handleDeletePost}
-                    savePost={savePost}
-                    editPost={editPost}
-                    admin={false}
-                  />
-                ))}
+            <div className="posts-container">
+                {yourPosts.length === 0 ? (
+                  <Box
+                    textAlign="center"
+                    fontSize="lg"
+                    fontWeight="bold"
+                    mt={10}
+                  >
+                    You haven't made any posts yet.
+                  </Box>
+                ) : (
+                  yourPosts.map((post, index) => (
+                    <Posts
+                      key={index}
+                      post={post}
+                      userId={userId}
+                      onLike={handleLike}
+                      onDislike={handleDislike}
+                      deletePost={handleDeletePost}
+                      savePost={savePost}
+                      editPost={editPost}
+                      admin={false}
+                    />
+                  ))
+                )}
               </div>
             </Flex>
           </Flex>

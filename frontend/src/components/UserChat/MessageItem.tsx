@@ -47,6 +47,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, cu
 
 
     return (
+        <Linkify>
         <HStack alignSelf={align} bg={bg} p={3} my={2} mx={1} borderRadius={borderRadius} maxWidth="40%">
             {!isCurrentUser && imageElement}
             <VStack align={isCurrentUser ? 'end' : 'start'} spacing={1}>
@@ -66,6 +67,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, cu
             </VStack>
             {isCurrentUser && imageElement}
         </HStack>
+        </Linkify>
     );
 };
 
