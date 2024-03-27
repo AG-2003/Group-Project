@@ -29,6 +29,7 @@ import { Message } from "../../interfaces/Message";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase-config";
 import { serverTimestamp } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 
 interface Props {
@@ -151,8 +152,24 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
     });
   };
 
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    // Check screen width or user agent to determine if it's desktop or mobile
+    const screenWidth = window.innerWidth;
+    setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+  }, []);
+
   return (
-    <div className="navbar">
+    <div className="navbarD">
+      {!isDesktop && (
+      <IconButton
+        className="menuIcon-Dash"
+        aria-label="Menu"
+        icon={<HamburgerIcon style={iconStyle} />}
+        onClick={onToggle}
+      />
+      )}
       <div className="nav-items">
         <button className="nav-item" onClick={() => { isSharePage? (isTeams? navigate(-1) : navigate('/projects')) : navigate(-1) }}>Home</button>
       </div>
@@ -181,19 +198,6 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             onClick={handleStartCall}
           />
         </Tooltip>
-        {/* <Tooltip
-          label="Get Analytics"
-          className="tooltip-label"
-          placement="top"
-          hasArrow
-        >
-          <IconButton
-            className="action-icon analytics"
-            aria-label="Analyse"
-            icon={<IoBarChartOutline />}
-            onClick={onOpen}
-          />
-        </Tooltip> */}
         <Tooltip
           label="Share"
           className="tooltip-label"

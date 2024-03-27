@@ -75,76 +75,12 @@ const SideBar = ({ onNavigate }: Props) => {
       <Button
         variant="ghost"
         justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        File
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        Edit
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        View
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        Insert
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        Format
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        Tools
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        Extensions
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        //onClick={() => onNavigate("account")}
-      >
-        Help
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
         leftIcon={<IoVideocamOutline />}
         onClick={handleStartCall}
       >
         Video Call
       </Button>
       <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        leftIcon={<IoBarChartOutline />}
-        onClick={onOpen}
-      >
-        Get Analytics
-      </Button>
-      x<Button
         variant="ghost"
         justifyContent="flex-start"
         leftIcon={<IoShareOutline />}

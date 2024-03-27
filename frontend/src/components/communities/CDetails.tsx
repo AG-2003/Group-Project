@@ -112,28 +112,29 @@ const CommunityDetails: React.FC = () => {
     fetchCommunityDetails();
   }, [community_id]);
 
+  const fetchCommunityPosts = async () => {
+    try {
+      if (community_id) {
+        const firestoreDB = db as Firestore;
+
+        const communityPostsRef = collection(firestoreDB, "communityPosts");
+        const q = query(
+          communityPostsRef,
+          where("Cid", "==", community_id),
+          orderBy("date", "desc") // Order posts by date in descending order
+        );
+        const snapshot = await getDocs(q);
+
+        const postsData = snapshot.docs.map((doc) => doc.data());
+        setCommunityPosts(postsData.reverse()); // Reverse the order of the posts
+      }
+    } catch (error) {
+      console.error("Error fetching community posts:", error);
+    }
+  };
+
   // Fetch community posts
   useEffect(() => {
-    const fetchCommunityPosts = async () => {
-      try {
-        if (community_id) {
-          const firestoreDB = db as Firestore;
-
-          const communityPostsRef = collection(firestoreDB, "communityPosts");
-          const q = query(
-            communityPostsRef,
-            where("Cid", "==", community_id),
-            orderBy("date", "desc") // Order posts by date in descending order
-          );
-          const snapshot = await getDocs(q);
-
-          const postsData = snapshot.docs.map((doc) => doc.data());
-          setCommunityPosts(postsData.reverse()); // Reverse the order of the posts
-        }
-      } catch (error) {
-        console.error("Error fetching community posts:", error);
-      }
-    };
 
     fetchCommunityPosts();
   }, [community_id]);
@@ -337,6 +338,8 @@ const CommunityDetails: React.FC = () => {
             }
           }
         }
+
+        fetchCommunityPosts();
       } else {
         console.error("User is not authorized to delete this post.");
       }
@@ -411,8 +414,8 @@ const CommunityDetails: React.FC = () => {
             description: newDescription,
           });
 
-          window.location.reload();
           console.log("Post updated successfully");
+          fetchCommunityPosts();
         } else {
           console.error("User is not authorized to edit this post.");
         }
@@ -474,7 +477,32 @@ const CommunityDetails: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Box flexGrow={1} padding="10px" marginLeft={5}>
+        <Box
+          flexGrow={1}
+          padding="10px"
+          marginLeft={5}
+          overflowY="auto"
+          overflowX="hidden"
+          sx={{
+                '&::-webkit-scrollbar': {
+                  width: '10px',
+                  backgroundColor: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'transparent',
+                },
+                '&::-webkit-scrollbar-button': {
+                  display: 'none', // Hide scrollbar arrows
+                },
+                '&:hover::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+                },
+                '&:hover': {
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+                },
+            }}
+        >
           <div className="community-details-container">
             {communityDetails ? (
               <div className="profile-container">
@@ -551,9 +579,10 @@ const CommunityDetails: React.FC = () => {
 
                   <PostModal
                     isOpen={isCreatePostModalOpen}
-                    onClose={handleCloseCreatePostModal}
+                    onClose={() =>{ handleCloseCreatePostModal(); fetchCommunityPosts()}}
                     Cid={community_id ? community_id : "null"}
                     Uid={userId}
+                    setCommunityPosts={setCommunityPosts}
                   />
 
                   <div className="posts-container">

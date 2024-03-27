@@ -15,6 +15,7 @@ import cardBg2 from '../assets/carbBg2.png'
 import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
 import { useReceivedRequests } from "../context/RecievedRequestsContext";
 import { useNavigate } from "react-router-dom";
+import { getOrCreateChatId } from "../chatService";
 
 
 
@@ -38,7 +39,13 @@ export const Friends: React.FC = () => {
     const [favorites, setFavorites] = useState<string[]>([]);
     const { receivedRequests, setReceivedRequests } = useReceivedRequests();
     const navigate = useNavigate();
+    const [isDesktop, setIsDesktop] = useState(true);
 
+    useEffect(() => {
+        // Check screen width or user agent to determine if it's desktop or mobile
+        const screenWidth = window.innerWidth;
+        setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
+    }, []);
 
 
     // State for managing modal visibility and the current selected friend
@@ -65,6 +72,10 @@ export const Friends: React.FC = () => {
     const sidebarVariants = {
         open: { width: '200px' },
         closed: { width: '0px' },
+    };
+    const sidebarVariantsMobile = {
+        open: { width: "100%" },
+        closed: { width: "0px" },
     };
 
     const bgColor = useColorModeValue('gray.50', 'gray.800');
@@ -131,61 +142,58 @@ export const Friends: React.FC = () => {
         }
     }, [searchTerm, users]);
 
-    // TODO: use batch
     const addFriend = async (friendEmail: string) => {
         if (!userEmail || userEmail === friendEmail) return;
 
         const userDocRef = doc(db, 'users', userEmail);
-
-        // Get the visibility status of the user to be added
         const friendDocRef = doc(db, 'users', friendEmail);
+
+        // First, get the friend's user visibility
         const friendDocSnap = await getDoc(friendDocRef);
+        if (!friendDocSnap.exists()) {
+            showToast('error', `User not found.`);
+            return;
+        }
 
-        if (friendDocSnap.exists() && friendDocSnap.data()) {
-            const friendData = friendDocSnap.data();
+        const friendData = friendDocSnap.data();
+        if (friendData.userVisibility === 'public') {
+            // If the friend's profile is public, proceed with adding them directly
+            const batch = writeBatch(db);
+            batch.update(userDocRef, {
+                userFriends: arrayUnion(friendEmail)
+            });
+            batch.update(friendDocRef, {
+                userFriends: arrayUnion(userEmail)
+            });
 
-            // If friend's profile is public, add directly as friends
-            if (friendData.userVisibility === 'public') {
-
-                try {
-                    // Transaction or batch could be used here for atomicity, ensuring both operations succeed or fail together
-                    // Add friend to current user's list
-                    await updateDoc(userDocRef, {
-                        userFriends: arrayUnion(friendEmail)
-                    });
-
-                    // Add current user to friend's list
-                    await updateDoc(friendDocRef, {
-                        userFriends: arrayUnion(userEmail)
-                    });
-
-                    setFriends(prev => [...prev, friendEmail]);
-                    showToast('info', 'Added new friend');
-                } catch (error) {
-                    console.error("Error adding friend:", error);
-                    showToast('error', `${error}`);
-                }
-
-            } else if (friendData.userVisibility === 'private') {
-                // Send a friend request instead
-                // For User A (current user sending the request)
-                const userDocRef = doc(db, 'users', userEmail);
+            try {
+                await batch.commit();
+                setFriends(prev => [...prev, friendEmail]);
+                showToast('info', 'Added new friend');
+            } catch (error) {
+                console.error("Error adding friend:", error);
+                showToast('error', `${error}`);
+            }
+        } else {
+            // If the friend's profile is private, send a friend request instead
+            try {
                 await updateDoc(userDocRef, {
                     sentRequests: arrayUnion(friendEmail)
                 });
-                setSentRequests(prev => [...prev, friendEmail]);
-
-                // For User B (receiving the request)
                 await updateDoc(friendDocRef, {
                     receivedRequests: arrayUnion(userEmail)
                 });
 
+                // Update the sentRequests state
+                setSentRequests(prev => [...prev, friendEmail]);
                 showToast('info', `Friend request sent to ${friendEmail}`);
+            } catch (error) {
+                console.error("Error sending friend request:", error);
+                showToast('error', `${error}`);
             }
-        } else {
-            showToast('error', `User not found.`);
         }
     };
+
 
     const fetchRecievedRequests = async () => {
         if (!userEmail) return;
@@ -374,38 +382,80 @@ export const Friends: React.FC = () => {
         fetchUserFriends();
     }, []);
 
+    const startChat = async (friendEmail: string) => {
+        if (!userEmail) {
+            showToast('error', 'You must be logged in to start a chat.');
+            return;
+        }
+
+        try {
+            const chatId = await getOrCreateChatId(userEmail, friendEmail);
+            navigate(`/chat/${chatId}`);
+        } catch (error) {
+            console.error("Error getting or creating chatId:", error);
+            showToast('error', 'Error starting chat.');
+        }
+    };
+
 
     const menuBg = useColorModeValue('white', 'gray.700');
     const menuItemHoverBg = useColorModeValue('purple.100', 'purple.700');
     const menuItemHoverColor = useColorModeValue('purple.700', 'purple.100');
     return (
-        <>
-            <Box padding="10px" background="#484c6c">
-                <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
-            </Box>
+
+        <div style={{ position: "fixed", width: "100%" }}>
+            <Navbar onToggle={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+
             <Divider borderColor="lightgrey" borderWidth="1px" maxWidth="98.5vw" />
-            <Box display="flex" height="calc(100vh - 10px)" width="100%">
-                <AnimatePresence>
-                    {isSidebarOpen ? (
-                        <motion.div
-                            initial="closed"
-                            animate="open"
-                            exit="closed"
-                            variants={sidebarVariants}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            style={{
-                                paddingTop: "10px",
-                                height: "inherit",
-                                backgroundColor: "#f4f1fa",
-                                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                                overflow: "hidden",
-                            }}
-                        >
-                            <SideBar />
-                        </motion.div>
-                    ) : null}
-                </AnimatePresence>
-                <Box flex="1" display="flex" flexDirection="column" p="4" bgColor='white'>
+            <Box display="flex" height="calc(100vh - 10px)" width="100%" position="relative">
+                {isDesktop && (
+                    <AnimatePresence>
+                        {isSidebarOpen ? (
+                            <motion.div
+                                initial="closed"
+                                animate="open"
+                                exit="closed"
+                                variants={sidebarVariants}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                style={{
+                                    paddingTop: "10px",
+                                    height: "inherit",
+                                    backgroundColor: "#f4f1fa",
+                                    boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                                    overflow: "hidden",
+                                }}
+                            >
+                                <SideBar />
+                            </motion.div>
+                        ) : null}
+                    </AnimatePresence>
+                )}
+                {!isDesktop && (
+                    <AnimatePresence>
+                        {isSidebarOpen ? (
+                            <motion.div
+                                initial="closed"
+                                animate="open"
+                                exit="closed"
+                                variants={sidebarVariantsMobile}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                style={{
+                                    paddingTop: "10px",
+                                    height: "inherit",
+                                    backgroundColor: "#f4f1fa",
+                                    boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                                    overflow: "hidden",
+                                    position: "absolute",
+                                    zIndex: "2",
+                                }}
+                            >
+                                <SideBar />
+                            </motion.div>
+                        ) : null}
+                    </AnimatePresence>
+                )}
+
+                <Box flex="1" display="flex" flexDirection="column" p="4" bgColor='white' overflowY="auto" position="relative" zIndex='1'>
 
                     {receivedRequests.length > 0 && (
                         <Flex direction="column" mb={6} align="center" >
@@ -469,7 +519,7 @@ export const Friends: React.FC = () => {
                                             <Button isDisabled>Request Sent</Button>
                                         ) : (
                                             <Button
-                                                onClick={() => result.email && addFriend(result.email ?? result.id)}
+                                                onClick={() => result.email && addFriend(result.email)}
                                                 bg="purple.400"
                                                 _hover={{ bg: 'purple.500' }}
                                                 color="white"
@@ -507,20 +557,14 @@ export const Friends: React.FC = () => {
                                                             </MenuItem>
                                                             <MenuItem
                                                                 _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => console.log("View Profile")}
-                                                            >
-                                                                View User Profile
-                                                            </MenuItem>
-                                                            <MenuItem
-                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => console.log('chats')}
+                                                                onClick={() => startChat(friendEmail)}
                                                             >
                                                                 Chat
                                                             </MenuItem>
                                                             {favorites.includes(friendEmail) ? (
                                                                 <MenuItem
                                                                     _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                    onClick={() => handleRemoveFavorite(friendEmail)} // Implement this function similar to handleAddFavorite
+                                                                    onClick={() => handleRemoveFavorite(friendEmail)}
                                                                 >
                                                                     Remove from Favorites
                                                                 </MenuItem>
@@ -606,6 +650,6 @@ export const Friends: React.FC = () => {
                     </Flex>
                 </Box >
             </Box >
-        </>
+        </div >
     )
 }
