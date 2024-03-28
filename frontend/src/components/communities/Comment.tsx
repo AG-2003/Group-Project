@@ -9,8 +9,10 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  IconButton,
 } from "@chakra-ui/react"; // Import Chakra UI components for styling
 import { DocumentData } from "firebase/firestore";
+import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 
 interface Props {
   comment: DocumentData;
@@ -83,6 +85,7 @@ const Comments = ({
   }, [comment.date]);
 
   const handleLikeClick = async () => {
+    setLikeActive(!likeActive);
     if (!likeClicked) {
       await onLike(comment.id, userId);
       setLikeClicked(true);
@@ -100,6 +103,7 @@ const Comments = ({
   };
 
   const handleDislikeClick = async () => {
+    setDislikeActive(!dislikeActive);
     if (!dislikeClicked) {
       await onDislike(comment.id, userId);
       setDislikeClicked(true);
@@ -120,9 +124,13 @@ const Comments = ({
     deleteComment(comment);
   };
 
+  const [likeActive, setLikeActive] = useState(false);
+  const [dislikeActive, setDislikeActive] = useState(false);
+
+
   return (
-    <Box>
-      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4" position="relative">
+    <Box borderRadius='none'>
+      <Box borderWidth="1px" borderRadius="lg" p="4" mb="4" position="relative" bgColor='#b89ce6' border='none'>
         <Flex justify="space-between" align="center" mb="2">
           <Flex align="center">
             <Avatar size="sm" name={comment.Uname} src={comment.Upic} mr="2" />
@@ -150,27 +158,33 @@ const Comments = ({
         <Text>{comment.description}</Text>
         {/* Like and Dislike buttons */}
         <Flex align="center" mt="2">
-          <Button
-            colorScheme={likeClicked ? "green" : "gray"}
+          <IconButton
+            aria-label="icon"
+            icon={likeActive ? <FaThumbsUp /> : <FaThumbsUp />}
+            color={likeClicked ? "green" : "black"}
             size="sm"
             mr="2"
             onClick={handleLikeClick}
             isDisabled={dislikeClicked}
+            variant='none'
           >
             Like
-          </Button>
+          </IconButton>
           <Text fontSize="sm" mr="2">
             {likeCount - dislikeCount}
           </Text>
-          <Button
-            colorScheme={dislikeClicked ? "red" : "gray"}
+          <IconButton
+            variant='none'
+            icon={dislikeActive ? <FaThumbsDown /> : <FaThumbsDown />}
+            aria-label="icon"
+            color={dislikeClicked ? "red" : "black"}
             size="sm"
             mr="2"
             onClick={handleDislikeClick}
             isDisabled={likeClicked}
           >
             Dislike
-          </Button>
+          </IconButton>
         </Flex>
       </Box>
     </Box>

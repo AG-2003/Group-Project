@@ -428,7 +428,7 @@ const CommunityDetails: React.FC = () => {
   };
 
   return (
-    <>
+    <div style={{ position: "fixed", width: '100%' }}>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
@@ -446,6 +446,7 @@ const CommunityDetails: React.FC = () => {
                 backgroundColor: "#f4f1fa",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
+                flexShrink: "0",
               }}
             >
               <SideBar
@@ -467,6 +468,7 @@ const CommunityDetails: React.FC = () => {
                 backgroundColor: "#f6f6f6",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
+                flexShrink: "0",
               }}
             >
               <SideBar
@@ -611,7 +613,7 @@ const CommunityDetails: React.FC = () => {
           </div>
         </Box>
       </Box>
-    </>
+    </div>
   );
 };
 

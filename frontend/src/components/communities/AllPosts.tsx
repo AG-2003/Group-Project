@@ -39,6 +39,7 @@ interface Post {
 const AllPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDesktop, setIsDesktop] = useState(true);
+  const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
 
   const [userId, setUserId] = useState("");
@@ -84,7 +85,7 @@ const AllPosts = () => {
   }, []);
 
   useEffect(() => {
-    const fetchCommunityPosts = async () => {
+    const fetchAllPosts = async () => {
       try {
         // Get the communities the user is part of
         const userCommunitiesQuery = query(
@@ -323,57 +324,113 @@ const AllPosts = () => {
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
-        <AnimatePresence>
-          {isSidebarOpen ? (
-            <motion.div
-              initial="open"
-              animate="open"
-              exit="closed"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f4f1fa",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-              }}
-            >
-              <SideBar
-                onNavigate={function (arg: string): void {
-                  throw new Error("Function not implemented.");
+        {!isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f4f1fa",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
                 }}
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              initial="closed"
-              animate="closed"
-              exit="open"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f6f6f6",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-              }}
-            >
-              <SideBar
-                onNavigate={function (arg: string): void {
-                  throw new Error("Function not implemented.");
+              >
+                <SideBar
+                  onNavigate={function (arg: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="closed"
+                exit="open"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
                 }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              >
+                <SideBar
+                  onNavigate={function (arg: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+        {isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f4f1fa",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  flexShrink: "0",
+                }}
+              >
+                <SideBar
+                  onNavigate={function (arg: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="closed"
+                exit="open"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  flexShrink: "0",
+                }}
+              >
+                <SideBar
+                  onNavigate={function (arg: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
         <Box
           flexGrow={1}
           padding="10px"
           marginLeft={5}
           overflowY="scroll"
           overflowX="hidden"
+          marginBottom={10}
           sx={{
             "&::-webkit-scrollbar": {
               width: "10px",

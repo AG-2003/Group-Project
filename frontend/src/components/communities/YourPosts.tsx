@@ -39,6 +39,8 @@ const YourPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [yourPosts, setYourPosts] = useState<Post[]>([]);
   const [userId, setUserId] = useState("");
+  const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -50,13 +52,34 @@ const YourPosts = () => {
 
     fetchUserId();
   }, []);
-  const [isDesktop, setIsDesktop] = useState(true);
 
   useEffect(() => {
     // Check screen width or user agent to determine if it's desktop or mobile
     const screenWidth = window.innerWidth;
     setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
   }, []);
+
+  useEffect(() => {
+    // Function to automatically check the sidebar status on window resize
+    const checkSidebar = () => {
+      const mobileBreakpoint = 768;
+      // Close the sidebar if window size is less than the breakpoint and it was not manually closed
+      if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
+        setIsSidebarOpen(false);
+      } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
+        // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
+        setIsSidebarOpen(true);
+      }
+    };
+    // Set up the event listener
+    window.addEventListener("resize", checkSidebar);
+
+    // Check the initial size of the window
+    checkSidebar();
+
+    // Clean up the event listener when the component unmounts
+    return () => window.removeEventListener("resize", checkSidebar);
+  }, [wasManuallyClosed]);
 
   // Function to fetch user's posts
   const fetchUserPosts = async () => {
