@@ -398,6 +398,7 @@ const YourPosts = () => {
                   backgroundColor: "#f4f1fa",
                   boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                   overflow: "hidden",
+                  flexShrink: "0",
                 }}
               >
                 <SideBar
@@ -419,6 +420,7 @@ const YourPosts = () => {
                   backgroundColor: "#f6f6f6",
                   boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                   overflow: "hidden",
+                  flexShrink: "0",
                 }}
               >
                 <SideBar
