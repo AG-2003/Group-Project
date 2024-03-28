@@ -98,6 +98,8 @@ const Profile: React.FC = () => {
   const [todaysEvents, setTodaysEvents] = useState<EventType[]>();
   const [isDesktop, setIsDesktop] = useState(true);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     // Check screen width or user agent to determine if it's desktop or mobile
@@ -383,33 +385,36 @@ const Profile: React.FC = () => {
     ));
   };
   useEffect(() => {
-    const fetchUserName = async () => {
-      if (auth.currentUser?.email) {
-        const userEmail = auth.currentUser.email;
-        const userDocRef = doc(db, 'users', userEmail);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists() && userDoc.data()) {
-          const userData = userDoc.data();
-          setUserName(userData.displayName);
+    setIsLoading(true);
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        const displayName = user.displayName || '';
+        if (displayName) {
+          setUserName(displayName);
+          setIsFirstTime(false);
+          setIsLoading(false);
+        } else {
+          if (!user.email) return;
+          const userEmail = user.email;
+          const userDocRef = doc(db, 'users', userEmail);
+          getDoc(userDocRef).then(userDoc => {
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              setUserName(userData.displayName);
+              setIsFirstTime(userData.isFirstTime === 'true');
+              setIsLoading(false);
+            }
+          }).catch(() => setIsLoading(false));
         }
+      } else {
+        setIsLoading(false);
       }
-    }
+    });
 
-    const fetchAndSetIsFirstTime = async () => {
-      if (auth.currentUser?.email) {
-        const userEmail = auth.currentUser.email;
-        const userDocRef = doc(db, 'users', userEmail);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists() && userDoc.data()) {
-          const isFirstTimeCheck: boolean = userDoc.data().isFirstTime === 'true';
-          setIsFirstTime(isFirstTimeCheck);
-          console.log(isFirstTime);
-        }
-      }
-    }
-    fetchAndSetIsFirstTime();
-    fetchUserName();
-  }, [])
+    return () => unsubscribe();
+  }, []);
+
+
 
 
 
@@ -534,21 +539,21 @@ const Profile: React.FC = () => {
                 mb={4}
               />
               <VStack spacing={2} align="stretch">
-                <ChakraLink
-                  fontWeight="bold"
-                  fontSize='x-large'
-                  as={ReactRouterLink}
-                  to="/settings"
-                  className="profile-name"
-                >
-                  {isFirstTime ? (
-                    `Welcome, ${userName ?? auth.currentUser?.displayName} !`
-                  ) : (
-                    `Welcome back, ${userName ?? auth.currentUser?.displayName} !`
-                  )
-                  }
-
-                </ChakraLink>
+                {isLoading ? (
+                  <Spinner />
+                ) : userName ? (
+                  <ChakraLink
+                    fontWeight="bold"
+                    fontSize='x-large'
+                    as={ReactRouterLink}
+                    to="/settings"
+                    className="profile-name"
+                  >
+                    {isFirstTime ? `Welcome, ${userName}!` : `Welcome back, ${userName}!`}
+                  </ChakraLink>
+                ) : (
+                  <Text>Welcome!</Text> // Default message or handle as needed
+                )}
                 <ChakraLink
                   fontWeight="semibold"
                   fontSize="md"
