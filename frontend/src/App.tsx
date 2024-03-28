@@ -8,7 +8,6 @@ import { SignUpEmail } from "./pages/Auth/SignUpEmail";
 import { SignUpPassword } from "./pages/Auth/SignUpPassword";
 import { NewPassword } from "./pages/Auth/NewPassword";
 import Policies from "./pages/Policies";
-// import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import ProtectedRoutes from "./RoutingSecurity/ProtectedRoutes";
