@@ -56,7 +56,8 @@ export function SignUpPasswordForm() {
           userTheme: "light",
           photoURL: user.photoURL,
           sheets: [],
-          Badges: initialBadges
+          Badges: initialBadges,
+          isFirstTime: 'true'
         } as DocumentData);
         showToast('success', `you have successfully created an account`)
         setTimeout(() => { navigate("/index") }, 1000)

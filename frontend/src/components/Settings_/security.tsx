@@ -17,7 +17,7 @@ import EditableTextField from "./sub-components/EditableTextField";
 import { auth, db } from '../../firebase-config'
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, getDoc, setDoc } from "firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { deleteUser, User, reauthenticateWithCredential, EmailAuthProvider, signOut, getRedirectResult, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
 import { UseToastNotification } from "../../utils/UseToastNotification";
@@ -30,7 +30,14 @@ const Security = () => {
 
   const logOut = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-
+    if (auth.currentUser?.email) {
+      const userDocRef = doc(db, 'users', auth.currentUser.email);
+      await setDoc(userDocRef, {
+        isFirstTime: 'false'
+      },
+        { merge: true }
+      );
+    }
     await signOut(auth)
       .then(() => {
         navigate('/auth')

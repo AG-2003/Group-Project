@@ -29,7 +29,7 @@ import "./Profile.scss"; // Make sure this path is correct
 import Navbar from "./Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "./sidebar";
-import { doc, getDoc, getDocsFromCache } from "firebase/firestore";
+import { doc, getDoc, getDocsFromCache, setDoc } from "firebase/firestore";
 import { Link as ReactRouterLink } from "react-router-dom";
 import { Link as ChakraLink, LinkProps } from "@chakra-ui/react";
 import { SuiteData } from "../../interfaces/SuiteData";
@@ -97,6 +97,7 @@ const Profile: React.FC = () => {
   const [lastAccessedProjects, setLastAccessedProjects] = useState<SuiteData[]>([]);
   const [todaysEvents, setTodaysEvents] = useState<EventType[]>();
   const [isDesktop, setIsDesktop] = useState(true);
+  const [isFirstTime, setIsFirstTime] = useState<boolean>();
 
   useEffect(() => {
     // Check screen width or user agent to determine if it's desktop or mobile
@@ -394,6 +395,18 @@ const Profile: React.FC = () => {
       }
     }
 
+    const fetchAndSetIsFirstTime = async () => {
+      if (auth.currentUser?.email) {
+        const userEmail = auth.currentUser.email;
+        const userDocRef = doc(db, 'users', userEmail);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data()) {
+          const isFirstTimeCheck: boolean = userDoc.data().isFirstTime === 'true';
+          setIsFirstTime(isFirstTimeCheck);
+        }
+      }
+    }
+    fetchAndSetIsFirstTime();
     fetchUserName();
   }, [])
 
@@ -527,8 +540,13 @@ const Profile: React.FC = () => {
                   to="/settings"
                   className="profile-name"
                 >
-                  {userName ||
-                    "Set username here"}
+                  {isFirstTime ? (
+                    `Welcome, ${userName} !`
+                  ) : (
+                    `Welcome back, ${userName} !`
+                  )
+                  }
+
                 </ChakraLink>
                 <ChakraLink
                   fontWeight="semibold"

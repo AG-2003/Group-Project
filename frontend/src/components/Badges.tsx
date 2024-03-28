@@ -11,9 +11,9 @@ import { auth } from '../firebase-config';
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { UseToastNotification } from '../utils/UseToastNotification';
 export const Badges: React.FC = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [tasks, setTasks] = useState<BadgesType[]>([]);
-    const showToast = UseToastNotification();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [tasks, setTasks] = useState<BadgesType[]>([]);
+  const showToast = UseToastNotification();
 
   const email = auth.currentUser?.email;
 
@@ -200,33 +200,33 @@ export const Badges: React.FC = () => {
     }
   };
 
-    useEffect(() => {
-        updateJoinTeamTask();
-    }, [updateJoinTeamTask])
+  useEffect(() => {
+    updateJoinTeamTask();
+  }, [updateJoinTeamTask])
 
 
-    const updateJoinCommunityTask = async () => {
-        if (email) {
-            const docRef = doc(db, 'users', email);
-            const userDocData = await getDoc(docRef);
-            if (userDocData.exists()) {
-                const userData = userDocData.data();
-                const badges: BadgesType[] = userData.Badges || [];
-                const joinCommunityTaskIndex: number = badges.findIndex(badge => badge.name === 'join a community');
+  const updateJoinCommunityTask = async () => {
+    if (email) {
+      const docRef = doc(db, 'users', email);
+      const userDocData = await getDoc(docRef);
+      if (userDocData.exists()) {
+        const userData = userDocData.data();
+        const badges: BadgesType[] = userData.Badges || [];
+        const joinCommunityTaskIndex: number = badges.findIndex(badge => badge.name === 'Join a community');
 
-                if (userDocData.data().communities && !badges[joinCommunityTaskIndex].status && joinCommunityTaskIndex !== -1) {
-                    badges[joinCommunityTaskIndex].status = true;
-                    await updateDoc(docRef, {
-                        Badges: badges
-                    })
-                }
-            }
+        if (userDocData.data().communities && !badges[joinCommunityTaskIndex].status && joinCommunityTaskIndex !== -1) {
+          badges[joinCommunityTaskIndex].status = true;
+          await updateDoc(docRef, {
+            Badges: badges
+          })
         }
+      }
     }
+  }
 
-    useEffect(() => {
-        updateJoinCommunityTask();
-    }, [updateJoinCommunityTask])
+  useEffect(() => {
+    updateJoinCommunityTask();
+  }, [updateJoinCommunityTask])
 
 
   return (
@@ -309,7 +309,7 @@ export const Badges: React.FC = () => {
               borderRadius="md"
               _hover={{ shadow: "lg" }}
 
-              
+
             >
               <Flex align="center" justify="space-between">
                 <Text fontWeight="bold">{task.name}</Text>
