@@ -97,7 +97,7 @@ const Profile: React.FC = () => {
   const [lastAccessedProjects, setLastAccessedProjects] = useState<SuiteData[]>([]);
   const [todaysEvents, setTodaysEvents] = useState<EventType[]>();
   const [isDesktop, setIsDesktop] = useState(true);
-  const [isFirstTime, setIsFirstTime] = useState<boolean>();
+  const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
 
   useEffect(() => {
     // Check screen width or user agent to determine if it's desktop or mobile
@@ -403,6 +403,7 @@ const Profile: React.FC = () => {
         if (userDoc.exists() && userDoc.data()) {
           const isFirstTimeCheck: boolean = userDoc.data().isFirstTime === 'true';
           setIsFirstTime(isFirstTimeCheck);
+          console.log(isFirstTime);
         }
       }
     }
@@ -541,9 +542,9 @@ const Profile: React.FC = () => {
                   className="profile-name"
                 >
                   {isFirstTime ? (
-                    `Welcome, ${userName} !`
+                    `Welcome, ${userName ?? auth.currentUser?.displayName} !`
                   ) : (
-                    `Welcome back, ${userName} !`
+                    `Welcome back, ${userName ?? auth.currentUser?.displayName} !`
                   )
                   }
 
