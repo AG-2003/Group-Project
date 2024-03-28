@@ -60,6 +60,10 @@ export const CalendarComponent: React.FC = () => {
   });
   const [isDesktop, setIsDesktop] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isStart, setStart] = useState(true);
+  const [currentView, setCurrentView] = useState<
+    "dayGridMonth" | "timeGridWeek" | "timeGridDay"
+  >("dayGridMonth");
 
   useEffect(() => {
     // Check screen width or user agent to determine if it's desktop or mobile
@@ -72,6 +76,10 @@ export const CalendarComponent: React.FC = () => {
   const handleCreateEventClick = () => {
     onOpen();
     setIsMenuOpen(false);
+  };
+
+  const startEnd = () => {
+    setStart(!isStart);
   };
 
   const handleEditTasksClick = () => {
@@ -238,6 +246,23 @@ export const CalendarComponent: React.FC = () => {
     }
   };
 
+  const handleChangeView = () => {
+    switch (currentView) {
+      case "dayGridMonth":
+        setCurrentView("timeGridWeek");
+        break;
+      case "timeGridWeek":
+        setCurrentView("timeGridDay");
+        break;
+      case "timeGridDay":
+        setCurrentView("dayGridMonth");
+        break;
+      default:
+        setCurrentView("dayGridMonth");
+        break;
+    }
+  };
+
   return (
     <>
       <Box flexGrow="1" pt="1px" pl="5px" overflowY="auto">
@@ -328,77 +353,156 @@ export const CalendarComponent: React.FC = () => {
             </form>
           </ModalContent>
         </Modal>
-        <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered size="xxl">
-          <ModalOverlay />
-          <ModalContent w="auto">
-            <ModalHeader>Edit Tasks</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody w="auto">
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Title</Th>
-                    <Th>Start</Th>
-                    <Th>End</Th>
-                    <Th>Action</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {events.map((event, index) => (
-                    <Tr key={index}>
-                      <Td>
-                        <Input
-                          variant="unstyled"
-                          defaultValue={event.title}
-                          onBlur={(e) =>
-                            handleEventUpdate(event, "title", e.target.value)
-                          }
-                        />
-                      </Td>
-                      <Td>
-                        <Input
-                          type="date"
-                          variant="unstyled"
-                          defaultValue={event.start.split("T")[0]}
-                          onBlur={(e) =>
-                            handleEventUpdate(
-                              event,
-                              "start",
-                              e.target.value + "T" + event.start.split("T")[1]
-                            )
-                          }
-                        />
-                      </Td>
-                      <Td>
-                        <Input
-                          type="date"
-                          variant="unstyled"
-                          defaultValue={event.end?.split("T")[0]}
-                          onBlur={(e) =>
-                            handleEventUpdate(
-                              event,
-                              "end",
-                              e.target.value + "T" + event.end?.split("T")[1]
-                            )
-                          }
-                        />
-                      </Td>
-                      <Td>
-                        <Button
-                          colorScheme="red"
-                          size="sm"
-                          onClick={() => handleDeleteEvent(event)}
-                        >
-                          Delete
-                        </Button>
-                      </Td>
+        {isDesktop ? (
+          <Modal
+            isOpen={isEditOpen}
+            onClose={onEditClose}
+            isCentered
+            size="xxl"
+          >
+            <ModalOverlay />
+            <ModalContent w="auto">
+              <ModalHeader>Edit Tasks</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody w="auto">
+                <Table variant="simple">
+                  <Thead>
+                    <Tr>
+                      <Th>Title</Th>
+                      <Th>Start</Th>
+                      <Th>End</Th>
+                      <Th>Action</Th>
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
+                  </Thead>
+                  <Tbody>
+                    {events.map((event, index) => (
+                      <Tr key={index}>
+                        <Td>
+                          <Input
+                            variant="unstyled"
+                            defaultValue={event.title}
+                            onBlur={(e) =>
+                              handleEventUpdate(event, "title", e.target.value)
+                            }
+                          />
+                        </Td>
+                        <Td>
+                          <Input
+                            type="date"
+                            variant="unstyled"
+                            defaultValue={event.start.split("T")[0]}
+                            onBlur={(e) =>
+                              handleEventUpdate(
+                                event,
+                                "start",
+                                e.target.value + "T" + event.start.split("T")[1]
+                              )
+                            }
+                          />
+                        </Td>
+                        <Td>
+                          <Input
+                            type="date"
+                            variant="unstyled"
+                            defaultValue={event.end?.split("T")[0]}
+                            onBlur={(e) =>
+                              handleEventUpdate(
+                                event,
+                                "end",
+                                e.target.value + "T" + event.end?.split("T")[1]
+                              )
+                            }
+                          />
+                        </Td>
+                        <Td>
+                          <Button
+                            colorScheme="red"
+                            size="sm"
+                            onClick={() => handleDeleteEvent(event)}
+                          >
+                            Delete
+                          </Button>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        ) : (
+          <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered size="sm">
+            <ModalOverlay />
+            <ModalContent w="auto">
+              <ModalHeader>Edit Tasks</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody w="auto">
+                <Table variant="simple">
+                  <Thead>
+                    <Tr>
+                      <Th>Title</Th>
+                      <Th>Start</Th>
+                      <Th>End</Th>
+                      <Th>Action</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {events.map((event, index) => (
+                      <Tr key={index}>
+                        <Td>
+                          <Input
+                            variant="unstyled"
+                            defaultValue={event.title}
+                            onBlur={(e) =>
+                              handleEventUpdate(event, "title", e.target.value)
+                            }
+                          />
+                        </Td>
+                        <Td>
+                          <Input
+                            type="date"
+                            variant="unstyled"
+                            defaultValue={event.start.split("T")[0]}
+                            onBlur={(e) =>
+                              handleEventUpdate(
+                                event,
+                                "start",
+                                e.target.value + "T" + event.start.split("T")[1]
+                              )
+                            }
+                          />
+                        </Td>
+                        <Td>
+                          <Input
+                            type="date"
+                            variant="unstyled"
+                            defaultValue={event.end?.split("T")[0]}
+                            onBlur={(e) =>
+                              handleEventUpdate(
+                                event,
+                                "end",
+                                e.target.value + "T" + event.end?.split("T")[1]
+                              )
+                            }
+                          />
+                        </Td>
+                        <Td>
+                          <Button
+                            colorScheme="red"
+                            size="sm"
+                            onClick={() => handleDeleteEvent(event)}
+                          >
+                            Delete
+                          </Button>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        )}
 
         {isDesktop ? (
           <FullCalendar
@@ -432,17 +536,26 @@ export const CalendarComponent: React.FC = () => {
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               height="100%"
               headerToolbar={{
-                start: "today prevYear,prev,next,nextYear",
+                start: `prevYear,prev today next,nextYear`,
                 center: "title",
-                end: "menuButton dayGridMonth,timeGridWeek,timeGridDay",
+                end: `menuButton menuButton2 ${currentView}`,
               }}
               customButtons={{
                 menuButton: {
                   text: "Menu",
                   click: handleMobileHeaderClick,
                 },
+                menuButton2: {
+                  text:
+                    currentView === "dayGridMonth"
+                      ? "↻"
+                      : currentView === "timeGridWeek"
+                      ? "↻"
+                      : "↻",
+                  click: handleChangeView,
+                },
               }}
-              initialView="dayGridMonth"
+              initialView={currentView}
               editable
               selectable
               dayMaxEvents
@@ -473,9 +586,19 @@ export const CalendarComponent: React.FC = () => {
               isCentered
             >
               <ModalOverlay onClick={handleClickOutsideModal}>
-                <ModalBody textAlign="center" justifyContent="center" mt="50%">
-                  <Button onClick={handleCreateEventClick}>Create Event</Button>
-                  <Button onClick={handleEditTasksClick}>Edit Tasks</Button>
+                <ModalBody
+                  textAlign="center"
+                  position="fixed"
+                  top="50%"
+                  left="50%"
+                  transform="translate(-50%, -50%)"
+                >
+                  <Button onClick={handleCreateEventClick} m={3} size="lg">
+                    Create Event
+                  </Button>
+                  <Button onClick={handleEditTasksClick} m={3} size="lg">
+                    Edit Tasks
+                  </Button>
                 </ModalBody>
               </ModalOverlay>
             </Modal>
