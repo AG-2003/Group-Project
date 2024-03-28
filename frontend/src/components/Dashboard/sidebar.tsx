@@ -42,19 +42,6 @@ const Sidebar = () => {
       >
         Projects
       </Button>
-
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        className="sidebar-button" // Added className for SCSS targeting
-        leftIcon={<ViewIcon />}
-        paddingLeft={5}
-        // onClick={() => {
-        //   nav("/Templates");
-        // }}
-      >
-        Templates
-      </Button>
       <Button
         variant="ghost"
         justifyContent="flex-start"
@@ -66,18 +53,6 @@ const Sidebar = () => {
         }}
       >
         Teams
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        className="sidebar-button" // Added className for SCSS targeting
-        leftIcon={<PhoneIcon />}
-        paddingLeft={5}
-        // onClick={() => {
-        //   nav("/Calls");
-        // }}
-      >
-        Calls
       </Button>
       <Button
         variant="ghost"

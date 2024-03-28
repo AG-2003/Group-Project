@@ -13,6 +13,8 @@ import {
   doc,
   deleteDoc,
   getDoc,
+  collectionGroup,
+  where,
 } from "firebase/firestore";
 import Posts from "./Posts";
 import "./Posts.scss";
@@ -37,6 +39,7 @@ interface Post {
 const AllPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDesktop, setIsDesktop] = useState(true);
+  const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
 
   const [userId, setUserId] = useState("");
@@ -60,11 +63,46 @@ const AllPosts = () => {
   }, []);
 
   useEffect(() => {
-    const fetchAllPosts = async () => {
+    // Function to automatically check the sidebar status on window resize
+    const checkSidebar = () => {
+      const mobileBreakpoint = 768;
+      // Close the sidebar if window size is less than the breakpoint and it was not manually closed
+      if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
+        setIsSidebarOpen(false);
+      } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
+        // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
+        setIsSidebarOpen(true);
+      }
+    };
+    // Set up the event listener
+    window.addEventListener("resize", checkSidebar);
+
+    // Check the initial size of the window
+    checkSidebar();
+
+    // Clean up the event listener when the component unmounts
+    return () => window.removeEventListener("resize", checkSidebar);
+  }, [wasManuallyClosed]);
+
+  useEffect(() => {
+    const fetchCommunityPosts = async () => {
       try {
-        // Fetch all community posts
+        // Get the communities the user is part of
+        const userCommunitiesQuery = query(
+          collection(db, "communities"),
+          where("members", "array-contains", userId)
+        );
+        const userCommunitiesSnapshot = await getDocs(userCommunitiesQuery);
+        const userCommunities = userCommunitiesSnapshot.docs.map(
+          (doc) => doc.id
+        );
+
+        console.log(userCommunities[3]);
+
+        // Fetch posts from the communities the user is part of
         const communityPostsQuery = query(
-          collection(db, "communityPosts"),
+          collectionGroup(db, "communityPosts"),
+          where("Cid", "in", userCommunities),
           orderBy("date", "desc")
         );
         const communityPostsSnapshot = await getDocs(communityPostsQuery);
@@ -75,12 +113,12 @@ const AllPosts = () => {
 
         setAllPosts(communityPostsData);
       } catch (error) {
-        console.error("Error fetching all posts:", error);
+        console.error("Error fetching community posts:", error);
       }
     };
 
-    fetchAllPosts();
-  }, []);
+    fetchCommunityPosts();
+  }, [userId]);
 
   const sidebarVariants = {
     open: { width: "200px" },
@@ -286,7 +324,59 @@ const AllPosts = () => {
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)">
-        <AnimatePresence>
+      {!isDesktop && (
+          <AnimatePresence>
+          {isSidebarOpen ? (
+            <motion.div
+              initial="open"
+              animate="open"
+              exit="closed"
+              variants={sidebarVariantsMobile}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f4f1fa",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+                position: "absolute",
+                zIndex: "2",
+              }}
+            >
+              <SideBar
+                onNavigate={function (arg: string): void {
+                  throw new Error("Function not implemented.");
+                }}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial="closed"
+              animate="closed"
+              exit="open"
+              variants={sidebarVariantsMobile}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{
+                paddingTop: "10px",
+                height: "inherit",
+                backgroundColor: "#f6f6f6",
+                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+                position: "absolute",
+                zIndex: "2",
+              }}
+            >
+              <SideBar
+                onNavigate={function (arg: string): void {
+                  throw new Error("Function not implemented.");
+                }}
+              />
+            </motion.div>
+          )}
+          </AnimatePresence>
+      )}
+      {isDesktop && (
+          <AnimatePresence>
           {isSidebarOpen ? (
             <motion.div
               initial="open"
@@ -300,6 +390,7 @@ const AllPosts = () => {
                 backgroundColor: "#f4f1fa",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
+                flexShrink: "0",
               }}
             >
               <SideBar
@@ -321,6 +412,7 @@ const AllPosts = () => {
                 backgroundColor: "#f6f6f6",
                 boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
                 overflow: "hidden",
+                flexShrink: "0",
               }}
             >
               <SideBar
@@ -330,13 +422,15 @@ const AllPosts = () => {
               />
             </motion.div>
           )}
-        </AnimatePresence>
+          </AnimatePresence>
+      )}
         <Box
           flexGrow={1}
           padding="10px"
           marginLeft={5}
           overflowY="scroll"
           overflowX="hidden"
+          marginBottom={10}
           sx={{
                 '&::-webkit-scrollbar': {
                   width: '10px',
@@ -346,14 +440,14 @@ const AllPosts = () => {
                   backgroundColor: 'transparent',
                 },
                 '&::-webkit-scrollbar-button': {
-                  display: 'none', // Hide scrollbar arrows
+                  display: 'none', 
                 },
                 '&:hover::-webkit-scrollbar-thumb': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)', 
                 },
                 '&:hover': {
                   scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+                  scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', 
                 },
             }}
         >
@@ -370,19 +464,30 @@ const AllPosts = () => {
               padding="0px"
             >
               <div className="posts-container">
-                {allPosts.map((post, index) => (
-                  <Posts
-                    key={index}
-                    post={post}
-                    userId={userId}
-                    onLike={handleLike}
-                    onDislike={handleDislike}
-                    deletePost={handleDeletePost}
-                    savePost={savePost}
-                    editPost={editPost}
-                    admin={false}
-                  />
-                ))}
+                {allPosts.length === 0 ? (
+                  <Box
+                    textAlign="center"
+                    fontSize="lg"
+                    fontWeight="bold"
+                    mt={10}
+                  >
+                    No posts available
+                  </Box>
+                ) : (
+                  allPosts.map((post, index) => (
+                    <Posts
+                      key={index}
+                      post={post}
+                      userId={userId}
+                      onLike={handleLike}
+                      onDislike={handleDislike}
+                      deletePost={handleDeletePost}
+                      savePost={savePost}
+                      editPost={editPost}
+                      admin={false}
+                    />
+                  ))
+                )}
               </div>
             </Flex>
           </Flex>

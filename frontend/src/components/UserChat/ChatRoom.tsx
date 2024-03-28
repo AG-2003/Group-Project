@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { db, auth } from '../../firebase-config';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, Timestamp, getDoc, doc } from 'firebase/firestore';
-// import { AuthContext } from '../../context/AuthContext';
 import { Box, VStack, Input, Button, Flex, Heading, Text, Image } from '@chakra-ui/react';
-import { formatDistanceToNow } from 'date-fns';
 import MessageItem from './MessageItem';
 import chatBG from '../../assets/chatBG.png'
+import { Spinner } from '@chakra-ui/react';
+
 
 
 interface Message {
@@ -25,6 +25,9 @@ const ChatRoom: React.FC = () => {
     const { chatId } = useParams<{ chatId: string }>();
     const [otherUserName, setOtherUserName] = useState('');
     const [otherUserPhoto, setOtherUserPhoto] = useState('');
+    const [otherUserEmail, setOtherUserEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
     const currentUser = auth.currentUser;
 
     useEffect(() => {
@@ -56,7 +59,8 @@ const ChatRoom: React.FC = () => {
     }, [chatId]);
 
     useEffect(() => {
-        const getOtherUserName = async () => {
+        const getOtherUserNameAndPhoto = async () => {
+            setIsLoading(true);
             if (!chatId || !currentUser) return;
 
             const chatRef = doc(db, 'chats', chatId);
@@ -64,19 +68,21 @@ const ChatRoom: React.FC = () => {
 
             if (chatSnap.exists()) {
                 const participants: string[] = chatSnap.data().participants;
-                const otherUserEmail = participants.find(email => email !== currentUser.email);
 
-                if (otherUserEmail) {
-                    const userRef = doc(db, 'users', otherUserEmail);
+                const foundOtherUserEmail = participants.find(email => email !== currentUser.email);
+
+                if (foundOtherUserEmail) {
+                    setOtherUserEmail(foundOtherUserEmail);
+
+                    const userRef = doc(db, 'users', foundOtherUserEmail);
                     const userSnap = await getDoc(userRef);
 
                     if (userSnap.exists()) {
-                        // Assuming the user document has a field 'username' that holds their username
                         const otherUserName = userSnap.data().displayName;
                         const otherUserPhotoURL = userSnap.data().photoURL;
                         setOtherUserName(otherUserName);
-                        setOtherUserPhoto(otherUserPhotoURL);
-
+                        setOtherUserPhoto(otherUserPhotoURL || chatBG);
+                        setIsLoading(false);
                     } else {
                         console.log('No such user found!');
                     }
@@ -88,8 +94,8 @@ const ChatRoom: React.FC = () => {
             }
         };
 
-        getOtherUserName();
-    }, [currentUser, chatId]);
+        getOtherUserNameAndPhoto();
+    }, [chatId, currentUser]);
 
 
 
@@ -118,6 +124,13 @@ const ChatRoom: React.FC = () => {
     };
 
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
 
 
@@ -129,14 +142,19 @@ const ChatRoom: React.FC = () => {
                 alignItems='center'
                 p={3}
                 bg="purple.200"
-                // bgOpacity="0.85"
                 boxShadow="md"
                 borderTopRadius='lg'
             >
-                <Image src={otherUserPhoto ?? chatBG} alt='photo' boxSize={10} borderRadius={50} />
-                <Text fontSize="xl" fontWeight={500} color="black" ml={3}>
-                    {otherUserName || 'Fetching user...'}
-                </Text>
+                {isLoading ? (
+                    <Spinner color='purple.500' />
+                ) : (
+                    <>
+                        <Image src={otherUserPhoto ?? chatBG} alt='photo' boxSize={10} borderRadius={50} />
+                        <Text fontSize="xl" fontWeight={500} color="black" ml={3}>
+                            {otherUserName || otherUserEmail?.split('@')[0] || 'unable to fetch user'}
+                        </Text>
+                    </>
+                )}
             </Flex>
             <VStack spacing={4} align="stretch" height='full' overflow='auto'>
                 <VStack
@@ -162,6 +180,7 @@ const ChatRoom: React.FC = () => {
                             senderPhotoURL={message.senderPhotoURL}
                         />
                     ))}
+                    <div ref={messagesEndRef} />
 
                 </VStack>
                 <Box as="form" onSubmit={sendMessage} display="flex" mt={3}>

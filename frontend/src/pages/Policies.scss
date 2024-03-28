@@ -1,86 +1,76 @@
- 
-
 .policyContainer {
-    padding: 20px;
-    max-width: 800px;
-    margin: 40px auto;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; // A more readable font
-    color: #333;
-    transition: background-color 0.3s ease, transform 0.3s ease; // Smooth transition for background color and transform
+  padding: 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  min-height: 200px; // Minimum height for all containers
+
+  &:hover {
+    background-color: darken(#fefcff, 2%);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  h1 {
+    cursor: pointer;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: #484c6c;
+    transition: color 0.3s ease; // Transition for the color
 
     &:hover {
-        background-color: darken(#fefcff, 2%); // Slightly darker on hover
-        transform: translateY(-3px); // Moves up slightly on hover
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); // Enhanced shadow on hover for a "lifting" effect
-        h1{
-        border-bottom: 1px solid darken(#fefcff, 10%);
-        }
-
-      }
-    
-  
-    h1 {
-        cursor: pointer;
-      border-bottom: 1px solid #eaeaea;
-      padding-top: 10px;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      font-size: 2rem; // Larger font size for the title
-      color: #484c6c; // A color that might match your app theme
-
-      &:hover {
-        color: darken(#484c6c, 10%); // Darken the title color on hover
-
-
-      }
+      color: darken(#484c6c, 10%);
     }
+  }
 
-     h1.minimized {
-    border-bottom: none; // This will remove the border when the content is minimized
+  h1.minimized {
     margin-bottom: 0;
   }
-  
-    .content {
-      line-height: 1.8; // Slightly increased line height for readability
-      padding: 0 15px; // Padding to prevent text from touching the edges
-      transition: max-height 0.3s ease-in-out; // Add a transition effect if desired
 
-  
-      p {
-        margin-bottom: 20px; // Increase space between paragraphs
-        text-indent: 20px; // Indent paragraphs to define separation
-        font-size: 1.4rem; // Ensure the font size is legible
-        color: #333;
-      }
-  
-      .subtitle {
-        font-size: 1.5rem;
-        color: #5e3a8b; // Subdued color for subtitles
-      }
-  
-      ul {
-        margin-left: 20px; // Indent for unordered lists
-        list-style: outside; // Use the default bullet style
-      }
-  
-      li {
-        margin-bottom: 10px; // Space between list items
-      }
-  
-      b, strong {
-        font-weight: bold; // Ensure bold text is rendered bold
-      }
-  
-      a {
-        color: #0066cc; // Hyperlink color
-        text-decoration: none; // No underline
-        &:hover {
-          text-decoration: underline; // Underline on hover for links
-        }
+  .content {
+    line-height: 1.8;
+    padding: 0 15px;
+    max-height: 150px; // Fixed max-height
+    overflow-y: auto; // Scrollbar if content overflows
+    transition: max-height 0.3s ease-in-out;
+
+    p {
+      margin-bottom: 20px;
+      text-indent: 20px;
+      font-size: 1.4rem;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #5e3a8b;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    b,
+    strong {
+      font-weight: bold;
+    }
+
+    a {
+      color: #0066cc;
+
+      &:hover {
+        text-decoration: underline;
       }
     }
   }
-  
+}

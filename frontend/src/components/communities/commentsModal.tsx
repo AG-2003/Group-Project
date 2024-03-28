@@ -24,6 +24,8 @@ import {
   ModalFooter,
   Text,
   Textarea,
+  ModalCloseButton,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
 import { BiMessageSquareAdd } from "react-icons/bi";
@@ -287,24 +289,32 @@ const CommentModal: React.FC<Props> = ({
       </>
     );
   };
+  const modalBg = useColorModeValue('purple.50', 'gray.700');
+  const buttonBg = useColorModeValue('gray.200', 'gray.600');
+
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
       <ModalOverlay />
-      <ModalContent>
-        <ModalBody maxHeight="60vh" overflowY="auto">
+      <ModalContent bg={modalBg} >
+        <ModalBody maxHeight="60vh" overflowY="auto" bgColor='#a786db'  >
           {renderModalContent()}
         </ModalBody>
-        <ModalFooter position="sticky" bottom="0" bg="white" zIndex="sticky">
+        {/* #f4f1fa */}
+        <ModalFooter position="sticky" bottom="0" bg="white" zIndex="sticky" bgColor='#a786db' border='1px' borderColor='purple.100' >
           <Flex alignItems="center" justify="space-between" width="100%">
             <Textarea
               placeholder="Write a comment..."
               value={commentDescription}
               onChange={handleCommentDescriptionChange}
               disabled={!commentsEnabled}
+              bg="#b89ce6"
             />
             <Button
-              colorScheme="blue"
+              bgColor='#b89ce6'
+              color='black'
+              ml={2}
+              colorScheme="purple"
               leftIcon={<BiMessageSquareAdd />}
               onClick={SaveNClose}
             >
