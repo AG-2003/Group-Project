@@ -1,8 +1,6 @@
 import { Button, Spacer, VStack, useDisclosure } from "@chakra-ui/react";
 import {
   IoVideocamOutline,
-  IoBarChartOutline,
-  IoShareOutline,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { Message } from "../../interfaces/Message";
@@ -16,7 +14,6 @@ interface Props {
 const SideBar = ({ onNavigate }: Props) => {
   const navigate = useNavigate(); // Hook for navigation
   const [user] = useAuthState(auth);
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   function randomID(len: number) {
     let result = "";
@@ -79,14 +76,6 @@ const SideBar = ({ onNavigate }: Props) => {
         onClick={handleStartCall}
       >
         Video Call
-      </Button>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        leftIcon={<IoShareOutline />}
-        onClick={onOpen}
-      >
-        Share
       </Button>
 
       <Spacer /> {/* This will push your go back button to the bottom */}
