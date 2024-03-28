@@ -608,6 +608,7 @@ const Account = () => {
   const [loadingUserType, setLoadingUserType] = useState<boolean>(true);
   const [loadingUserVisibility, setLoadingUserVisibility] = useState<boolean>(true);
   const [userVisibility, setUserVisibility] = useState<boolean>(true);  // true means public and false private.
+  const [userName, setUserName] = useState<string>();
 
   const showToast = UseToastNotification();
 
@@ -813,6 +814,22 @@ const Account = () => {
     navigate(-1); // Go back to previous page
   };
 
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (auth.currentUser?.email) {
+        const userEmail = auth.currentUser.email;
+        const userDocRef = doc(db, 'users', userEmail);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data()) {
+          const userData = userDoc.data();
+          setUserName(userData.displayName);
+        }
+      }
+    }
+
+    fetchUserName();
+  }, [])
+
 
 
 
@@ -822,12 +839,12 @@ const Account = () => {
       <div className="head">
         <Heading>Your Account</Heading>
         <Button
-        size="sm"
-        leftIcon={<ArrowBackIcon />}
-        onClick={goBack}
-      >
-        Go back
-      </Button>
+          size="sm"
+          leftIcon={<ArrowBackIcon />}
+          onClick={goBack}
+        >
+          Go back
+        </Button>
       </div>
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="" />
 
@@ -869,9 +886,7 @@ const Account = () => {
           <EditableTextField
             b1="Edit"
             initialValue={
-              auth.currentUser?.displayName
-                ? auth.currentUser.displayName
-                : "click on edit to set username"
+              userName ? userName : "click on edit to set username"
             }
             onSave={handleUsernameSave}
           />
