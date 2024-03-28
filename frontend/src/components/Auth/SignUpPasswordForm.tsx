@@ -50,7 +50,7 @@ export function SignUpPasswordForm() {
         await setDoc(userRef, {
           email: user?.email,
           emailVerified: user?.emailVerified,
-          displayName: user.displayName,
+          displayName: user?.email?.split('@')[0] || user?.displayName,
           desc: null,
           userType: "",
           userTheme: "light",
