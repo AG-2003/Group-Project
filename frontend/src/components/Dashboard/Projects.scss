@@ -141,7 +141,7 @@
   // top: 100px;
   margin: 2rem;
   width: auto; // Maintain aspect ratio
-  max-width: 100%; // This ensures that the image is never wider than its container
+  max-width: 20%; // This ensures that the image is never wider than its container
   height: auto; // This ensures that the height scales proportionally with the width
   object-fit: contain; // This tells the browser to display the image as large as possible within its container, without cropping or stretching it
 }

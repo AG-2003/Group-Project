@@ -102,10 +102,15 @@ const Profile: React.FC = () => {
 
 
   useEffect(() => {
+    const checkScreenSize = () => {
     // Check screen width or user agent to determine if it's desktop or mobile
     const screenWidth = window.innerWidth;
     setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
-  }, []);
+    };
+    window.addEventListener("resize", checkScreenSize);
+    checkScreenSize();
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, [isDesktop]);
 
 
   //@daawar TODO: this can be used

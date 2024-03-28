@@ -12,10 +12,15 @@ const Communities = () => {
   const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
 
   useEffect(() => {
+    const checkScreenSize = () => {
     // Check screen width or user agent to determine if it's desktop or mobile
     const screenWidth = window.innerWidth;
     setIsDesktop(screenWidth > 768); // Adjust the breakpoint as needed
-  }, []);
+    };
+    window.addEventListener("resize", checkScreenSize);
+    checkScreenSize();
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, [isDesktop]);
 
   const sidebarVariants = {
     open: { width: "200px" },
