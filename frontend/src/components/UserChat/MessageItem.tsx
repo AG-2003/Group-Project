@@ -6,6 +6,8 @@ import { Timestamp } from 'firebase/firestore';
 import { MessageItemProps } from '../../interfaces/MessageItemProps';
 import { Image } from '@chakra-ui/react'
 import Linkify from 'react-linkify';
+import chatBG from '../../assets/chatBG.png';
+
 
 const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, currentUserId, senderPhotoURL }) => {
     const isCurrentUser = senderId === currentUserId;
@@ -30,12 +32,18 @@ const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, cu
         <Image
             borderRadius='full'
             boxSize='20px'
-            src={senderPhotoURL}
-            alt={senderId}
+            src={senderPhotoURL ?? chatBG}
+            alt={senderId || 'chat background'}
             mr={isCurrentUser ? 0 : 2}
             ml={isCurrentUser ? 2 : 0}
         />
     );
+
+    const handleLinkClick = (event: any) => {
+        event.preventDefault();
+        const href = event.target.href;
+        window.open(href, '_blank');
+    };
 
 
     return (
@@ -43,7 +51,14 @@ const MessageItem: React.FC<MessageItemProps> = ({ text, senderId, createdAt, cu
         <HStack alignSelf={align} bg={bg} p={3} my={2} mx={1} borderRadius={borderRadius} maxWidth="40%">
             {!isCurrentUser && imageElement}
             <VStack align={isCurrentUser ? 'end' : 'start'} spacing={1}>
-                <Text fontSize="lg" textAlign='center'>{text}</Text>
+                <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
+                    <a href={decoratedHref} key={key} onClick={handleLinkClick} target="_blank" rel="noopener noreferrer">
+                        {decoratedText}
+                    </a>
+                )}>
+                    <Text>{text}</Text>
+                </Linkify>
+                {/* <Text fontSize="lg" textAlign='center'>{text}</Text> */}
                 {createdAt && (
                     <Text fontSize="xs" color="gray.500">
                         {formatDistanceToNow(createdAt, { addSuffix: true })}

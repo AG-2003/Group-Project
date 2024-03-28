@@ -29,7 +29,7 @@ import "./Profile.scss"; // Make sure this path is correct
 import Navbar from "./Navbar";
 import { AnimatePresence, motion } from "framer-motion";
 import SideBar from "./sidebar";
-import { doc, getDoc, getDocsFromCache } from "firebase/firestore";
+import { doc, getDoc, getDocsFromCache, setDoc } from "firebase/firestore";
 import { Link as ReactRouterLink } from "react-router-dom";
 import { Link as ChakraLink, LinkProps } from "@chakra-ui/react";
 import { SuiteData } from "../../interfaces/SuiteData";
@@ -89,7 +89,7 @@ const Profile: React.FC = () => {
   // State to track whether the sidebar was manually closed by the user
   const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
   const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(true);
-
+  const [userName, setUserName] = useState<string>();
   const [user] = useAuthState(auth);
   const [totalNoOfProjects, setTotalNoOfProjects] = useState<number>(0);
   const [totalNoOfAwards, setTotalNoOfAwards] = useState<number>(0);
@@ -97,6 +97,9 @@ const Profile: React.FC = () => {
   const [lastAccessedProjects, setLastAccessedProjects] = useState<SuiteData[]>([]);
   const [todaysEvents, setTodaysEvents] = useState<EventType[]>();
   const [isDesktop, setIsDesktop] = useState(true);
+  const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -297,7 +300,7 @@ const Profile: React.FC = () => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
         const comms: [] = userData.communities;
-        if(comms && comms.length){
+        if (comms && comms.length) {
           setTotalNoOfCommunities(comms.length);
         } else {
           setTotalNoOfCommunities(0)
@@ -386,98 +389,130 @@ const Profile: React.FC = () => {
       </Tr>
     ));
   };
+  useEffect(() => {
+    setIsLoading(true);
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        const displayName = user.displayName || '';
+        if (displayName) {
+          setUserName(displayName);
+          setIsFirstTime(false);
+          setIsLoading(false);
+        } else {
+          if (!user.email) return;
+          const userEmail = user.email;
+          const userDocRef = doc(db, 'users', userEmail);
+          getDoc(userDocRef).then(userDoc => {
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              setUserName(userData.displayName);
+              setIsFirstTime(userData.isFirstTime === 'true');
+              setIsLoading(false);
+            }
+          }).catch(() => setIsLoading(false));
+        }
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+
+
 
 
 
   return (
-    <div style={{ position: "fixed", width: "100%"}}>
+    <div style={{ position: "fixed", width: "100%" }}>
       <Navbar onToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Divider borderColor="lightgrey" borderWidth="1px" maxW="98.5vw" />
       <Box display="flex" height="calc(100vh - 10px)" position="relative">
-      {!isDesktop && (
-        <AnimatePresence>
-          {isSidebarOpen ? (
-            <motion.div
-              initial="open"
-              animate="open"
-              exit="closed"
-              variants={sidebarVariantsMobile}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f4f1fa",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-                position: "absolute",
-                zIndex: "2",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          ) : (
-            <motion.div
-              initial="closed"
-              animate="clsoed"
-              exit="open"
-              variants={sidebarVariantsMobile}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f6f6f6",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-                position: "absolute",
-                zIndex: "2",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
-      {isDesktop && (
-        <AnimatePresence>
-          {isSidebarOpen ? (
-            <motion.div
-              initial="open"
-              animate="open"
-              exit="closed"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f4f1fa",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-                flexShrink: "0",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          ) : (
-            <motion.div
-              initial="closed"
-              animate="clsoed"
-              exit="open"
-              variants={sidebarVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: "10px",
-                height: "inherit",
-                backgroundColor: "#f6f6f6",
-                boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-                overflow: "hidden",
-                flexShrink: "0",
-              }}
-            >
-              <SideBar />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
+        {!isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f4f1fa",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="clsoed"
+                exit="open"
+                variants={sidebarVariantsMobile}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  position: "absolute",
+                  zIndex: "2",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+        {isDesktop && (
+          <AnimatePresence>
+            {isSidebarOpen ? (
+              <motion.div
+                initial="open"
+                animate="open"
+                exit="closed"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f4f1fa",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  flexShrink: "0",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial="closed"
+                animate="clsoed"
+                exit="open"
+                variants={sidebarVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                  paddingTop: "10px",
+                  height: "inherit",
+                  backgroundColor: "#f6f6f6",
+                  boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
+                  flexShrink: "0",
+                }}
+              >
+                <SideBar />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
         <Box width="full" m={4} overflowY='auto' position="relative" zIndex='1'>
           {/* User Info Box */}{" "}
           {/* <Heading size="sm" mb={3} p={4} pl={4}>
@@ -509,17 +544,21 @@ const Profile: React.FC = () => {
                 mb={4}
               />
               <VStack spacing={2} align="stretch">
-                <ChakraLink
-                  fontWeight="bold"
-                  fontSize='x-large'
-                  as={ReactRouterLink}
-                  to="/settings"
-                  className="profile-name"
-                >
-                  {userProfile.displayName ||
-                    auth.currentUser?.displayName ||
-                    "Set username here"}
-                </ChakraLink>
+                {isLoading ? (
+                  <Spinner />
+                ) : userName ? (
+                  <ChakraLink
+                    fontWeight="bold"
+                    fontSize='x-large'
+                    as={ReactRouterLink}
+                    to="/settings"
+                    className="profile-name"
+                  >
+                    {isFirstTime ? `Welcome, ${userName}!` : `Welcome back, ${userName}!`}
+                  </ChakraLink>
+                ) : (
+                  <Text>Welcome!</Text> // Default message or handle as needed
+                )}
                 <ChakraLink
                   fontWeight="semibold"
                   fontSize="md"
@@ -715,7 +754,7 @@ const Profile: React.FC = () => {
                 shadow="xl"
                 borderWidth="1px"
                 borderRadius="2xl"
-                mb={8}
+                mb={12}
                 m={4}
                 width="full"
                 height="auto"
@@ -739,11 +778,12 @@ const Profile: React.FC = () => {
                     <Tbody>{renderEventRows(todaysEvents)}</Tbody>
                   </Table>
                 ) : (
-                  <Text textAlign="center" mt={4}>
+                  <Text textAlign="center" m={4}>
                     No events for today.
                   </Text>
                 )}
               </Box>
+              <Box h={100} />
 
             </Flex>
           </Flex>

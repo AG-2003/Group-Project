@@ -50,13 +50,14 @@ export function SignUpPasswordForm() {
         await setDoc(userRef, {
           email: user?.email,
           emailVerified: user?.emailVerified,
-          displayName: user.displayName,
+          displayName: user?.email?.split('@')[0] || user?.displayName,
           desc: null,
           userType: "",
           userTheme: "light",
           photoURL: user.photoURL,
           sheets: [],
-          Badges: initialBadges
+          Badges: initialBadges,
+          isFirstTime: 'true'
         } as DocumentData);
         showToast('success', `you have successfully created an account`)
         setTimeout(() => { navigate("/index") }, 1000)

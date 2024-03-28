@@ -1,13 +1,25 @@
-import { Button, Spacer, VStack, useDisclosure, Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    Input,} from "@chakra-ui/react";
+import {
+  Button,
+  Spacer,
+  VStack,
+  useDisclosure,
+  PopoverHeader,
+  PopoverBody,
+  UnorderedList,
+  ListItem,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverFooter,
+  PopoverCloseButton,
+  InputGroup,
+  Input,
+  InputRightElement,
+  IconButton
+} from "@chakra-ui/react";
 import {
   IoVideocamOutline,
-  IoBarChartOutline,
   IoShareOutline,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +27,7 @@ import { Message } from "../../interfaces/Message";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase-config";
 import { serverTimestamp } from "firebase/firestore";
+import { CopyIcon } from "@chakra-ui/icons";
 
 interface Props {
   onNavigate: (arg: string) => void;
@@ -22,11 +35,7 @@ interface Props {
 const SideBar = ({ onNavigate }: Props) => {
   const navigate = useNavigate(); // Hook for navigation
   const [user] = useAuthState(auth);
-  const {
-    isOpen: isShareModalOpen,
-    onOpen: onShareModalOpen,
-    onClose: onShareModalClose,
-  } = useDisclosure();
+  const { isOpen: isPopoverOpen, onOpen: onOpenPopover, onClose: onClosePopover } = useDisclosure();
 
   function randomID(len: number) {
     let result = "";
@@ -79,7 +88,7 @@ const SideBar = ({ onNavigate }: Props) => {
     navigator.clipboard.writeText(getShareableLink()).then(() => {
       // You can add a notification or feedback to the user here
       console.log("Copied to clipboard");
-      onShareModalClose()
+      onClosePopover()
     }).catch(err => {
       console.error('Failed to copy: ', err);
     });
@@ -104,36 +113,55 @@ const SideBar = ({ onNavigate }: Props) => {
         >
           Video Call
         </Button>
-        <Button
-          variant="ghost"
-          justifyContent="flex-start"
-          leftIcon={<IoShareOutline />}
-          onClick={onShareModalOpen}
-        >
-          Share
-        </Button>
+        <Popover isOpen={isPopoverOpen} onClose={onClosePopover}>
+        <PopoverTrigger>
+            <Button
+              variant="ghost"
+              justifyContent="flex-start"
+              leftIcon={<IoShareOutline />}
+              onClick={onOpenPopover}
+            >
+              Share
+            </Button>
+        </PopoverTrigger>
+        <PopoverContent>
+            <PopoverArrow />
+            <PopoverCloseButton />
+            <PopoverHeader>Please note:</PopoverHeader>
+            <PopoverBody>
+              <UnorderedList spacing={2}>
+                <ListItem>This document's shareable link grants access to anyone in possession of it. Handle with care.</ListItem>
+                <ListItem>To ensure no loss of content, the document's owner MUST manually paste this link before the document's shareable link is distributed.</ListItem>
+              </UnorderedList>
+              <InputGroup size="md" mt={4} >
+                <Input
+                    pr="4.5rem"
+                    value={getShareableLink()}
+                    _hover={{cursor: 'pointer' }}
+                    fontFamily="mono"
+                    bgColor={"#f0f4f4"}
+                    onClick={copyToClipboard}
+                    isReadOnly
+                  />
+                <InputRightElement width="4.5rem">
+                  <IconButton
+                      aria-label="Copy link"
+                      icon={<CopyIcon />}
+                      variant="ghost"
+                      onClick={copyToClipboard}
+                    />
+                </InputRightElement>
+              </InputGroup>
+            </PopoverBody>
+            <PopoverFooter>
+            <Button colorScheme="purple" mr={3} onClick={copyToClipboard} _hover={{ bgColor: "purple.600" }} w="100%">
+                Copy Link
+              </Button>
+            </PopoverFooter>
+        </PopoverContent>
+        </Popover>
         <Spacer /> {/* This will push your go back button to the bottom */}
       </VStack>
-      <Modal isOpen={isShareModalOpen} onClose={onShareModalClose} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Share this WhiteBoard</ModalHeader>
-          <ModalBody>
-            <p>
-              Anyone who has the following link will have access to the board.
-            </p>
-            <Input value={getShareableLink()} isReadOnly my={4} />
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="purple" mr={3} onClick={copyToClipboard}>
-              Copy Link
-            </Button>
-            <Button variant="ghost" onClick={onShareModalClose}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </>
   );
 };

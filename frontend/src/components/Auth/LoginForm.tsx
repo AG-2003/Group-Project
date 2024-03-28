@@ -74,7 +74,8 @@ export function LoginForm() {
           userTheme: "light",
           photoURL: user.photoURL,
           sheets: [],
-          Badges: allBadges
+          Badges: allBadges,
+          isFirstTime: true
         } as DocumentData);
       }
       // If the document exists, the user is already in the database, so you can proceed with the login

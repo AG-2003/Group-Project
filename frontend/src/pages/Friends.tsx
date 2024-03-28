@@ -15,7 +15,9 @@ import cardBg2 from '../assets/carbBg2.png'
 import { HamburgerIcon } from "@chakra-ui/icons"; // might replace icon with 3 dot thingy 
 import { useReceivedRequests } from "../context/RecievedRequestsContext";
 import { useNavigate } from "react-router-dom";
-import { getOrCreateChatId } from "../chatService";
+import { getOrCreateChatId } from "../utils/chatService";
+import { FiMessageSquare } from 'react-icons/fi';
+
 
 
 
@@ -25,7 +27,6 @@ interface User {
     username?: string;
     email?: string
     userVisibility?: 'public' | 'private';
-    // add other properties as needed
 }
 
 
@@ -56,24 +57,24 @@ export const Friends: React.FC = () => {
     useEffect(() => {
         // Function to automatically check the sidebar status on window resize
         const checkSidebar = () => {
-          const mobileBreakpoint = 768;
-          // Close the sidebar if window size is less than the breakpoint and it was not manually closed
-          if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
-            setIsSidebarOpen(false);
-          } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
-            // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
-            setIsSidebarOpen(true);
-          }
+            const mobileBreakpoint = 768;
+            // Close the sidebar if window size is less than the breakpoint and it was not manually closed
+            if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
+                setIsSidebarOpen(false);
+            } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
+                // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
+                setIsSidebarOpen(true);
+            }
         };
         // Set up the event listener
         window.addEventListener("resize", checkSidebar);
-    
+
         // Check the initial size of the window
         checkSidebar();
-    
+
         // Clean up the event listener when the component unmounts
         return () => window.removeEventListener("resize", checkSidebar);
-      }, [wasManuallyClosed]);
+    }, [wasManuallyClosed]);
 
 
     // State for managing modal visibility and the current selected friend
@@ -574,38 +575,37 @@ export const Friends: React.FC = () => {
                                             {friends.map((friendEmail) => (
                                                 <Flex key={friendEmail} justifyContent="space-between" alignItems="center" p="4" bg="white" borderRadius="md" shadow="base" bgImage={cardBg2}>
                                                     <Text>{friendEmail}</Text>
-                                                    <Menu placement="bottom-start" gutter={4} strategy="fixed">
-                                                        <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
-                                                        <MenuList bg={menuBg} zIndex={10} minW="240px">
-                                                            <MenuItem
-                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => removeFriend(friendEmail)}
-                                                            >
-                                                                Remove Friend
-                                                            </MenuItem>
-                                                            <MenuItem
-                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                onClick={() => startChat(friendEmail)}
-                                                            >
-                                                                Chat
-                                                            </MenuItem>
-                                                            {favorites.includes(friendEmail) ? (
+                                                    <Box >
+                                                        <IconButton aria-label="chaticon" variant='none' icon={<FiMessageSquare />} onClick={(() => { startChat(friendEmail) })} />
+                                                        <Menu placement="bottom-start" gutter={4} strategy="fixed">
+                                                            <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
+                                                            <MenuList bg={menuBg} zIndex={10} minW="240px">
                                                                 <MenuItem
                                                                     _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                    onClick={() => handleRemoveFavorite(friendEmail)}
+                                                                    onClick={() => removeFriend(friendEmail)}
                                                                 >
-                                                                    Remove from Favorites
+                                                                    Remove Friend
                                                                 </MenuItem>
-                                                            ) : (
-                                                                <MenuItem
-                                                                    _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                    onClick={() => handleAddFavorite(friendEmail)}
-                                                                >
-                                                                    Add to Favorites
-                                                                </MenuItem>
-                                                            )}
-                                                        </MenuList>
-                                                    </Menu>
+
+                                                                {favorites.includes(friendEmail) ? (
+                                                                    <MenuItem
+                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                        onClick={() => handleRemoveFavorite(friendEmail)}
+                                                                    >
+                                                                        Remove from Favorites
+                                                                    </MenuItem>
+                                                                ) : (
+                                                                    <MenuItem
+                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                        onClick={() => handleAddFavorite(friendEmail)}
+                                                                    >
+                                                                        Add to Favorites
+                                                                    </MenuItem>
+                                                                )}
+                                                            </MenuList>
+                                                        </Menu>
+                                                    </Box>
+
                                                 </Flex>
                                             ))}
                                         </VStack>
@@ -623,44 +623,36 @@ export const Friends: React.FC = () => {
                                                     .map((friendEmail) => (
                                                         <Flex key={friendEmail} justifyContent="space-between" alignItems="center" p="4" bg="white" borderRadius="md" shadow="base" bgImage={cardBg2}>
                                                             <Text>{friendEmail}</Text>
-                                                            <Menu placement="bottom-start" gutter={4} strategy="fixed">
-                                                                <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
-                                                                <MenuList bg={menuBg} zIndex={10} minW="240px">
-                                                                    <MenuItem
-                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                        onClick={() => removeFriend(friendEmail)}
-                                                                    >
-                                                                        Remove Friend
-                                                                    </MenuItem>
-                                                                    <MenuItem
-                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                        onClick={() => console.log("View Profile")}
-                                                                    >
-                                                                        View User Profile
-                                                                    </MenuItem>
-                                                                    <MenuItem
-                                                                        _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                        onClick={() => console.log("Chat")}
-                                                                    >
-                                                                        Chat
-                                                                    </MenuItem>
-                                                                    {favorites.includes(friendEmail) ? (
+                                                            <Box>
+                                                                <IconButton aria-label="chaticon" variant='none' icon={<FiMessageSquare />} onClick={(() => { startChat(friendEmail) })} />
+                                                                <Menu placement="bottom-start" gutter={4} strategy="fixed">
+                                                                    <MenuButton as={IconButton} icon={<HamburgerIcon />} variant='none' />
+                                                                    <MenuList bg={menuBg} zIndex={10} minW="240px">
                                                                         <MenuItem
                                                                             _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                            onClick={() => handleRemoveFavorite(friendEmail)} // Implement this function similar to handleAddFavorite
+                                                                            onClick={() => removeFriend(friendEmail)}
                                                                         >
-                                                                            Remove from Favorites
+                                                                            Remove Friend
                                                                         </MenuItem>
-                                                                    ) : (
-                                                                        <MenuItem
-                                                                            _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
-                                                                            onClick={() => handleAddFavorite(friendEmail)}
-                                                                        >
-                                                                            Add to Favorites
-                                                                        </MenuItem>
-                                                                    )}
-                                                                </MenuList>
-                                                            </Menu>
+                                                                        {favorites.includes(friendEmail) ? (
+                                                                            <MenuItem
+                                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                                onClick={() => handleRemoveFavorite(friendEmail)} // Implement this function similar to handleAddFavorite
+                                                                            >
+                                                                                Remove from Favorites
+                                                                            </MenuItem>
+                                                                        ) : (
+                                                                            <MenuItem
+                                                                                _hover={{ bg: menuItemHoverBg, color: menuItemHoverColor }}
+                                                                                onClick={() => handleAddFavorite(friendEmail)}
+                                                                            >
+                                                                                Add to Favorites
+                                                                            </MenuItem>
+                                                                        )}
+                                                                    </MenuList>
+                                                                </Menu>
+                                                            </Box>
+
                                                         </Flex>
                                                     ))
                                                 }

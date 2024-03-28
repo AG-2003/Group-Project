@@ -3,10 +3,10 @@ import { db } from '../firebase-config';
 import { collection, query, where, onSnapshot, addDoc } from 'firebase/firestore';
 
 export const useChat = (currentChatId: string | null) => {
-    const [chats, setChats] = useState<any[]>([]); // Define a more specific type for chats
+    const [chats, setChats] = useState<any[]>([]); 
 
     useEffect(() => {
-        // Example: Fetching chats. Adjust based on your app's requirements
+        
         const fetchChats = async () => {
             const q = query(collection(db, 'chats'));
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -23,8 +23,8 @@ export const useChat = (currentChatId: string | null) => {
         fetchChats();
     }, []);
 
-    const addChat = async (chat: any) => { // Define parameters more specifically
-        // Example: Adding a new chat document to Firestore
+    const addChat = async (chat: any) => { 
+        
         await addDoc(collection(db, 'chats'), chat);
     };
 

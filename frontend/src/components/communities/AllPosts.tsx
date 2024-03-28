@@ -445,14 +445,14 @@ const AllPosts = () => {
                   backgroundColor: 'transparent',
                 },
                 '&::-webkit-scrollbar-button': {
-                  display: 'none', // Hide scrollbar arrows
+                  display: 'none', 
                 },
                 '&:hover::-webkit-scrollbar-thumb': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Change this to the color you want
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)', 
                 },
                 '&:hover': {
                   scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', // Change this to the color you want
+                  scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent', 
                 },
             }}
         >
