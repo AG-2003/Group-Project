@@ -85,7 +85,29 @@ const AllPosts = () => {
   }, []);
 
   useEffect(() => {
-    const fetchAllPosts = async () => {
+    // Function to automatically check the sidebar status on window resize
+    const checkSidebar = () => {
+      const mobileBreakpoint = 768;
+      // Close the sidebar if window size is less than the breakpoint and it was not manually closed
+      if (window.innerWidth < mobileBreakpoint && !wasManuallyClosed) {
+        setIsSidebarOpen(false);
+      } else if (window.innerWidth >= mobileBreakpoint && !wasManuallyClosed) {
+        // Reopen the sidebar when window size is above the breakpoint and it was not manually closed
+        setIsSidebarOpen(true);
+      }
+    };
+    // Set up the event listener
+    window.addEventListener("resize", checkSidebar);
+
+    // Check the initial size of the window
+    checkSidebar();
+
+    // Clean up the event listener when the component unmounts
+    return () => window.removeEventListener("resize", checkSidebar);
+  }, [wasManuallyClosed]);
+
+  useEffect(() => {
+    const fetchCommunityPosts = async () => {
       try {
         // Get the communities the user is part of
         const userCommunitiesQuery = query(
@@ -440,14 +462,14 @@ const AllPosts = () => {
               backgroundColor: "transparent",
             },
             "&::-webkit-scrollbar-button": {
-              display: "none", // Hide scrollbar arrows
+              display: "none",
             },
             "&:hover::-webkit-scrollbar-thumb": {
-              backgroundColor: "rgba(0, 0, 0, 0.5)", // Change this to the color you want
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
             },
             "&:hover": {
               scrollbarWidth: "thin",
-              scrollbarColor: "rgba(0, 0, 0, 0.5) transparent", // Change this to the color you want
+              scrollbarColor: "rgba(0, 0, 0, 0.5) transparent",
             },
           }}
         >
