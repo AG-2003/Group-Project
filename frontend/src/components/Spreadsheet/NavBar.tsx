@@ -162,19 +162,6 @@ const NavBar = ({ onToggle, isSidebarOpen, documentTitle, setDocumentTitle }: Pr
             onClick={handleStartCall}
           />
         </Tooltip>
-        <Tooltip
-          label="Share"
-          className="tooltip-label"
-          placement="top"
-          hasArrow
-        >
-          <IconButton
-            className="action-icon share"
-            aria-label="share"
-            icon={<IoShareOutline />}
-            onClick={onOpen}
-          />
-        </Tooltip>
       </div>
     </div >
   );

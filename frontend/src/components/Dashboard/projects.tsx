@@ -429,11 +429,11 @@ const Projects: React.FC = () => {
         )}
         {/* Code is contained in this box */}
         <Box
-         
+
           flexGrow={1}
-         
+
           padding="10px"
-         
+
           marginLeft={5}
           overflowY="auto"
           position="relative"
@@ -529,7 +529,7 @@ const Projects: React.FC = () => {
                           className="ProjImage"
                           src={NoProj}
                           alt="No Projects"
-                          
+
                         />
                       </Box>
                     </>
@@ -631,7 +631,7 @@ const Projects: React.FC = () => {
                   {sharedProjects.length !== 0 && (
                   <h2 className="projects-heading">Shared</h2>
                   )}
-                  <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6}>
+                  <Grid templateColumns="repeat(auto-fit, max(300px))" gap={6} marginBottom="70px">
                     {sharedProjects.map((project) => (
 
                       <GridItem key={project.id} w="100%"  _hover={{transform: "translateY(-1px)", shadow: "lg"}}>
@@ -727,76 +727,6 @@ const Projects: React.FC = () => {
                     ))}
                   </Grid>
                 </div>
-
-              {/* {sharedProjects.length !== 0 &&
-                <div className="projects-container">
-                  <h2 className="projects-heading">Shared</h2>
-                  <div className="projects-list">
-                    {sharedProjects.map((project: SuiteData) => (
-                      <div
-                        key={project.id}
-                        className="project-card"
-                        onClick={() =>
-                          handleSharedCardClick(
-                            project.id,
-                            project.title,
-                            project.type
-                          )
-                        }
-                      >
-                        <div
-                          className="card-top"
-                          style={{
-                            backgroundImage: `url(${getImageForType(
-                              project.type
-                            )})`,
-                          }}
-                        >
-                          <h3 className="project-title">{project.title}</h3>
-                        </div>
-                        <div className="card-bottom">
-                          <p className="last-edited">
-                            Last edited: {formatDate(project.lastEdited)}
-                          </p>
-                          <IconButton
-                            icon={<Icon as={FaTrash} color="#484c6c" />}
-                            size="sm"
-                            aria-label="Delete Project"
-                            className="delete-icon"
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                setSharedProjectToDelete({ id: project.id, type: project.type });
-                                setIsSharedModalOpen(true);
-                            }}
-                            />
-                            <Modal isOpen={isSharedModalOpen} onClose={() => setIsSharedModalOpen(false)}>
-                            <ModalOverlay />
-                            <ModalContent>
-                                <ModalHeader>Confirm Deletion</ModalHeader>
-                                <ModalCloseButton />
-                                <ModalBody>
-                                  Are you sure you want to delete this project? This action cannot be undone.
-                                </ModalBody>
-                                <ModalFooter>
-                                  <Button colorScheme="red" mr={3} onClick={() => {
-                                    if (sharedProjectToDelete) {
-                                      handleSharedTrashIconClick(sharedProjectToDelete.id, sharedProjectToDelete.type,);
-                                    }
-                                    setIsSharedModalOpen(false);
-                                  }}>
-                                    Confirm
-                                  </Button>
-                                  <Button variant="ghost" onClick={() => setIsSharedModalOpen(false)}>
-                                    Cancel
-                                  </Button>
-                                </ModalFooter>
-                            </ModalContent>
-                          </Modal>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>} */}
             </>
           )}
         </Box>
