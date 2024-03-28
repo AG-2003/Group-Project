@@ -89,7 +89,7 @@ const Profile: React.FC = () => {
   // State to track whether the sidebar was manually closed by the user
   const [wasManuallyClosed, setWasManuallyClosed] = useState(false);
   const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(true);
-
+  const [userName, setUserName] = useState<string>();
   const [user] = useAuthState(auth);
   const [totalNoOfProjects, setTotalNoOfProjects] = useState<number>(0);
   const [totalNoOfAwards, setTotalNoOfAwards] = useState<number>(0);
@@ -381,6 +381,22 @@ const Profile: React.FC = () => {
       </Tr>
     ));
   };
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (auth.currentUser?.email) {
+        const userEmail = auth.currentUser.email;
+        const userDocRef = doc(db, 'users', userEmail);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data()) {
+          const userData = userDoc.data();
+          setUserName(userData.displayName);
+        }
+      }
+    }
+
+    fetchUserName();
+  }, [])
+
 
 
 
@@ -511,8 +527,7 @@ const Profile: React.FC = () => {
                   to="/settings"
                   className="profile-name"
                 >
-                  {userProfile.displayName ||
-                    auth.currentUser?.displayName ||
+                  {userName ||
                     "Set username here"}
                 </ChakraLink>
                 <ChakraLink
