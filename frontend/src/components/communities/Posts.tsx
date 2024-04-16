@@ -227,7 +227,7 @@ const Posts = ({
         )}
 
         <Text
-         className="post-description">
+          className="post-description">
           <Linkify>{post.description}</Linkify>
         </Text>
         {/* Like and Dislike buttons */}
@@ -256,9 +256,7 @@ const Posts = ({
             <FaRegThumbsDown color={dislikeClicked ? "red" : "gray"} />
           </Button>
           <Button size="sm" onClick={handleCommentsClick}>
-            <Box as="span" mr="1">
-              <Text as="span">{post.commentsCount || 0}</Text>
-            </Box>
+
             <Box as="span">
               <Text as="span">Comments</Text>
             </Box>
